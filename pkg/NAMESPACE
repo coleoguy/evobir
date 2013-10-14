@@ -1,4 +1,0 @@
-exportPattern("^[[:alpha:]]+")
-export(AnalyzeAssembly, CalcD, CalcPartD, CalcPopD, HetLevels, HighLevelTree, PPSDiscrete, ResSel)
-export(SampleTrees, DriftSim, SelSim, ReplTable, MaxTips, CoalSim)
-

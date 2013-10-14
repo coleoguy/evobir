@@ -9,4 +9,3 @@ Url: http://www.uta.edu/karyodb/evobiR/
 Depends: seqinr, ape, stringr, geiger, taxize
 Description: evobiR is a collection of tools for use in evolutionary biology
 License: GPL (>=2)
-Packaged: 2013-10-14 20:03:33 UTC; hlb7922
