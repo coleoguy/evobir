@@ -11,7 +11,10 @@ but hopefully with time I will keep adding useful functions and speeding up exis
 
 To install the latest version of evobirR run the following lines in your R terminal.
 
+You don't have the package devtools installed yet you will need to do that first:
 install.packages("devtools")
+
+
 library(devtools)
 install_github("evobir", username='coleoguy')
 library(evobiR)
