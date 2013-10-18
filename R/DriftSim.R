@@ -7,7 +7,7 @@ DriftSim <- function(census, initial.freq, iter, generations){
     count0 <- census - count1
     population[1:census] <- c(rep(0, count0), rep(1, count1))
     for(i in 1:generations){
-      population[1:census] <- sample(population, 100, replace = T)
+      population[1:census] <- sample(population, census, replace = T)
       freq[i] <- sum(population == 1) / census
     }
     results[j, ] <- freq
