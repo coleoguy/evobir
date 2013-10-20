@@ -35,7 +35,9 @@ data('mite.tree')
 data('data.taxonomy')
 data('tree.taxonomy')
 
-replacement.table <- ReplTable(tree = mite.tree, data.taxonomy = data.taxonomy, tree.taxonomy = tree.taxonomy, levels=c("Genus", "Family"), verbose=TRUE)
+replacement.table <- ReplTable(tree = mite.tree, data.taxonomy = data.taxonomy, 
+                               tree.taxonomy = tree.taxonomy, levels=c("Genus", "Family"), 
+                               verbose=TRUE)
 new.data <- MaxTips(mite.tree, mite.data, replacement.table)}
 \seealso{ \code{\link{GetTaxonomy}}
 }

@@ -17,5 +17,6 @@ an object of the class "multiPhylo" is returned
 \references{\url{http://www.uta.edu/karyodb/evobiR/}}
 \author{Heath Blackmon}
 \examples{
-SampleTrees(trees = system.file("trees.nex", package = "evobiR"), burnin = .1, final.number = 20, format = 'new', prefix = 'sample')}
+SampleTrees(trees = system.file("trees.nex", package = "evobiR"), 
+            burnin = .1, final.number = 20, format = 'new', prefix = 'sample')}
 \keyword{ phylogenetics }

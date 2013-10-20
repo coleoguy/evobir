@@ -23,7 +23,8 @@ FuzzyMatch(tree, data, max.dist)
 \author{Heath Blackmon and Matt Pennell}
 \examples{
 data(hym.tree)
-names <- c("Pepsis_elegans", "Plagiolepis_alluaudi", "Pheidele_lucreti", "Meliturgula_scriptifronsi", "Andrena_afimbriat")
+names <- c("Pepsis_elegans", "Plagiolepis_alluaudi", "Pheidele_lucreti",
+           "Meliturgula_scriptifronsi", "Andrena_afimbriat")
 FuzzyMatch(tree = hym.tree, data = names, max.dist=3)
 }
 \keyword{phylogenetics}

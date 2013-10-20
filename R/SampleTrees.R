@@ -1,5 +1,4 @@
 SampleTrees<-function(trees, burnin, final.number, format, prefix){           #nexus trees, %eg .25, 500
-  require(ape)
   trees<-read.nexus(trees)
   original.number<-as.numeric(length(trees))                           #NUMBER OF TREES IN ORIGINAL FILE
   post.burnin.trees<-trees[(burnin*original.number):original.number]   #THIS CREATES THE POST BURNIN PORTION

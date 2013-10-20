@@ -6,10 +6,12 @@
 This function is designed to simulate the evolution of a diploid organism with chromosomal sex determination.  It allows for the evolution of sexual antagonism, recombination supression, anneuploidy, haplosufficiency.  }
 \usage{
 GenomeSym(model = "fragileY", generations = 100, census = 50,  gametes = 4,
-loci.a  = 100, loci.s = 50, prob.point.mut = .0010, DFE = (c(rnorm(1000, mean = 0.9, sd = 0.06), rgamma(1000, rate = 2, 
+          loci.a  = 100, loci.s = 50, prob.point.mut = .0010, 
+          DFE = (c(rnorm(1000, mean = 0.9, sd = 0.06), rgamma(1000, rate = 2,
           shape = 0.4))), sex.bias.mut = .85, haplosuff.mut = 1, crossovers = 2, 
-recom.mu = 10, anneuploi.mut = c(0, .0002), distance.mut = c(0, .000002), 
-achiasmat.mut = c(0, .00002), sex.ant = c(.5, .3, .2), fragile.fact = 20, reporting = "None") }
+          recom.mu = 10, anneuploi.mut = c(0, .0002), distance.mut = c(0, .000002),
+          achiasmat.mut = c(0, .00002), sex.ant = c(.5, .3, .2), 
+          fragile.fact = 20, reporting = "None") }
 \arguments{
   \item{model}{ the type of simulation to be run}
   \item{generations}{ integer indicating the number of generations that the simulation should be run}
