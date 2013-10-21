@@ -9,7 +9,7 @@ PPSDiscrete(trees, MCMC, states, N = 2)
 }
 \arguments{
   \item{trees}{an object of class "multiPhylo" or "phylo" containing the trees used in generting the rate estimates}
-  \item{MCMC}{MCMC states bring this will normally be a log file that is brought into R with read.csv the columns for a three state character should be: tree, qAA, qBA, qCA, qAB, qBB, qCB, qAC, qBC, qCC.  If your analysis involves only a single tree then the tree column should be excluded.}
+  \item{MCMC}{this will normally be a log file that is brought into R with read.csv the columns for a three state character should be: tree, qAA, qBA, qCA, qAB, qBB, qCB, qAC, qBC, qCC.  If your analysis involves only a single tree then the tree column should be excluded.}
   \item{states}{a vector of root probabilities}
   \item{N}{the number of PPS datasets desired}
 }
