@@ -15,8 +15,9 @@ ViewEvo(simulation)
 \references{\url{http://www.uta.edu/karyodb/evobiR/}}
 \author{Heath Blackmon}
 \examples{
-data <- read.csv(file = system.file("horn.beetle.csv", package = "evobiR"))
-ResSel(data = data, traits = c(2,3), percent = 15, identifier = 1, model = "linear")
+\dontrun{
+ViewEvo("wf.model")
+}
 }
 \keyword{ hard selection }
 \keyword{ residual }
