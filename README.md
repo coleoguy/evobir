@@ -20,7 +20,7 @@ install_github("evobir", username='coleoguy')
 library(evobiR)
 
 for more info you can check out the evobiR website:
-http://www.uta.edu/karyodb/evobir/index.html
+http://www.uta.edu/karyodb/evobiR/index.html
 
 if you have questions or problems please let me know
 coleoguy at gmail dot com.
