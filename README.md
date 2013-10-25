@@ -9,7 +9,10 @@ those created primarily for didactic purposes.  At the current time (October 201
 but hopefully with time I will keep adding useful functions and speeding up existing ones.
 
 
-To install the latest version of evobirR run the following lines in your R terminal.
+evobiR is now on CRAN! This means that you can install as you would any other package
+install.packages('evobiR')
+
+If you want the very latest version of evobiR then you can install my developmental version from GitHub.
 
 You don't have the package devtools installed yet you will need to do that first:
 install.packages("devtools")
