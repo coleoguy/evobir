@@ -3,7 +3,7 @@ shinyUI(pageWithSidebar(
   headerPanel("Randomly Generated BD trees"),    # Application title
   sidebarPanel(
     sliderInput("num.taxa", "Number of Taxa:", 
-                min = 4, max = 100, value=.5, step = 1),
+                min = 4, max = 100, value=10, step = 1),
     sliderInput("birth", "Number of Taxa:", 
                 min = .1, max = 1, value=.5, step = .1),
     sliderInput("death", "Number of Taxa:", 
