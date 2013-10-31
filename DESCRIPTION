@@ -6,6 +6,6 @@ Date: 2013-10-08
 Author: Heath Blackmon
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: http://www.uta.edu/karyodb/evobiR/
-Depends: seqinr, ape, stringr, geiger, taxize
+Depends: seqinr, ape, stringr, geiger, taxize, shiny
 Description: evobiR is a collection of tools for use in evolutionary biology
 License: GPL (>=2)
