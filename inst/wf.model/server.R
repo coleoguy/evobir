@@ -54,7 +54,7 @@ pop.fit[{foo.Aa+1}:length(pop)] <- fitness[3]
       AA <- sum(adults == 1)
       Aa <- sum(adults == 2)
       plot.val[i] <- AA + .5 * Aa
-    }
+  #  }
     results[k,]<-plot.val
   }
   return(results)
