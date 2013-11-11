@@ -49,7 +49,7 @@ pop.fit[{foo.Aa+1}:length(pop)] <- fitness[3]
 #        }else{
 #          pop.fit[j] <- fitness[3]
         }
-      }
+  #    }
       adults <- sample(babies, pop, replace = T, prob = pop.fit)
       AA <- sum(adults == 1)
       Aa <- sum(adults == 2)
