@@ -30,8 +30,8 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*(1-A))), 
                    rep(3, each = round(pop*(1-A)^2)))
-      if(input$heath=='preset') pop.fit <- vector(length = pop)                       # fitness for each offspring
-      if(input$heath=='fly') pop.fit <- vector() 
+      if(heath=='preset') pop.fit <- vector(length = pop)                       # fitness for each offspring
+      if(heath=='fly') pop.fit <- vector() 
       pop.fit <- vector(length = )                       # fitness for each offspring
       for(j in 1:length(babies)){               # THIS IS CRAPPY CODE
         if(babies[j] == 1){                     # this loop goes through the population
@@ -72,7 +72,8 @@ shinyServer(function(input, output) {
                                 pop = input$pop, 
                                 gen = input$gen, 
                                 var.plot = input$var.plot, 
-                                iter = input$iter)
+                                iter = input$iter,
+                                heath = input$heath)
   })
   
   fate.lost <- reactive({sum(data()[,input$gen] == 0)})
