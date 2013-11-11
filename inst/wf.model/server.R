@@ -30,16 +30,24 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*(1-A))), 
                    rep(3, each = round(pop*(1-A)^2)))
-      if(heath=='preset') pop.fit <- vector(length = pop)                       # fitness for each offspring
-      if(heath=='fly') pop.fit <- vector() 
+      pop.fit <- vector(length = pop)                       # fitness for each offspring
       pop.fit <- vector(length = )                       # fitness for each offspring
-      for(j in 1:length(babies)){               # THIS IS CRAPPY CODE
-        if(babies[j] == 1){                     # this loop goes through the population
-          pop.fit[j] <- fitness[1]
-        }else if(babies[j] == 2){
-          pop.fit[j] <- fitness[2]
-        }else{
-          pop.fit[j] <- fitness[3]
+      
+      foo.AA <- round(pop*A^2)
+      foo.Aa <- round(pop*2*A*(1-A))
+      foo.aa <- round(pop*(1-A)^2))
+pop.fit[1:foo.AA]               <- fitness[1]
+pop.fit[{foo.AA+1}:foo.Aa]      <- fitness[2]
+pop.fit[{foo.Aa+1}:length(pop)] <- fitness[3]
+
+      
+#      for(j in 1:length(babies)){               # THIS IS CRAPPY CODE
+#       if(babies[j] == 1){                     # this loop goes through the population
+#          pop.fit[j] <- fitness[1]
+#        }else if(babies[j] == 2){
+#          pop.fit[j] <- fitness[2]
+#        }else{
+#          pop.fit[j] <- fitness[3]
         }
       }
       adults <- sample(babies, pop, replace = T, prob = pop.fit)
