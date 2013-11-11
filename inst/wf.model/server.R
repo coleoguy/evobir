@@ -34,15 +34,6 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
       pop.fit[babies == 1] <- fitness[1]
       pop.fit[babies == 2] <- fitness[2]
       pop.fit[babies == 3] <- fitness[3]
-      #for(j in 1:length(babies)){               # THIS IS CRAPPY CODE
-       #if(babies[j] == 1){                     # this loop goes through the population
-      #    pop.fit[j] <- fitness[1]
-      #  }else if(babies[j] == 2){
-       #   pop.fit[j] <- fitness[2]
-      #  }else{
-          pop.fit[j] <- fitness[3]
-      #  }
-      #}
       adults <- sample(babies, pop, replace = T, prob = pop.fit)
       AA <- sum(adults == 1)
       Aa <- sum(adults == 2)
