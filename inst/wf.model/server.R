@@ -81,7 +81,7 @@ shinyServer(function(input, output) {
   
   output$genePlot <- renderPlot({
     plot(0, 0, col = 'white', ylim = c(0, 1), xlim = c(0, input$gen),
-         xlab = 'Generations', ylab = genotypes())
+         xlab = 'Generations\n Produced with the Package:evobiR', ylab = genotypes())
   for(i in 1:input$iter){
     if(input$var.plot == 1){
       lines(1:input$gen, (data()[i,1:input$gen]/input$pop)^2,
