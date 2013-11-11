@@ -18,7 +18,7 @@ gen.exp <- function(x, y, wAA, wAa, waa){
   }
   return(foo)
 }
-ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter){
+ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
   results <- matrix(,iter,gen)
   for(k in 1:iter){                             # this loop goes through the iterations
     adults <- c(rep(1, each = round(pop*initial.A^2)), 
