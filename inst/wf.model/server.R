@@ -30,7 +30,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*{1-A})), 
                    rep(3, each = round(pop*(1-A)^2)))
-      pop.fit <- vector(length = pop)                       # fitness for each offspring
+      pop.fit <- vector(length = babies)                       # fitness for each offspring
       pop.fit <- vector(length = )                       # fitness for each offspring
       
       foo.AA <- round(pop*A^2)
