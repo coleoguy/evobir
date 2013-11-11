@@ -8,11 +8,11 @@ shinyUI(pageWithSidebar(
     sliderInput("initial.A", "Initial Frequency of A allele:", 
                 min = 0, max = 1, value=.5, step =.025),
     selectInput("pop", "Population Size:", 
-                list(10=10,
-                     50=50,
-                     100=100,
-                     200=200,
-                     400=400))
+                list('10'=10,
+                     '50'=50,
+                     '100'=100,
+                     '200'=200,
+                     '400'=400))
                      min = 10, max = 500, value = 100, step = 1),
     sliderInput("gen", "Generations to simualte:", 
                 min = 10, max = 500, value = 100, step = 1),
