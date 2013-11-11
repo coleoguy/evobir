@@ -81,7 +81,7 @@ shinyServer(function(input, output) {
   
   output$genePlot <- renderPlot({
     plot(0, 0, col = 'white', ylim = c(0, 1), xlim = c(0, input$gen),
-         xlab = 'Generations', ylab = genotypes())
+         xlab = 'Generations', ylab = genotypes(), cex.lab=1.2)
     mtext("Produced with the package evobiR", side = 1, cex=.8, line=4)
   for(i in 1:input$iter){
     if(input$var.plot == 1){
