@@ -22,20 +22,20 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
   results <- matrix(,iter,gen)
   for(k in 1:iter){                             # this loop goes through the iterations
     adults <- c(rep(1, each = round(pop*initial.A^2)), 
-                rep(2, each = round(pop*2*initial.A*(1-initial.A))), 
-                rep(3, each = round(pop*(1-initial.A)^2)))
+                rep(2, each = round(pop*2*initial.A*{1-initial.A})), 
+                rep(3, each = round(pop*{1-initial.A}^2)))
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
-      A <- ((2 * sum(adults == 1)) + sum(adults ==2) ) / (pop*2)
+      A <- ((2 * sum(adults == 1)) + sum(adults ==2) ) / {pop*2}
       babies <-  c(rep(1, each = round(pop*A^2)), 
-                   rep(2, each = round(pop*2*A*(1-A))), 
+                   rep(2, each = round(pop*2*A*{1-A})), 
                    rep(3, each = round(pop*(1-A)^2)))
       pop.fit <- vector(length = pop)                       # fitness for each offspring
       pop.fit <- vector(length = )                       # fitness for each offspring
       
       foo.AA <- round(pop*A^2)
-      foo.Aa <- round(pop*2*A*(1-A))
-      foo.aa <- round(pop*(1-A)^2))
+      foo.Aa <- round(pop*2*A*{1-A})
+      foo.aa <- round(pop*{1-A}^2)
 pop.fit[1:foo.AA]               <- fitness[1]
 pop.fit[{foo.AA+1}:foo.Aa]      <- fitness[2]
 pop.fit[{foo.Aa+1}:length(pop)] <- fitness[3]
