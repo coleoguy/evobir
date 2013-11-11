@@ -1,4 +1,5 @@
 library(shiny)
+library(phytools)
 shinyServer(function(input, output) {
   tree <- reactive({
       set.seed(input$seed.val)
