@@ -38,7 +38,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
       foo.aa <- round(pop*{1-A}^2)
 pop.fit[1:foo.AA]               <- fitness[1]
 pop.fit[{foo.AA+1}:foo.Aa]      <- fitness[2]
-pop.fit[{foo.Aa+1}:length(pop)] <- fitness[3]
+pop.fit[{foo.Aa+1}:length(babies)] <- fitness[3]
 
       
 #      for(j in 1:length(babies)){               # THIS IS CRAPPY CODE
