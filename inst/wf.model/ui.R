@@ -12,8 +12,7 @@ shinyUI(pageWithSidebar(
                      '50'=50,
                      '100'=100,
                      '200'=200,
-                     '400'=400))
-                     min = 10, max = 500, value = 100, step = 1),
+                     '400'=400)),
     sliderInput("gen", "Generations to simualte:", 
                 min = 10, max = 500, value = 100, step = 1),
     sliderInput("fit.AA", "Fitness of AA:", 
