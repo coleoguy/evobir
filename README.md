@@ -19,8 +19,11 @@ install.packages("devtools")
 
 
 library(devtools)
+
 install_github("evobir", username='coleoguy')
+
 library(evobiR)
+
 
 for more info you can check out the evobiR website:
 http://www.uta.edu/karyodb/evobiR/index.html
