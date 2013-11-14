@@ -27,7 +27,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
       A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
-      A <- A + {1 - A * qaA} - {A * qAa}
+      #A <- A + {1 - A * qaA} - {A * qAa}
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*{1-A})), 
                    rep(3, each = round(pop*(1-A)^2)))
