@@ -29,7 +29,11 @@ shinyUI(pageWithSidebar(
                      "aa"  = 3)),
 #    selectInput("heath", "Benchmarking Tests:",
 #                list("option 1" = "preset", 
-#                     "option 2" = "fly")),
+#                     "option 2" = "fly")),\
+    sliderInput("qAa", "Mutation Rate to a:", 
+                min = 0, max = .5, value = 0, step = .05),
+    sliderInput("qaA", "Mutation Rate to A:", 
+                min = 0, max = .5, value = 0, step = .05),
     checkboxInput(inputId = "traj",
                   label = "Show expected outcome",
                   value = FALSE),

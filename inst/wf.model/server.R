@@ -18,7 +18,7 @@ gen.exp <- function(x, y, wAA, wAa, waa){
   }
   return(foo)
 }
-ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
+ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa, qaA){
   results <- matrix(,iter,gen)
   for(k in 1:iter){                             # this loop goes through the iterations
     adults <- c(rep(1, each = round(pop*initial.A^2)), 
@@ -26,7 +26,8 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath){
                 rep(3, each = round(pop*{1-initial.A}^2)))
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
-      A <- ((2 * sum(adults == 1)) + sum(adults ==2) ) / {pop*2}
+      A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
+      A <- A + {1 - A * qaA} - {A * qAa}
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*{1-A})), 
                    rep(3, each = round(pop*(1-A)^2)))
@@ -65,7 +66,7 @@ shinyServer(function(input, output) {
                                 gen = input$gen, 
                                 var.plot = input$var.plot, 
                                 iter = input$iter,
-                                heath = input$heath)
+                                heath = input$heath, input$qAa, input$qaA)
   })
   
   fate.lost <- reactive({sum(data()[,input$gen] == 0)})
