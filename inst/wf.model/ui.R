@@ -22,6 +22,7 @@ shinyUI(pageWithSidebar(
     selectInput("var.plot", "Plot:",
                 list("A" = 4, 
                      "a" = 5, 
+                     "Plotting Genotypes Assumes Constant Populations Size",
                      "AA" = 1,
                      "Aa"  = 2,
                      "aa"  = 3)),
@@ -29,7 +30,7 @@ shinyUI(pageWithSidebar(
                   label = "Show expected outcome",
                   value = FALSE),
     actionButton("seed.val", 'Refresh'),
-    #    selectInput("heath", "Benchmarking Tests:",
+    #selectInput("heath", "Benchmarking Tests:",
     #                list("option 1" = "preset", 
     #                     "option 2" = "fly")),\
     sliderInput("qAa", "Mutation Rate from A to a:", 
@@ -37,9 +38,12 @@ shinyUI(pageWithSidebar(
     sliderInput("qaA", "Mutation Rate from a to A:", 
                 min = 0, max = .2, value = 0, step = .02),
     sliderInput("popD", "Max Annual Drift in Population Size:", 
-                min = 0, max = 500, value = 0, step = 25),
+                min = 0, max = 50, value = 0, step = 5),
     sliderInput("width", "Line width:", 
-                min = .2, max = 6, value = 3, step = .1)
+                min = .2, max = 6, value = 3, step = .1),
+    checkboxInput(inputId = "plotpop",
+                  label = "Plot Population Sizes",
+                  value = FALSE)
   ),  
   mainPanel(
        h4(textOutput("caption1")),

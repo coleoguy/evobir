@@ -19,8 +19,9 @@ gen.exp <- function(x, y, wAA, wAa, waa, qAa, qaA){
   }
   return(foo)
 }
-ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa, qaA){
+ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa, qaA, popD){
   results <- matrix(,iter,gen)
+  pop2 <- vector()
   for(k in 1:iter){                             # this loop goes through the iterations
     adults <- c(rep(1, each = round(pop*initial.A^2)), 
                 rep(2, each = round(pop*2*initial.A*{1-initial.A})), 
@@ -29,14 +30,19 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
     for(i in 1:gen){                            # this loop goes through the generations
       A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
       if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa}
-      babies <-  c(rep(1, each = round(pop*A^2)), 
-                   rep(2, each = round(pop*2*A*{1-A})), 
-                   rep(3, each = round(pop*(1-A)^2)))
+      pop2 <- pop
+      if(popD != 0) pop2 <- pop + runif(1, min = -popD, max= popD)
+      if(pop2 < 10) pop2 <- 10
+      if(A>1) A <- 1
+      print(paste("gen:",i, "\npop2:",pop2, "A:", A))
+      babies <-  c(rep(1, each = round(pop2*A^2)), 
+                   rep(2, each = round(pop2*2*A*{1-A})), 
+                   rep(3, each = round(pop2*(1-A)^2)))
       pop.fit <- vector(length = length(babies))                       # fitness for each offspring
       pop.fit[babies == 1] <- fitness[1]
       pop.fit[babies == 2] <- fitness[2]
       pop.fit[babies == 3] <- fitness[3]
-      adults <- sample(babies, pop, replace = T, prob = pop.fit)
+      adults <- sample(babies, pop2, replace = T, prob = pop.fit)
       AA <- sum(adults == 1)
       Aa <- sum(adults == 2)
       plot.val[i] <- AA + .5 * Aa
@@ -67,7 +73,8 @@ shinyServer(function(input, output) {
                                 gen = input$gen, 
                                 var.plot = input$var.plot, 
                                 iter = input$iter,
-                                heath = input$heath, input$qAa, input$qaA)
+                                heath = input$heath, input$qAa, input$qaA,
+                                input$popD)
   })
   
   fate.lost <- reactive({sum(data()[,input$gen] == 0)})
@@ -83,35 +90,69 @@ shinyServer(function(input, output) {
   })
   
   output$genePlot <- renderPlot({
-    plot(0, 0, col = 'white', ylim = c(0, 1), xlim = c(0, input$gen),
+    if(input$plotpop == F){
+      plot(0, 0, col = 'white', ylim = c(0, 1), xlim = c(0, input$gen),
          xlab = 'Generations', ylab = genotypes(), cex.lab=1.2)
-    mtext("Produced with the package evobiR", side = 1, cex=.8, line=4)
-  for(i in 1:input$iter){
-    if(input$var.plot == 1){
-      lines(1:input$gen, (data()[i,1:input$gen]/input$pop)^2,
-            col=rainbow(input$iter)[i], lwd = input$width)
-    }else if(input$var.plot == 2){
-      lines(1:input$gen, 2 * (data()[i,1:input$gen]/input$pop) * (1-(data()[i,1:input$gen]/input$pop)),
-            col=rainbow(input$iter)[i], lwd = input$width)
-    }else if(input$var.plot == 3){
-      lines(1:input$gen, (1-(data()[i,1:input$gen]/input$pop))^2,
-            col=rainbow(input$iter)[i], lwd = input$width)
-    }else if(input$var.plot == 4){
-      lines(1:input$gen, data()[i,1:input$gen]/input$pop,
-            col=rainbow(input$iter)[i], lwd = input$width)
+      mtext("Produced with the package evobiR", side = 1, cex=.8, line=4)
+      for(i in 1:input$iter){
+        if(input$var.plot == 1){
+          lines(1:input$gen, (data()[i,1:input$gen]/input$pop)^2,
+          col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 2){
+          lines(1:input$gen, 2 * (data()[i,1:input$gen]/input$pop) * (1-(data()[i,1:input$gen]/input$pop)),
+          col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 3){
+          lines(1:input$gen, (1-(data()[i,1:input$gen]/input$pop))^2,
+          col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 4){
+          lines(1:input$gen, data()[i,1:input$gen]/input$pop,
+          col=rainbow(input$iter)[i], lwd = input$width)
+        }else{
+          lines(1:input$gen, 1 - data()[i,1:input$gen]/input$pop,
+          col=rainbow(input$iter)[i], lwd = input$width)
+        }
+      }
+      if(input$traj == T){
+        if(input$var.plot == 1) lines(1:input$gen, expected.A()^2, col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 2) lines(1:input$gen, 2 * expected.A() * (1-expected.A()), col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 3) lines(1:input$gen, (1-expected.A())^2, col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 4) lines(1:input$gen, expected.A(), col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 5) lines(1:input$gen, (1-expected.A()), col='black', lwd = input$width+1, lty=2)
+      }
     }else{
-      lines(1:input$gen, 1 - data()[i,1:input$gen]/input$pop,
-            col=rainbow(input$iter)[i], lwd = input$width)
-    }  }
-    
-    if(input$traj == T){
-      if(input$var.plot == 1) lines(1:input$gen, expected.A()^2, col='black', lwd = input$width+1, lty=2)
-      if(input$var.plot == 2) lines(1:input$gen, 2 * expected.A() * (1-expected.A()), col='black', lwd = input$width+1, lty=2)
-      if(input$var.plot == 3) lines(1:input$gen, (1-expected.A())^2, col='black', lwd = input$width+1, lty=2)
-      if(input$var.plot == 4) lines(1:input$gen, expected.A(), col='black', lwd = input$width+1, lty=2)
-      if(input$var.plot == 5) lines(1:input$gen, (1-expected.A()), col='black', lwd = input$width+1, lty=2)
+      plot(0, 0, col = 'white', ylim = c(-.5, 1), xlim = c(0, input$gen),
+           xlab = 'Generations', yaxt="n", ylab = genotypes(), cex.lab=1.2)
+      mtext("Produced with the package evobiR", side = 1, cex=.8, line=4)
+      for(i in 1:input$iter){
+        if(input$var.plot == 1){
+          lines(1:input$gen, (data()[i,1:input$gen]/input$pop)^2,
+                col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 2){
+          lines(1:input$gen, 2 * (data()[i,1:input$gen]/input$pop) * (1-(data()[i,1:input$gen]/input$pop)),
+                col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 3){
+          lines(1:input$gen, (1-(data()[i,1:input$gen]/input$pop))^2,
+                col=rainbow(input$iter)[i], lwd = input$width)
+        }else if(input$var.plot == 4){
+          lines(1:input$gen, data()[i,1:input$gen]/input$pop,
+                col=rainbow(input$iter)[i], lwd = input$width)
+        }else{
+          lines(1:input$gen, 1 - data()[i,1:input$gen]/input$pop,
+                col=rainbow(input$iter)[i], lwd = input$width)
+        }
+      }
+      if(input$traj == T){
+        if(input$var.plot == 1) lines(1:input$gen, expected.A()^2, col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 2) lines(1:input$gen, 2 * expected.A() * (1-expected.A()), col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 3) lines(1:input$gen, (1-expected.A())^2, col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 4) lines(1:input$gen, expected.A(), col='black', lwd = input$width+1, lty=2)
+        if(input$var.plot == 5) lines(1:input$gen, (1-expected.A()), col='black', lwd = input$width+1, lty=2)
+      }
+      abline(h=0)
+    text(1,-.1, "I am working on this", col = "red",cex=2, pos=4)
+    #axis(side = 4)
+    #mtext(side = 4, line = 3, "Population Size")
     }
-    
 })
 
   })
