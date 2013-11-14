@@ -1,6 +1,6 @@
 library(shiny)
 genotype.options <- c('AA', 'Aa', 'aa', 'A', 'a')
-gen.exp <- function(x, y, wAA, wAa, waa){
+gen.exp <- function(x, y, wAA, wAa, waa, qAa, qaA){
   foo <- vector()
   A <- x
   AA <- A^2       #p2
@@ -12,6 +12,7 @@ gen.exp <- function(x, y, wAA, wAa, waa){
     Aa <- Aa * (wAa / w.bar)
     aa <- aa * (waa / w.bar)
     foo[i] <- A <- (AA + .5*Aa)
+    if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa} # 
     AA <- A^2
     Aa <- 2*A*(1-A)
     aa <- (1-A)^2
@@ -27,7 +28,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
       A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
-      #A <- A + {1 - A * qaA} - {A * qAa}
+      if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa}
       babies <-  c(rep(1, each = round(pop*A^2)), 
                    rep(2, each = round(pop*2*A*{1-A})), 
                    rep(3, each = round(pop*(1-A)^2)))
@@ -77,7 +78,8 @@ shinyServer(function(input, output) {
   output$caption2 <- renderText({paste('Allele A fixed in', fate.fixed(), 'populations')})
   
   expected.A <- reactive({
-    gen.exp(input$initial.A, input$gen, input$fit.AA, input$fit.Aa, input$fit.aa)
+    gen.exp(input$initial.A, input$gen, input$fit.AA, input$fit.Aa, input$fit.aa,
+            input$qAa, input$qaA)
   })
   
   output$genePlot <- renderPlot({
