@@ -31,7 +31,11 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
                 rep(3, each = round(pop*{1-initial.A}^2)))
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
-      if(A < 1) A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
+      if((2 * sum(adults == 1) + sum(adults ==2)) / {pop*2} < 1){
+        A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
+      }else{
+        A <- 1
+      }
       if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa}
       pop2 <- pop
       if(popD != 0) pop2 <- pop + runif(1, min = -popD, max= popD)
