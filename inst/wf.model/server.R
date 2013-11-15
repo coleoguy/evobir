@@ -34,7 +34,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
       if(popD != 0) pop2 <- pop + runif(1, min = -popD, max= popD)
       if(pop2 < 10) pop2 <- 10
       if(A>1) A <- 1
-      print(paste("gen:",i, "\npop2:",pop2, "A:", A))
+      #print(paste("gen:",i, "\npop2:",pop2, "A:", A))
       babies <-  c(rep(1, each = round(pop2*A^2)), 
                    rep(2, each = round(pop2*2*A*{1-A})), 
                    rep(3, each = round(pop2*(1-A)^2)))
