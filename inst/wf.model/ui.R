@@ -2,7 +2,7 @@
 shinyUI(pageWithSidebar(
   
   # Application title
-  headerPanel(""),#Change in Genotype Frequency
+  headerPanel("Change in Genotype Frequency"),
   
   sidebarPanel(
     sliderInput("initial.A", "Initial Frequency of A allele:", 
