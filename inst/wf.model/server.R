@@ -1,3 +1,6 @@
+## right now I am not getting fixations of A if population size fluctuates?
+
+
 library(shiny)
 genotype.options <- c('AA', 'Aa', 'aa', 'A', 'a')
 gen.exp <- function(x, y, wAA, wAa, waa, qAa, qaA){
@@ -12,7 +15,7 @@ gen.exp <- function(x, y, wAA, wAa, waa, qAa, qaA){
     Aa <- Aa * (wAa / w.bar)
     aa <- aa * (waa / w.bar)
     foo[i] <- A <- (AA + .5*Aa)
-    if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa} # 
+    if(qAa + qaA != 0 & A < 1) A <- A + {{1 - A} * qaA} - {A * qAa} # 
     AA <- A^2
     Aa <- 2*A*(1-A)
     aa <- (1-A)^2
