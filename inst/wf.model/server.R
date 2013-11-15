@@ -15,7 +15,7 @@ gen.exp <- function(x, y, wAA, wAa, waa, qAa, qaA){
     Aa <- Aa * (wAa / w.bar)
     aa <- aa * (waa / w.bar)
     foo[i] <- A <- (AA + .5*Aa)
-    if(qAa + qaA != 0 & A < 1) A <- A + {{1 - A} * qaA} - {A * qAa} # 
+    if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa} # 
     AA <- A^2
     Aa <- 2*A*(1-A)
     aa <- (1-A)^2
@@ -31,7 +31,7 @@ ShinyPopGen <- function(fitness, initial.A, pop, gen, var.plot, iter, heath, qAa
                 rep(3, each = round(pop*{1-initial.A}^2)))
     plot.val <- vector()
     for(i in 1:gen){                            # this loop goes through the generations
-      A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
+      if(A < 1) A <- (2 * sum(adults == 1) + sum(adults ==2)) / {pop*2}
       if(qAa + qaA != 0) A <- A + {{1 - A} * qaA} - {A * qAa}
       pop2 <- pop
       if(popD != 0) pop2 <- pop + runif(1, min = -popD, max= popD)
