@@ -22,7 +22,6 @@ shinyUI(pageWithSidebar(
     selectInput("var.plot", "Plot:",
                 list("A" = 4, 
                      "a" = 5, 
-                     "Plotting Genotypes Assumes Constant Populations Size",
                      "AA" = 1,
                      "Aa"  = 2,
                      "aa"  = 3)),
@@ -37,13 +36,8 @@ shinyUI(pageWithSidebar(
                 min = 0, max = .2, value = 0, step = .02),
     sliderInput("qaA", "Mutation Rate from a to A:", 
                 min = 0, max = .2, value = 0, step = .02),
-    sliderInput("popD", "Max Annual Drift in Population Size:", 
-                min = 0, max = 50, value = 0, step = 5),
     sliderInput("width", "Line width:", 
-                min = .2, max = 6, value = 3, step = .1),
-    checkboxInput(inputId = "plotpop",
-                  label = "Plot Population Sizes",
-                  value = FALSE)
+                min = .2, max = 6, value = 3, step = .1)
   ),  
   mainPanel(
        h4(textOutput("caption1")),
