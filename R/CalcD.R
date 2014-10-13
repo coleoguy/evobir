@@ -43,18 +43,24 @@ CalcD <- function(alignment = "alignment.fasta", boot=F, replicate=1000){
       }
       sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)   #what its all about   
     }
+    sd.sim.d <- round(sqrt(var(sim.d)),5)
+    mn.sim.d <- round(mean(sim.d),5)
+    new.pval <- 2*(pnorm(-abs(d/sd.sim.d)))
+    ## NOW WE MAKE THE OUTPUTS  
+    cat("\nSites in alignment =", ncol(alignment.matrix))
+    cat("\nNumber of sites with ABBA pattern =", abba)
+    cat("\nNumber of sites with BABA pattern =", baba)
+    cat("\n\nD raw statistic / Z-score = ", d, " / ", d/sd.sim.d)
+    cat("\n\nResults from ", replicate, "bootstraps")
+    cat("\nSD D statistic =", sd.sim.d)
+    cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
   }
-  sd.sim.d <- round(sqrt(var(sim.d)),5)
-  mn.sim.d <- round(mean(sim.d),5)
-  new.pval <- 2*(pnorm(-abs(d/sd.sim.d)))
-## NOW WE MAKE THE OUTPUTS  
-  cat("\nSites in alignment =", ncol(alignment.matrix))
-  cat("\nNumber of sites with ABBA pattern =", abba)
-  cat("\nNumber of sites with BABA pattern =", baba)
-  cat("\n\nD raw statistic / Z-score = ", d, " / ", d/sd.sim.d)
-  cat("\n\nResults from ", replicate, "bootstraps")
-  cat("\nSD D statistic =", sd.sim.d)
-  cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
+  if(boot==F){
+    cat("\nSites in alignment =", ncol(alignment.matrix))
+    cat("\nNumber of sites with ABBA pattern =", abba)
+    cat("\nNumber of sites with BABA pattern =", baba)
+    cat("\n\nD raw statistic = ", d)
+  }
 }
 CalcPopD <- function(alignment = "alignment.fasta"){
   ##  Now we have eqn. 2 from page 2240
@@ -231,20 +237,18 @@ CalcPartD <- function(alignment = "alignment.fasta", boot=F, replicate = 1000, a
     mn.sim.d12 <- round(mean(sim.d12),5)
     new.pval.d12 <- 2*(pnorm(-abs(d12/sd.sim.d12)))
     
-  } 
-  if(is.nan(d1)) d1<- "Error Missing Data"
-  if(is.nan(d2)) d2<- "Error Missing Data"
-  if(is.nan(d12)) d12<- "Error Missing Data"
-  
-  ## NOW WE MAKE THE OUTPUTS  
-  cat("Sites in alignment =", ncol(alignment.matrix))
-  cat("\nD1 sites with ABBAA/BABAA pattern =", abbaa,"/",babaa)
-  cat("\nD2 sites with ABABA/BAABA pattern =", ababa,"/",baaba)
-  cat("\nD12 sites with ABABA/BAABA pattern =", abbba,"/",babba)
-  cat("\n\nD1 raw statistic / Z-score =", d1,"/",d1/sd.sim.d1)
-  cat("\nD2 raw statistic / Z-score =", d2,"/",d2/sd.sim.d2)
-  cat("\nD12 raw statistic / Z-score =", d12,"/",d12/sd.sim.d12)
-  if(boot==T){
+    if(is.nan(d1)) d1<- "Error Missing Data"
+    if(is.nan(d2)) d2<- "Error Missing Data"
+    if(is.nan(d12)) d12<- "Error Missing Data"
+    
+    ## NOW WE MAKE THE OUTPUTS  
+    cat("Sites in alignment =", ncol(alignment.matrix))
+    cat("\nD1 sites with ABBAA/BABAA pattern =", abbaa,"/",babaa)
+    cat("\nD2 sites with ABABA/BAABA pattern =", ababa,"/",baaba)
+    cat("\nD12 sites with ABABA/BAABA pattern =", abbba,"/",babba)
+    cat("\n\nD1 raw statistic / Z-score =", d1,"/",d1/sd.sim.d1)
+    cat("\nD2 raw statistic / Z-score =", d2,"/",d2/sd.sim.d2)
+    cat("\nD12 raw statistic / Z-score =", d12,"/",d12/sd.sim.d12)
     if(!(d1=="Error Missing Data")){
       cat("\n\nD1 Bootstrap Statistics: ")
       cat("SD = ", sd.sim.d1)
@@ -262,4 +266,13 @@ CalcPartD <- function(alignment = "alignment.fasta", boot=F, replicate = 1000, a
     }
     cat("\n\nBonferroni adjustment: alpha selected:",alpha," number of tests:",3,"\nSo P-value of less than ",round(alpha/3,4)," should be considered significant", sep="")
   }
+  if(boot==F){
+    cat("\nD1 sites with ABBAA/BABAA pattern =", abbaa,"/",babaa)
+    cat("\nD2 sites with ABABA/BAABA pattern =", ababa,"/",baaba)
+    cat("\nD12 sites with ABABA/BAABA pattern =", abbba,"/",babba)
+    cat("\n\nD1 raw statistic =", d1)
+    cat("\nD2 raw statistic =", d2)
+    cat("\nD12 raw statistic =", d12)
+    
+  } 
 }
