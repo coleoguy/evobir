@@ -2,7 +2,9 @@
 shinyUI(pageWithSidebar(
   headerPanel("Probability Density of Distributions"),    # Application title
   sidebarPanel(
-    helpText("Normal")
+    tags$div(class="header", checked=NA,
+             tags$p("Ready to take the Shiny tutorial? If so")
+    )
     sliderInput("time", "Time for simulation:", 
                 min = 4, max = 20, value=10, step = 1),
     sliderInput("birth", "Birth Rate:", 
