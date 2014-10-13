@@ -8,6 +8,7 @@ shinyServer(function(input, output) {
       
   })
   output$treePlot <- renderPlot({
+    plot(1:10,1:10)
 #    if(select == 1){
 #      tree(N.mean, N.sd)
 #    }
