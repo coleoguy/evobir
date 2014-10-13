@@ -37,8 +37,8 @@ shinyUI(pageWithSidebar(
 #    
 #
 #####
-    ),  
-  mainPanel(
-    plotOutput("treePlot", width='100%', height='600px')
-  )
+    )#,  
+#  mainPanel(
+#    plotOutput("treePlot", width='100%', height='600px')
+#  )
 ))
