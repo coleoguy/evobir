@@ -2,7 +2,7 @@
 shinyUI(pageWithSidebar(
   headerPanel("Probability Density of Distributions"),    # Application title
   sidebarPanel(
-    selectInput("select", label = "Select Statistical Distribution"),
+    selectInput("select", label = "Select Statistical Distribution",
                 choices = list("Normal" = 1, "Exponential" = 2,
                                "Gamma" = 3, "Logistic" = 4), selected = 1),    
     tags$div(class="header", checked=NA,
