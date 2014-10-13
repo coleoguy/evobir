@@ -7,7 +7,7 @@ shinyServer(function(input, output) {
     y <- dnorm(x, mean = input$N.mean, sd=input$N.sd)
   })
   output$treePlot <- renderPlot({
-      plot(x=tree()$x, y=tree()$y col = "red", type="l", lwd=3)
+      plot(x=tree()$x, y=tree()$y, col = "red", type="l", lwd=3)
   })  
 })
 
