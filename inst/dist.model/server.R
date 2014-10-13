@@ -7,7 +7,7 @@ shinyServer(function(input, output) {
              d = input$death,
              t = input$time, 
              scale = 1,
-             nsim = 4,
+             nsim = 1,
              extant.only = input$extinct) 
   })
   counts <- 
