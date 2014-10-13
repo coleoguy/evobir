@@ -6,7 +6,7 @@ shinyServer(function(input, output) {
         length = 200)
   })
   y <- reactive({
-    dnorm(x, mean = input$N.mean, sd=input$N.sd)
+    dnorm(x(), mean = input$N.mean, sd=input$N.sd)
   })
   output$treePlot <- renderPlot({
       plot(x=x(), y=y(), col = "red", type="l", lwd=3)
