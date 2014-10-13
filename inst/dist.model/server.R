@@ -6,9 +6,8 @@ shinyServer(function(input, output) {
              length = 200)
     y <- dnorm(x, mean = input$N.mean, input$N.sd)
   })
-  counts <- 
   output$treePlot <- renderPlot({
-      plot(tree())
+      plot(tree(), col = "red", type="l", lwd=3)
   })  
 })
 
