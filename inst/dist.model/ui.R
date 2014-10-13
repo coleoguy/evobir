@@ -6,7 +6,7 @@ shinyUI(pageWithSidebar(
              tags$p("Select Statistical Distribution")),
     selectInput("select", label = h3("Select box"), 
                 choices = list("Normal" = 1, "Exponential" = 2,
-                               "Gamma" = 3, "Logistic" = 4), selected = 1)),    
+                               "Gamma" = 3, "Logistic" = 4), selected = 1),    
   
   
     tags$div(class="header", checked=NA,
