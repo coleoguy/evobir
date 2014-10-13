@@ -9,6 +9,7 @@ shinyServer(function(input, output) {
   })
   counts <- 
   output$treePlot <- renderPlot({
+    tree()
     plot(x=x,y=y,col="red",  type="l", ylab="Density")
 
     
