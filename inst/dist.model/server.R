@@ -1,20 +1,25 @@
 library(shiny)
 shinyServer(function(input, output) {
-  x <- reactive({
-    if(input$select == 1){
+  if(input$select == 1){
+    x <- reactive({
       seq(input$N.mean - 4 * input$N.sd, 
           input$N.mean + 4 * input$N.sd, 
           length = 200)
-    }
-    if(input$select == 2){
+    })
+  }
+  if(input$select == 2){
+    x <- reactive({
       seq(input$N.mean - 6 * input$N.sd, 
           input$N.mean + 6 * input$N.sd, 
           length = 200)
-    }
-    if(input$select == 3){
+    })
+  }
+  if(input$select == 3){
+    x <- reactive({
       seq(input$N.mean - 12 * input$N.sd, 
           input$N.mean + 12 * input$N.sd, 
           length = 200)
+      })
     }
     
     
