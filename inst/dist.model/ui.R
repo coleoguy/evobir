@@ -9,8 +9,8 @@ shinyUI(pageWithSidebar(
 #                               "Gamma" = 3, "Logistic" = 4), selected = 1),    
   
 #####  
-    tags$div(class="header", checked=NA,
-             tags$p("Normal Distribution")),
+#    tags$div(class="header", checked=NA,
+#             tags$p("Normal Distribution")),
     sliderInput("N.mean", "mean:", 
                 min = -100, max = 100, value=0, step = 5),
     sliderInput("N.sd", "standard deviation:", 
