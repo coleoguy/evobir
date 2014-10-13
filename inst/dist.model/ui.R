@@ -11,7 +11,28 @@ shinyUI(pageWithSidebar(
                 min = -100, max = 100, value=0, step = 5),
     sliderInput("N.sd", "standard deviation:", 
                 min = 0, max = 10, value=1, step = .25),
-
+    tags$div(class="header", checked=NA,
+             tags$p("Exponential Distribution")),
+    sliderInput("E.lambda", "Rate parameter (lambda):", 
+                min = 0, max = 5, value=1, step = .25),
+    
+    tags$div(class="header", checked=NA,
+             tags$p("Gamma Distribution")),
+    sliderInput("G.shape", "Shape parameter:", 
+                min = 0, max = 10, value=1, step = .25),
+    sliderInput("G.scale", "Scale parameter:", 
+                min = 0, max = 10, value=1, step = .25),
+    
+    tags$div(class="header", checked=NA,
+             tags$p("Logistic Distribution")),
+    sliderInput("L.mean", "Mean parameter:", 
+                min = 0, max = 10, value=1, step = .25),
+    sliderInput("L.sd", "Standard deviation parameter:", 
+                min = 0, max = 10, value=1, step = .25),
+    
+    
+    
+    
     sliderInput("time", "Time for simulation:", 
                 min = 4, max = 20, value=10, step = 1),
     sliderInput("birth", "Birth Rate:", 
