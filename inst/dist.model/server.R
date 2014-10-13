@@ -1,30 +1,40 @@
 library(shiny)
+
+
 shinyServer(function(input, output) {
+  
   x <- reactive({
     if(input$select == 1){
-      seq(input$N.mean - 4 * input$N.sd, 
-          input$N.mean + 4 * input$N.sd, 
+      seq(input$mu - 4 * input$sigma, 
+          input$mu + 4 * input$sigma, 
           length = 200)
+    }else if(input$select == 2){
+      high <- qexp(.999, rate = input$lambda, lower.tail = TRUE, log.p = FALSE)
+      seq(0, high, length = 200)
+    }else if(input$select == 3){
+      high <- qgamma(.999, shape = input$kappa, rate = input$theta)
+      seq(0, high, length = 200)
+    }else if(input$select == 4){
+      low <- qlogis(.01, location = input$mu, scale = input$sigma*0.551328895, lower.tail = TRUE, log.p = FALSE)
+      high <- qlogis(.99, location = input$mu, scale = input$sigma*0.551328895, lower.tail = TRUE, log.p = FALSE)
+      seq(low, high, length = 200)      
     }
-    if(input$select == 2){
-      seq(input$N.mean - 6 * input$N.sd, 
-          input$N.mean + 6 * input$N.sd, 
-          length = 200)
-    }
-    if(input$select == 3){
-      seq(input$N.mean - 12 * input$N.sd, 
-          input$N.mean + 12 * input$N.sd, 
-          length = 200)
-    }
-    
-    
-    
   })
   y <- reactive({
-    dnorm(x(), mean = input$N.mean, sd=input$N.sd)
-  })
+    if(input$select == 1){
+      dnorm(x(), mean = input$mu, sd=input$sigma)
+    }else if(input$select == 2){
+      dexp(x(), rate = input$lambda)
+    }else if(input$select == 3){
+      dgamma(x(), shape = input$kappa, rate = input$theta)
+    }else if(input$select == 4){
+      dlogis(x(), location = input$mu, scale = input$sigma*0.551328895)
+  }
+})
+   
   output$treePlot <- renderPlot({
-      plot(x=x(), y=y(), col = "red", xlab=input$select, type="l", lwd=3)
+      plot(x=x(), y=y(), col = "red", ylab="density", 
+           xlab=paste("Distribution:"), type="l", lwd=3)
   })  
 })
 
