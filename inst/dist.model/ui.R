@@ -2,8 +2,6 @@
 shinyUI(pageWithSidebar(
   headerPanel("Probability Density of Distributions"),    # Application title
   sidebarPanel(
-    tags$div(class="header", checked=NA,
-             tags$p("Ready to take the Shiny tutorial? If so")),
     sliderInput("time", "Time for simulation:", 
                 min = 4, max = 20, value=10, step = 1),
     sliderInput("birth", "Birth Rate:", 
@@ -13,7 +11,10 @@ shinyUI(pageWithSidebar(
     checkboxInput(inputId = "extinct",
                   label = "Prune Extinct Taxa",
                   value = FALSE),
-    actionButton("seed.val", 'Simulate')
+    actionButton("seed.val", 'Simulate'),
+    tags$div(class="header", checked=NA,
+             tags$p("Ready to take the Shiny tutorial? If so"))
+    
   ),  
   mainPanel(
     plotOutput("treePlot", width='100%', height='600px')
