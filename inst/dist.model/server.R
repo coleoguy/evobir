@@ -4,7 +4,7 @@ shinyServer(function(input, output) {
     x <- seq(input$N.mean - 4 * input$N.sd, 
              input$N.mean + 4 * input$N.sd, 
              length = 200)
-    y <- dnorm(x, mean = N.mean, N.sd)
+    y <- dnorm(x, mean = input$N.mean, input$N.sd)
   })
   counts <- 
   output$treePlot <- renderPlot({
