@@ -10,7 +10,6 @@ shinyServer(function(input, output) {
              nsim = 4,
              extant.only = input$extinct) 
   })
-  #counts <- 
   output$treePlot <- renderPlot({
     par(mfcol=c(2,2))
     for(i in 1:4){

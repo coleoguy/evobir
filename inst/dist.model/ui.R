@@ -15,7 +15,7 @@ shinyUI(pageWithSidebar(
                 min = -100, max = 100, value=0, step = 5),
     sliderInput("N.sd", "standard deviation:", 
                 min = 0, max = 10, value=1, step = .25),
-#    
+######      
 #    tags$div(class="header", checked=NA,
 #             tags$p("Exponential Distribution")),
 #    sliderInput("E.lambda", "Rate parameter (lambda):", 

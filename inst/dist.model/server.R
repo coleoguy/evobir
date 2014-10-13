@@ -7,7 +7,6 @@ shinyServer(function(input, output) {
     }
       
   })
-  counts <- 
   output$treePlot <- renderPlot({
     if(select == 1){
       tree(N.mean, N.sd)
