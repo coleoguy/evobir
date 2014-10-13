@@ -12,8 +12,8 @@ shinyServer(function(input, output) {
   })
   counts <- 
   output$treePlot <- renderPlot({
-      plot.phylo(tree()[[i]], show.tip.label=F)
-      mtext(paste("N =", length(tree()[[i]]$tip.label)), side = 1, line = 0)
+      plot.phylo(tree(), show.tip.label=F)
+      mtext(paste("N =", length(tree()$tip.label)), side = 1, line = 0)
   })  
 })
 
