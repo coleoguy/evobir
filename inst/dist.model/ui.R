@@ -4,7 +4,12 @@ shinyUI(pageWithSidebar(
   sidebarPanel(
     tags$div(class="header", checked=NA,
              tags$p("Normal Distribution")),
-
+    tags$div(class="header", checked=NA,
+             tags$p("Select Statistical Distribution")),
+    selectInput("select", label = h3("Select box"),
+                choices = list("Normal" = 1, "Exponential" = 2,
+                               "Gamma" = 3, "Logistic" = 4), selected = 1),    
+    
     sliderInput("time", "Time for simulation:", 
                 min = 4, max = 20, value=10, step = 1),
     sliderInput("birth", "Birth Rate:", 
