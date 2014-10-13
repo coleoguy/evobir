@@ -2,7 +2,7 @@
 shinyUI(pageWithSidebar(
   headerPanel("Probability Density of Distributions"),    # Application title
   sidebarPanel(
-    #print("Normal")
+    print("Normal")
     sliderInput("time", "Time for simulation:", 
                 min = 4, max = 20, value=10, step = 1),
     sliderInput("birth", "Birth Rate:", 
