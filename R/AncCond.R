@@ -163,6 +163,6 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   results[[3]] <- null.anc.nodes
   results[[4]] <- bigger
   results[[5]] <- smaller
-  names(results) <- c("OriginatingNodes", "NTrans", "NullDist", "smaller", "bigger")
+  names(results) <- c("OriginatingNodes", "NTrans", "NullDist", "bigger", "smaller")
   return(results)
 }
