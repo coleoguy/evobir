@@ -56,7 +56,7 @@ AncCond <- function(trees, data, derived.state, iterations=10){
     }
   }
   if(class(trees) == "phylo"){
-    temp.anc <- make.simmap(trees, dt.vec, model = "ARD", nsim = 1, pi=c(1,0))
+    temp.anc <- make.simmap(trees, dt.vec, model = "ARD", nsim = 1, pi=c(1,0), message=F)
     anc.state.dt[[1]] <- temp.anc
   }
     

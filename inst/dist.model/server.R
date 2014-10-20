@@ -15,9 +15,13 @@ shinyServer(function(input, output) {
       high <- qgamma(.999, shape = input$kappa, rate = input$theta)
       seq(0, high, length = 200)
     }else if(input$select == 4){
-      seq(input$mu - 30, 
-          input$mu + 30, 
+      seq(input$mu2 - 30, 
+          input$mu2 + 30, 
           length = 200)
+    }else if(input$select == 5){
+      seq(1:50)
+    }else if(input$select == 6){
+      seq(0, 1, length = 200)
     }
   })
   y <- reactive({
@@ -28,26 +32,39 @@ shinyServer(function(input, output) {
     }else if(input$select == 3){
       dgamma(x(), shape = input$kappa, rate = input$theta)
     }else if(input$select == 4){
-      dlogis(x(), location = input$mu, scale = input$sigma*0.551328895)
-  }
+      dlogis(x(), location = input$mu2, scale = input$sigma2*0.551328895)
+    }else if(input$select == 5){
+      dpois(x(), lambda = input$lambda2)
+    }else if(input$select == 6){
+      dbeta(x(), shape1 = input$alpha, shape2= input$beta)
+    }
 })
    
   output$treePlot <- renderPlot({
     if(input$select == 1){
-      plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,.6),
-           xlab=paste("Distribution:"), type="l", lwd=3)
+      plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,.6), xlab="x",
+           main=paste("Normal probability density"), type="l", lwd=3)
       abline(h=0, lty=3, cex=2)
     }else if(input$select == 2){
-      plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,2),
-           xlab=paste("Distribution:"), type="l", lwd=3)
+      plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,11), xlab="x",
+           main=paste("Exponential probability density"), type="l", lwd=3)
       abline(h=0, lty=3, cex=2)
     }else if(input$select == 3){
-      plot(x=x(), y=y(), col = "red", ylab="density", 
-           xlab=paste("Distribution:"), type="l", lwd=3)
+      plot(x=x(), y=y(), col = "red", ylab="density",  xlab="x",
+           main=paste("Gamma probability density"), type="l", lwd=3)
       abline(h=0, lty=3, cex=2)
     }else if(input$select == 4){
-      plot(x=x(), y=y(), col = "red", ylab="density", 
-           xlab=paste("Distribution:"), type="l", lwd=3)
+      plot(x=x(), y=y(), col = "red", ylab="density",  xlab="x",
+           main=paste("Logistic probability density"), type="l", lwd=3)
+      abline(h=0, lty=3, cex=2)
+    }else if(input$select == 5){
+      plot(x=x(), y=y(), col = "red", ylab="density",  xlab="x",
+           main=paste("Poisson probability density"), type="l", lwd=3)
+      abline(h=0, lty=3, cex=2)
+      points(x=x(), y=y(), col="blue", pch=19)
+    }else if(input$select == 6){
+      plot(x=x(), y=y(), col = "red", ylab="density",  xlab="x",
+           main=paste("Beta probability density"), type="l", lwd=3, ylim=c(0,6))
       abline(h=0, lty=3, cex=2)
     }
   })  
