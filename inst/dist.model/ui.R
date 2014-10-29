@@ -12,7 +12,9 @@ shinyUI(pageWithSidebar(
       sliderInput("mu", "mu:", 
                   min = -100, max = 100, value=0, step = 5),
       sliderInput("sigma", "sigma:", 
-                  min = 0.1, max = 10, value=1, step = .1)
+                  min = 0.1, max = 10, value=1, step = .1),
+      sliderInput("n", "sample size:", 
+                  min = 2, max = 1000, value=100, step = 1)
     ),
     # exponential    
     conditionalPanel(
