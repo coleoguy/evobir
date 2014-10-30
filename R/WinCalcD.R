@@ -12,7 +12,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
   results.matrix <- as.data.frame(matrix(,1,6))
   colnames(results.matrix) <- c("range", "abba", "baba", "d", "Z", "pval")
   for(q in 1:win.num){
-    alignment.matrix <- full.align[spots[q]:(spots[q] + window - 1)])
+    alignment.matrix <- full.align[spots[q]:(spots[q] + window - 1)]
     abba <- 0                                                                         #  set up my variables
     baba <- 0                                                                         #  set up my variables
     for(i in 1:ncol(alignment.matrix)){                                               #  run through all sites
