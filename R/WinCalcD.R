@@ -1,4 +1,4 @@
-WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
+WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50,
                      boot = F, replicate = 1000){
   alignment <- read.alignment(alignment, format = "fasta")                         #  read in the alignment
   alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
