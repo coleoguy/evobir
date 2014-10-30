@@ -1,4 +1,4 @@
-WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
+WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
                      boot = F, replicate = 1000){
   alignment <- read.alignment(alignment, format = "fasta")                         #  read in the alignment
   alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
@@ -6,13 +6,13 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
     alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))               #  fill in the matrix
   }
   full.align <- alignment.matrix
-  win.num <- floor(ncol(full.align)/win.size)
+  
+  total <- ncol(full.align)
+  spots <- seq(from = 1, to = (total - window.size), by = step.size)
   results.matrix <- as.data.frame(matrix(,1,6))
   colnames(results.matrix) <- c("range", "abba", "baba", "d", "Z", "pval")
   for(q in 1:win.num){
-    ending <- q * win.size
-    starting <- ending - win.size + 1
-    alignment.matrix <- full.align[, starting:ending]
+    alignment.matrix <- full.align[spots[q]:(spots[q] + window - 1)])
     abba <- 0                                                                         #  set up my variables
     baba <- 0                                                                         #  set up my variables
     for(i in 1:ncol(alignment.matrix)){                                               #  run through all sites
