@@ -11,7 +11,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
   spots <- seq(from = 1, to = (total - win.size), by = step.size)
   results.matrix <- as.data.frame(matrix(,1,6))
   colnames(results.matrix) <- c("range", "abba", "baba", "d", "Z", "pval")
-  for(q in 1:win.num){
+  for(q in 1:length(spots)){
     alignment.matrix <- full.align[spots[q]:(spots[q] + win.size - 1)]
     abba <- 0                                                                         #  set up my variables
     baba <- 0                                                                         #  set up my variables
