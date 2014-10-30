@@ -1,6 +1,6 @@
 \name{WinCalcD}
 \alias{WinCalcD}
-\title{Calculate Patterson's D-statistic in windows}
+\title{Calculate Patterson's D-statistic in sliding windows}
 \description{This functions calculate Patterson's D-statistic in windows.}
 \usage{
 CalcD(alignment = "alignment.fasta", win.size = 500, boot = F, replicate = 1000)
@@ -8,6 +8,7 @@ CalcD(alignment = "alignment.fasta", win.size = 500, boot = F, replicate = 1000)
 \arguments{
   \item{alignment}{This is an alignment in fasta format}
   \item{win.size}{This is the size of the window used}
+  \item{step.size}{This is the size of steps in the sliding window}
   \item{boot}{This indicates whether or not bootstrapping should be performed to estimate variance}
   \item{replicate}{Number of replicates to be used in estimating variance}
 }
