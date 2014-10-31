@@ -6,7 +6,6 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
     alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))               #  fill in the matrix
   }
   full.align <- alignment.matrix
-  
   total <- ncol(full.align)
   spots <- seq(from = 1, to = (total - win.size), by = step.size)
   results.matrix <- as.data.frame(matrix(,1,6))
