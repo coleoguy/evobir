@@ -1,4 +1,4 @@
 exportPattern("^[[:alpha:]]+")
-export(WinCalcD, CalcD, CalcPartD, CalcPopD, PPSDiscrete, ResSel)
+export(WinCalcD, WinCalcPartD, CalcD, CalcPartD, CalcPopD, PPSDiscrete, ResSel)
 export(SampleTrees, Mode, Even, FuzzyMatch, ViewEvo, AncCond)
 
