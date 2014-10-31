@@ -3,7 +3,7 @@
 \title{Calculate Partitioned D-statistic in sliding windows}
 \description{This functions calculate Partitioned D-statistic in windows.}
 \usage{
-CalcD(alignment = "alignment.fasta", win.size = 1000, , step.size=500,
+WinCalcPartD(alignment = "alignment.fasta", win.size = 1000, , step.size=500,
 boot = F, replicate = 1000)
 }
 \arguments{
@@ -13,7 +13,7 @@ boot = F, replicate = 1000)
   \item{boot}{This indicates whether or not bootstrapping should be performed to estimate variance}
   \item{replicate}{Number of replicates to be used in estimating variance}
 }
-\details{ This function is just an extension of CalcD and calculates D statistic for non-overlapping windows. }
+\details{ This function is just an extension of CalcPartD and calculates the partitioned D statistic for in windows. }
 \value{
 Returns a table with the number of each type of site, Z scores and p-values for each window in the genome
 }
