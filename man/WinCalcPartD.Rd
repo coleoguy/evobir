@@ -18,7 +18,7 @@ boot = F, replicate = 1000)
 Returns a table with the number of each type of site, Z scores and p-values for each window in the genome
 }
 \author{Heath Blackmon}
-\references{http://www.uta.edu/karyodb/evobiR/
+\references{http://www.uta.edu/karyodb/evobiR/}
 
 \examples{
 WinCalcPartD(alignment = system.file("2.fasta", package = "evobiR"), 
