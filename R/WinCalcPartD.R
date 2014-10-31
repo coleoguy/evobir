@@ -142,7 +142,11 @@ WinCalcPartD <- function(alignment = "alignment.fasta", boot=F, replicate = 1000
       cat("\n\nD1 raw statistic =", d1)
       cat("\nD2 raw statistic =", d2)
       cat("\nD12 raw statistic =", d12)
-    
+      results.matrix[q,1:10] <- c(paste(starting,":",ending,sep=""),
+                                  abbaa, babaa, ababa, baaba, abbba,
+                                  babba, d1, d2, d12)
+      results.matrix <- results.matrix[,1:10]
     } 
   }
+  return(results.matrix)
 }
