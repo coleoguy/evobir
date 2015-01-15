@@ -20,7 +20,7 @@ install.packages("devtools")
 
 library(devtools)
 
-install_github("evobir", username='coleoguy')
+install_github('coleoguy/evobir')
 
 library(evobiR)
 
