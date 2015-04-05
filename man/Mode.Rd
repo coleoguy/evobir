@@ -13,7 +13,7 @@ mode(x)
 \details{
 Returns the most frequently occuring value in a vector. In the case of a tie it will return the mode which has the earliest initial occurence in the vector}
 \value{
-retunrs the most frequently occuring value in a series of numbers
+returns the most frequently occuring value in a series of numbers
 }
 \references{
 \url{http://www.uta.edu/karyodb/evobiR/}}

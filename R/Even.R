@@ -1,7 +1,11 @@
 Even <- function(x){
-  if(x/2 == round(x/2)){
-    return(T)
-  }else{
-    return(F)
+  result <- vector()
+  for(i in 1:length(x)){
+    if(x[i]/2 == round(x[i]/2)){
+      result[i] <- T
+    }else{
+      result[i] <- F
+    }
   }
+  return(result)
 }
