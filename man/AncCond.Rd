@@ -7,7 +7,7 @@ AncCond(trees, data, derived.state, iterations=1000)
 }
 \arguments{
   \item{trees}{tree(s) of class phylo or multiPhylo}
-  \item{data}{a dataframe with rows matching the tips on the tree, and 2 columns the first should have the continuous trait value and the second the state of the binary character}
+  \item{data}{a dataframe with 3 columns. The first should match the taxa names in the tree, the second should have the continuous trait values and the third the states for the binary character}
   \item{derived.state}{the derived condition for the binary trait}
   \item{iterations}{the number of iterations to be used in estimating significance}
 }
