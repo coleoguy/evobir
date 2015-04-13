@@ -51,7 +51,7 @@ AncCond <- function(trees, data, derived.state, iterations=10){
       ##### pi argumentis is hard coded should look at the Levels present in data[,3] and
       ##### code the pi so derived = 0 and ancestral =1
       ##########################################################################################
-      temp.anc <- make.simmap(trees[[i]], dt.vec, model = "ARD", nsim = 1, pi=c(1,0), message=F)
+      temp.anc <- make.simmap(trees[[i]], dt.vec, model = "ARD", nsim = 1, pi=c(.999,.001), message=F)
       anc.state.dt[[i]] <- temp.anc
     }
   }
