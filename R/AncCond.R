@@ -1,7 +1,5 @@
 library(phytools)
 # to do:
-# line 45 fix pi argument
-# do one more walk through with a tree and visually make sure its working
 #
 #
 ################################################
@@ -13,10 +11,12 @@ library(phytools)
 ################################################
 ##
 ## INPUT DATA
-## trees: a multiPhylo object
+## trees: a phylo or multiPhylo object
 ## data: a dataframe with three collumns (tips, cont trait, disc trait)
-## derived.state: a text string matching one of the entriesin column 3 of data
-## iterations the number of Monte Carlo simulations per tree
+## derived.state: a text string or numeric matching one of the 
+##                entries in column 3 of data
+## iterations the number of Monte Carlo simulations per tree 
+##                used to calc p-value
 
 AncCond <- function(trees, data, derived.state, iterations=10){
 
@@ -47,16 +47,25 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   anc.state.dt  <- list()
   if(class(trees) == "multiPhylo"){
     for(i in 1:length(trees)){
-      ##########################################################################################
-      ##### pi argumentis is hard coded should look at the Levels present in data[,3] and
-      ##### code the pi so derived = 0 and ancestral =1
-      ##########################################################################################
-      temp.anc <- make.simmap(trees[[i]], dt.vec, model = "ARD", nsim = 1, pi=c(.999,.001), message=F)
+      #################################################################
+      ##### pi argumentis is hard coded so derived = 0 and ancestral =1
+      #################################################################
+      temp.anc <- make.simmap(trees[[i]], 
+                              dt.vec, 
+                              model = matrix(c(0, 0, 1, 0), 2), 
+                              nsim = 1, 
+                              pi=c(1, 0), 
+                              message=F)
       anc.state.dt[[i]] <- temp.anc
     }
   }
   if(class(trees) == "phylo"){
-    temp.anc <- make.simmap(trees, dt.vec, model = "ARD", nsim = 1, pi=c(1,0), message=F)
+    temp.anc <- make.simmap(trees, 
+                            dt.vec, 
+                            model = matrix(c(0, 0, 1, 0), 2), 
+                            nsim = 1, 
+                            pi=c(1,0), 
+                            message=F)
     anc.state.dt[[1]] <- temp.anc
   }
     
@@ -65,7 +74,8 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   if(class(trees) == "multiPhylo"){
     for(i in 1:length(trees)){
       anc.state.bi <- anc.state.dt[[i]]
-      ss_nodes <- anc.state.bi$mapped.edge[,1] > 0 & anc.state.bi$mapped.edge[,2] > 0
+      ss_nodes <- anc.state.bi$mapped.edge[,1] > 0 & 
+        anc.state.bi$mapped.edge[,2] > 0
       wanted_branches <- ss_nodes[ss_nodes==T]
       wanted_nodes <- names(wanted_branches)
       wanted_nodes <- gsub(",.*","",wanted_nodes)
@@ -74,7 +84,8 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   }
   if(class(trees) == "phylo"){
     anc.state.bi <- anc.state.dt[[1]]
-    ss_nodes <- anc.state.bi$mapped.edge[,1] > 0 & anc.state.bi$mapped.edge[,2] > 0
+    ss_nodes <- anc.state.bi$mapped.edge[,1] > 0 & 
+      anc.state.bi$mapped.edge[,2] > 0
     wanted_branches <- ss_nodes[ss_nodes==T]
     wanted_nodes <- names(wanted_branches)
     wanted_nodes <- gsub(",.*","",wanted_nodes)
@@ -88,13 +99,15 @@ AncCond <- function(trees, data, derived.state, iterations=10){
     for(i in 1:length(trees)){
       anc.states <- anc.states.cont.trait[[i]]
       producing.nodes <- producing.nodes.list[[i]]
-      hd.nodes[i] <- mean(anc.states$ace[names(anc.states$ace) %in% producing.nodes])
+      hd.nodes[i] <- mean(anc.states$ace[names(anc.states$ace) %in% 
+                                           producing.nodes])
     }
   }
   if(class(trees) == "phylo"){
     anc.states <- anc.states.cont.trait[[1]]
     producing.nodes <- producing.nodes.list[[1]]
-    hd.nodes[1] <- mean(anc.states$ace[names(anc.states$ace) %in% producing.nodes])
+    hd.nodes[1] <- mean(anc.states$ace[names(anc.states$ace) %in% 
+                                         producing.nodes])
   }
     hd.nodes <- mean(hd.nodes)
 
@@ -109,9 +122,12 @@ AncCond <- function(trees, data, derived.state, iterations=10){
       anc.dt <- anc.state.dt[[i]]
       anc.ct <- anc.states.cont.trait[[i]]
       node.states <- describe.simmap(anc.dt)$states
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)[node.states != derived.state]]
+      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% 
+                                     names(node.states)[node.states != 
+                                                          derived.state]]
       for(j in 1:iterations){
-        null.anc.nodes[counter] <- mean(sample(anc.cond.nodes, length(producing.nodes)))
+        null.anc.nodes[counter] <- mean(sample(anc.cond.nodes, 
+                                               length(producing.nodes)))
         counter <- counter + 1
       }
     }
@@ -122,9 +138,12 @@ AncCond <- function(trees, data, derived.state, iterations=10){
       anc.dt <- anc.state.dt[[1]]
       anc.ct <- anc.states.cont.trait[[1]]
       node.states <- describe.simmap(anc.dt)$states
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)[node.states != derived.state]]
+      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% 
+                                     names(node.states)[node.states != 
+                                                          derived.state]]
       for(j in 1:iterations){
-        null.anc.nodes[counter] <- mean(sample(anc.cond.nodes, length(producing.nodes)))
+        null.anc.nodes[counter] <- mean(sample(anc.cond.nodes, 
+                                               length(producing.nodes)))
         counter <- counter + 1
       }
     }
@@ -133,11 +152,15 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   plot(density(null.anc.nodes), main="", xlab=colnames(data)[2], lwd=2)
   max.y <- range(density(null.anc.nodes)[2])[2]
   lines(x=c(hd.nodes,hd.nodes), y=c(0, max.y), col="red", lty=1, lwd=2)
-  text(17,.4, label=paste("p-value", sum(null.anc.nodes<hd.nodes)/length(null.anc.nodes)))
+  text(17,.4, label=paste("p-value", 
+                          sum(null.anc.nodes<hd.nodes) / 
+                            length(null.anc.nodes)))
 
   ## how many more extreme
-  bigger <- (sum(null.anc.nodes >= hd.nodes)/length(null.anc.nodes)) * 100
-  smaller <- (sum(null.anc.nodes <= hd.nodes)/length(null.anc.nodes)) * 100
+  bigger <- (sum(null.anc.nodes >= hd.nodes)/
+               length(null.anc.nodes)) * 100
+  smaller <- (sum(null.anc.nodes <= hd.nodes)/
+                length(null.anc.nodes)) * 100
   
   
   ## print results to terminal
@@ -146,15 +169,11 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   cat(paste("Mean of null dist:", mean(null.anc.nodes), "\n"))
   cat(paste("SD of null dist:", sd(null.anc.nodes), "\n"))
   cat(paste(bigger), "% of simulations had a derived state which arrose\n", 
-      "with a mean continuous value larger than inferred for the observed derived state\n")
+      "with a mean continuous value larger than 
+      inferred for the observed derived state\n")
   cat(paste(smaller), "% of simulations had a derived state which arrose\n", 
-    "with a mean continuous value smaller than inferred for the observed derived state\n")
-
-  
- 
-############## add a 1 vs 2 sided flag and calculate the p-value for the user
-  
-
+    "with a mean continuous value smaller than 
+    inferred for the observed derived state\n")
   
   ## return results to user
   results <- list()
@@ -163,6 +182,7 @@ AncCond <- function(trees, data, derived.state, iterations=10){
   results[[3]] <- null.anc.nodes
   results[[4]] <- bigger
   results[[5]] <- smaller
-  names(results) <- c("OriginatingNodes", "NTrans", "NullDist", "bigger", "smaller")
+  names(results) <- c("OriginatingNodes", "NTrans", 
+                      "NullDist", "bigger", "smaller")
   return(results)
 }
