@@ -24,7 +24,7 @@ Heath Blackmon
 }
 
 \examples{
-SuperMatrix(missing = "N", file = "conc..fasta")
+SuperMatrix(missing = "N", prefix = "DATASET2", save = T)
 }
 \keyword{ concatention alignment DNA fasta }
-\keyword{ superMatrix, concatenation, alignment }
+\keyword{ SuperMatrix, concatenation, alignment }
