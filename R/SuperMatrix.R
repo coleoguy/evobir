@@ -1,4 +1,4 @@
-superMatrix <- function(missing = "-", format = "f",
+SuperMatrix <- function(missing = "-",
                         file = "conc.alignment.fasta"){
   # get file names
   file.names <- list.files()
@@ -6,10 +6,10 @@ superMatrix <- function(missing = "-", format = "f",
   DNA <- list()
   for(i in 1:length(file.names)){
     DNA[[i]] <- read.dna(file=file.names[i], 
-                         format = format, 
+                         format = "f", 
                          as.character=T)
   }
-  # calculate total alignment lenght
+  # calculate total alignment length
   total.length <- 0
   for(i in 1:length(DNA)){
     total.length <- total.length + ncol(DNA[[i]])
@@ -35,8 +35,8 @@ superMatrix <- function(missing = "-", format = "f",
   c.col <- 0
   for(i in 1:length(DNA)){
     gene <- DNA[[i]]
+    print(i)
     for(j in 1:nrow(gene)){
-      print(j)
       c.row <- which(rownames(seqmatrix) == rownames(gene)[j])
       seqmatrix[c.row, (c.col + 1):(c.col + ncol(gene))] <- gene[j, ]
     }
