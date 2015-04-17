@@ -1,5 +1,6 @@
 SuperMatrix <- function(missing = "-",
-                        file = "conc.alignment.fasta"){
+                        prefix = "concatenated",
+                        save = T){
   # get file names
   file.names <- list.files()
   # read DNA
@@ -49,7 +50,13 @@ SuperMatrix <- function(missing = "-",
   results <- list()
   results[[1]] <- partitions
   results[[2]] <- seqmatrix
-  write.dna(seqmatrix, file=file, format="f")
-  write.csv(partitions, row.names=F, file="partitions.csv")
+  if(save == T){
+    write.dna(seqmatrix, 
+              file = paste(prefix, ".fasta", sep = ""), 
+              format = "f")
+    write.csv(partitions, 
+              row.names = F, 
+              file = paste(prefix, ".partitions.csv", sep = ""))
+  }
   return(results)
 }
