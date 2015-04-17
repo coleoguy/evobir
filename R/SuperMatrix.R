@@ -37,7 +37,7 @@ SuperMatrix <- function(missing = "-",
   c.col <- 0
   print("Creating supermatrix")
   for(i in 1:length(DNA)){
-    print("Processing alignment", i)
+    print(paste("Processing alignment", i))
     gene <- DNA[[i]]
     print(i)
     for(j in 1:nrow(gene)){
