@@ -5,6 +5,7 @@ SuperMatrix <- function(missing = "-",
   # read DNA
   DNA <- list()
   for(i in 1:length(file.names)){
+    print(paste("Reading alignment", i))
     DNA[[i]] <- read.dna(file=file.names[i], 
                          format = "f", 
                          as.character=T)
@@ -33,7 +34,9 @@ SuperMatrix <- function(missing = "-",
   colnames(partitions) <- c("part", "start", "stop")
   #build the supermatrix
   c.col <- 0
+  print("Creating supermatrix")
   for(i in 1:length(DNA)){
+    print("Processing alignment", i)
     gene <- DNA[[i]]
     print(i)
     for(j in 1:nrow(gene)){

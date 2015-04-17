@@ -9,7 +9,6 @@ superMatrix(missing = "-", file = "conc.alignment.fasta")
 }
 \arguments{
   \item{missing}{the character to use when no data is available for a taxa}
-  \item{format}{the format of the input alignments}
   \item{file}{file name for the resulting supermatrix}
 }
 \details{
