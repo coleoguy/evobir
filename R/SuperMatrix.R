@@ -51,6 +51,7 @@ SuperMatrix <- function(missing = "-",
   results[[1]] <- partitions
   results[[2]] <- seqmatrix
   if(save == T){
+    print("saving files")
     write.dna(seqmatrix, 
               file = paste(prefix, ".fasta", sep = ""), 
               format = "f")
