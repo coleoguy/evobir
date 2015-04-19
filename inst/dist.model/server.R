@@ -42,12 +42,12 @@ shinyServer(function(input, output) {
 
 SE <- reactive({
   if(input$select == 1){
-    sd(rnorm(input$n, mean = input$mu, sd=input$sigma))
+    sd(rnorm(input$n, mean = input$mu, sd=input$sigma)) / sqrt(input$n)
   }
 })
 SD <- reactive({
   if(input$select == 1){
-    sd(rnorm(input$n, mean = input$mu, sd=input$sigma)) / sqrt(input$n)
+    sd(rnorm(input$n, mean = input$mu, sd=input$sigma))
   }
 })
 
@@ -58,9 +58,9 @@ SD <- reactive({
       plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,.6), xlab="x",
            main=paste("Normal probability density"), type="l", lwd=3)
       abline(h=0, lty=3, cex=2)
-      mtext(text = paste("SE =", SE, digits=4),
+      mtext(text = paste("SE =", round(SE(), digits=4)),
             side=3,line=-2)
-      mtext(text = paste("SD est =", SD, digits=4),
+      mtext(text = paste("SD est =", round(SD(), digits=4)),
             side=3,line=-3)
     }else if(input$select == 2){
       plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,11), xlab="x",
