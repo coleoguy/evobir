@@ -61,7 +61,7 @@ SD <- reactive({
       mtext(text = paste("SE =", SE, digits=4),
             side=3,line=-2)
       mtext(text = paste("SD est =", SD, digits=4),
-            side=3,line=-2)
+            side=3,line=-3)
     }else if(input$select == 2){
       plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,11), xlab="x",
            main=paste("Exponential probability density"), type="l", lwd=3)
