@@ -58,9 +58,9 @@ SD <- reactive({
       plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,.6), xlab="x",
            main=paste("Normal probability density"), type="l", lwd=3)
       abline(h=0, lty=3, cex=2)
-      mtext(text = paste("SE =", SE, digits=4)),
+      mtext(text = paste("SE =", SE, digits=4),
             side=3,line=-2)
-      mtext(text = paste("SD est =", SD, digits=4)),
+      mtext(text = paste("SD est =", SD, digits=4),
             side=3,line=-2)
     }else if(input$select == 2){
       plot(x=x(), y=y(), col = "red", ylab="density", ylim=c(0,11), xlab="x",
