@@ -13,9 +13,8 @@ install.packages('evobiR')
 
 If you want the very latest version of evobiR then you can install my developmental version from GitHub.
 
-You don't have the package devtools installed yet you will need to do that first:
+First install the package devtools if you dont have it yet:
 install.packages("devtools")
-
 
 library(devtools)
 
@@ -23,6 +22,5 @@ install_github('coleoguy/evobir')
 
 library(evobiR)
 
-
 if you have questions or problems please let me know
-coleoguy at gmail dot com.
+coleoguy@gmail.com.
