@@ -6,6 +6,12 @@ Date: 2014-10-08
 Author: Heath Blackmon and Richard H. Adams
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: http://www.uta.edu/karyodb/evobiR/
-Depends: seqinr, ape, geiger, shiny, phytools 
 Description: evobiR is a collection of tools for use in evolutionary biology
 License: GPL (>=2)
+Imports: 
+     seqinr, 
+     ape, 
+     geiger, 
+     shiny, 
+     phytools 
+
