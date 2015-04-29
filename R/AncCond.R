@@ -1,4 +1,3 @@
-library(phytools)
 # to do:
 #
 #
