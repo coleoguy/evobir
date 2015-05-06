@@ -6,7 +6,9 @@ library(evobiR)
 
 
 #calcD functions
-CalcD(alignment = system.file("1.fasta", package = "evobiR"), boot = TRUE, replicate=10)
+CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test="N", replicate=10)
+CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test="B", replicate=10)
+CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test="J", block.size=100,replicate=10)
 CalcPartD(alignment = system.file("2.fasta", package = "evobiR"), boot = TRUE, 10)
 CalcPopD(alignment = system.file("3.fasta", package = "evobiR"))
 
