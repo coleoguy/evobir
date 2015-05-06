@@ -5,7 +5,7 @@
 \title{Calculate Patterson's D-statistic}
 \description{These functions calculate Patterson's D-statistic to compare the frequencies of discordant SNP genealogies.  These tests assume equal substitution rates and unlinked loci, D-statistics significantly different from 0 suggest that introgression has occurred.}
 \usage{
-CalcD(alignment = "alignment.fasta", boot = F, replicate = 1000)
+CalcD(alignment = "alignment.fasta", sig.test = "N", block.size = 1000, replicate = 1000)
 
 CalcPartD(alignment = "alignment.fasta", boot = F, replicate = 1000, alpha = 0.05)
 
@@ -14,11 +14,12 @@ CalcPopD(alignment = "alignment.fasta")
 }
 \arguments{
   \item{alignment}{This is an alignment in fasta format}
-  \item{boot}{This indicates whether or not bootstrapping should be performed to estimate variance}
+  \item{sig.test}{This indicates whether or if to test for significance. Options are "B" bootstrap, "J" jackknife, or "N" none.}
+  \item{block.size}{The number of sites to be dropped in the jackknife approach}
   \item{replicate}{Number of replicates to be used in estimating variance}
   \item{alpha}{The desired alpha level, used in calculating significance of tests in CalcPartD after Bonferoni correction}
 }
-\details{ The functions CalcD and CalcPopD are implementations of the algorithm described in Durand et al. 2011.  The function CalcPartD is an implementation of the extension that was reported by Eaton and Ree 2013 which extended the original ABBA-BABA test to include additional taxa providing the ability to identify the source population of introgression events when more than one extant lineage may have hybridized with the ingroup.}
+\details{ The functions CalcD and CalcPopD are implementations of the algorithm described in Durand et al. 2011.  The function CalcPartD is an implementation of the extension that was reported by Eaton and Ree 2013 which extended the original ABBA-BABA test to include additional taxa providing the ability to identify the source population of introgression events when more than one extant lineage may have hybridized with the ingroup.  Significance of the D-stat can be calculated either through bootstrapping or jackknifing.  Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data.  Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments.}
 \value{
 Returns the number of each type of site, Z scores and p-values
 }
