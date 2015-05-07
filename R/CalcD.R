@@ -50,8 +50,7 @@ CalcD <- function(alignment = "alignment.fasta",
       results <- d.calc(sim.matrix)
       sim.d[k] <- results[[1]]
     }
-    z <- abs(d/sd.sim.d)
-    sd.sim.d <- round(sd(sim.d),5)
+    z <- abs(d-0/sd(sim.d))
     new.pval <- 2 * (1 - pnorm(z))
     ## NOW WE MAKE THE OUTPUTS  
     cat("\nSites in alignment =", ncol(alignment.matrix))
