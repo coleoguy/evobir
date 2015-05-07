@@ -59,7 +59,7 @@ CalcD <- function(alignment = "alignment.fasta",
     cat("\nNumber of sites with BABA pattern =", baba)
     cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
     cat("\n\nResults from ", replicate, "bootstraps")
-    cat("\nSD D statistic =", sd.sim.d)
+    cat("\nSD D statistic =", sd(sim.d))
     cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
   }
 
