@@ -50,16 +50,15 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
         }
         sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)   #what its all about   
       }
-      sd.sim.d <- round(sqrt(var(sim.d)),5)
-      mn.sim.d <- round(mean(sim.d),5)
-      new.pval <- 2*(pnorm(-abs(d/sd.sim.d)))
+      z <- abs(d/sd(sim.d))
+      new.pval <- 2 * (1 - pnorm(z))
       ## NOW WE MAKE THE OUTPUTS  
       cat("\nSites in alignment =", ncol(alignment.matrix))
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)
-      cat("\n\nD raw statistic / Z-score = ", d, " / ", d/sd.sim.d)
+      cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
       cat("\n\nResults from ", replicate, "bootstraps")
-      cat("\nSD D statistic =", sd.sim.d)
+      cat("\nSD D statistic =", sd(sim.d))
       cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
       results.matrix[q, 1:6] <- c(paste(starting,":",ending,sep=""), 
                                   abba, baba, d, d/sd.sim.d, new.pval)
