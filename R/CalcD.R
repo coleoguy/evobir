@@ -50,13 +50,14 @@ CalcD <- function(alignment = "alignment.fasta",
       results <- d.calc(sim.matrix)
       sim.d[k] <- results[[1]]
     }
+    z <- abs(d/sd.sim.d)
     sd.sim.d <- round(sd(sim.d),5)
-    new.pval <- 2 * (1 - pnorm(-abs(d/sd.sim.d)))
+    new.pval <- 2 * (1 - pnorm(z))
     ## NOW WE MAKE THE OUTPUTS  
     cat("\nSites in alignment =", ncol(alignment.matrix))
     cat("\nNumber of sites with ABBA pattern =", abba)
     cat("\nNumber of sites with BABA pattern =", baba)
-    cat("\n\nD raw statistic / Z-score = ", d, " / ", d/sd.sim.d)
+    cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
     cat("\n\nResults from ", replicate, "bootstraps")
     cat("\nSD D statistic =", sd.sim.d)
     cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
