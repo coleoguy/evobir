@@ -36,7 +36,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
       foo <- ncol(alignment.matrix)
       sim.matrix<-matrix(,4,foo)
       for(k in 1:replicate){      
-        sim.matrix[1:4,1:foo] <-alignment.matrix[1:4, sample(1:foo, replace = T)])
+        sim.matrix[1:4,1:foo] <- alignment.matrix[1:4, sample(1:foo, replace = T)]
         t.abba <- t.baba <- 0                                                                         #  set up my variables
         for(i in 1:ncol(sim.matrix)){                                               #  run through all sites
           if(length(unique(sim.matrix[, i])) == 2){                                 #  unique(c(p1,p2,p3,o))==2 aka biallelic
