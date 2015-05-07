@@ -3,7 +3,7 @@
 \title{Calculate Patterson's D-statistic in sliding windows}
 \description{This functions calculate Patterson's D-statistic in windows.}
 \usage{
-CalcD(alignment = "alignment.fasta", win.size = 500, , step.size=50,
+WinCalcD(alignment = "alignment.fasta", win.size = 500, , step.size=50,
 boot = F, replicate = 1000)
 }
 \arguments{
