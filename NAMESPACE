@@ -1,7 +1,6 @@
 export(AICc)
 export(AncCond)
 export(CalcD)
-export(CalcPartD)
 export(CalcPopD)
 export(Even)
 export(FuzzyMatch)
