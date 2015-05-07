@@ -50,9 +50,8 @@ CalcD <- function(alignment = "alignment.fasta",
       results <- d.calc(sim.matrix)
       sim.d[k] <- results[[1]]
     }
-    sd.sim.d <- round(sqrt(var(sim.d)),5)
-    mn.sim.d <- round(mean(sim.d),5)
-    new.pval <- 2*(pnorm(-abs(d/sd.sim.d)))
+    sd.sim.d <- round(sd(sim.d),5)
+    new.pval <- 2 * (1 - pnorm(-abs(d/sd.sim.d)))
     ## NOW WE MAKE THE OUTPUTS  
     cat("\nSites in alignment =", ncol(alignment.matrix))
     cat("\nNumber of sites with ABBA pattern =", abba)
