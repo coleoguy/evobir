@@ -93,17 +93,16 @@ if(sig.test=="J"){
     results <- d.calc(sim.matrix)
     sim.d[k] <- results[[1]]
   }
-  sd.sim.d <- round(sqrt(var(sim.d)),5)
-  mn.sim.d <- round(mean(sim.d),5)
-  new.pval <- 2*(pnorm(-abs(d/sd.sim.d)))
+  z <- abs(d/sd(sim.d))
+  new.pval <- 2 * (1 - pnorm(z))
   ## NOW WE MAKE THE OUTPUTS  
   cat("\nSites in alignment =", ncol(alignment.matrix))
   cat("\nNumber of sites with ABBA pattern =", abba)
   cat("\nNumber of sites with BABA pattern =", baba)
   cat("\nD raw statistic", d)
-  cat("\nZ-score = ", d/sd.sim.d)
+  cat("\nZ-score = ", z)
   cat("\n\nResults from", replicate2, "jackknifes with block size of", block.size)
-  cat("\nSD D statistic =", sd.sim.d)
+  cat("\nSD D statistic =", sd(sim.d))
   cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
 }
   if(sig.test=="N"){
