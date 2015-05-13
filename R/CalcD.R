@@ -32,6 +32,7 @@ CalcD <- function(alignment = "alignment.fasta",
   }
   results <- d.calc(alignment.matrix)
   d <- results[[1]]
+  if(is.nan(d)) d <- 0
   abba <- results[[2]]
   baba <- results[[3]]
   
@@ -45,11 +46,12 @@ CalcD <- function(alignment = "alignment.fasta",
     sim.matrix<-matrix(,4,foo)
     cat("\nperforming bootstrap")
     for(k in 1:replicate){
-      cat(".")
+      if(k/(replicate/100) == round(k/(replicate/100))) cat(".")
       sim.matrix[1:4,1:foo] <- alignment.matrix[1:4, sample(1:foo, replace=T)]
       results <- d.calc(sim.matrix)
       sim.d[k] <- results[[1]]
     }
+    sim.d[is.nan(sim.d)] <- 0
     z <- abs(d/sd(sim.d))
     new.pval <- 2 * (1 - pnorm(z))
     ## NOW WE MAKE THE OUTPUTS  
@@ -79,7 +81,14 @@ if(sig.test=="J"){
               "sites \nsome sites would never be included in the \nanalysis",
               "\n\nThe maximum block size is 1/2 the alignment length"))
   }
-  if(max.rep > replicate){
+  if(max.rep < replicate){
+    stop(call. = F, paste("\nWith a block size of", block.size, 
+                          "and an alignment of", ncol(alignment.matrix), 
+                          "sites", replicate, "replicates\nare not possible"))
+  }
+  
+  
+  if(max.rep >= replicate){
     drop.pos <- seq.int(from=1, to=(max.rep-1), length.out=replicate)
     replicate2 <- replicate
   }
@@ -88,11 +97,12 @@ if(sig.test=="J"){
   sim.matrix<-matrix(,4,foo-block.size)
   cat("\nperforming jackknife")
   for(k in 1:replicate2){  
-    cat(".")
+    if(k/2 == round(k/2)) cat(".")
     sim.matrix[1:4,1:(foo-block.size-1)] <-alignment.matrix[1:4, -drop.pos[k]:-(drop.pos[k]+block.size)]
     results <- d.calc(sim.matrix)
     sim.d[k] <- results[[1]]
   }
+  sim.d[is.nan(sim.d)] <- 0
   z <- abs(d/sd(sim.d))
   new.pval <- 2 * (1 - pnorm(z))
   ## NOW WE MAKE THE OUTPUTS  

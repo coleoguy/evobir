@@ -1,5 +1,5 @@
 WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50,
-                     boot = F, replicate = 1000){
+                     boot = F, replicate=1000){
   alignment <- read.alignment(alignment, format = "fasta")                         #  read in the alignment
   alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
   for(i in 1:length(alignment$nam)){
@@ -26,7 +26,8 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
         }
       }
     }
-    d <- (abba - baba) / (abba + baba)   #what its all about    
+    d <- (abba - baba) / (abba + baba)   #what its all about 
+    if(is.nan(d)) d <- 0   # if there are no ABBA BABA sites should interpret as zero
   ## THIS SECTION WILL CALCULATE THE P-VAL BASED ON BOOTSTRAPPING
   ## SITES ARE SAMPLED WITH REPLACEMENT TO MAKE A NEW DATASET OF
   ## OF EQUAL SIZE TO THE ORIGINAL DATASET THIS ALLOWS US TO CALCULATE
@@ -50,18 +51,22 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
         }
         sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)   #what its all about   
       }
-      z <- abs(d/sd(sim.d))
+      sim.d[is.nan(sim.d)] <- 0
+      z <- abs(d/sd(sim.d, na.rm = T))
+      z[is.nan(z)] <- 0
       new.pval <- 2 * (1 - pnorm(z))
       ## NOW WE MAKE THE OUTPUTS  
+      cat("\n\n TEST FUNCTION\n\n")
+      print(sim.d)
       cat("\nSites in alignment =", ncol(alignment.matrix))
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)
       cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
       cat("\n\nResults from ", replicate, "bootstraps")
-      cat("\nSD D statistic =", sd(sim.d))
+      cat("\nSD D statistic =", sd(sim.d, na.rm = F))
       cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
       results.matrix[q, 1:6] <- c(paste(starting,":",ending,sep=""), 
-                                  abba, baba, d, d/sd.sim.d, new.pval)
+                                  abba, baba, d, z, new.pval)
       
     }
     if(boot==F){
