@@ -5,12 +5,12 @@ creates a supermatrix from multiple gene alignments}
 \description{
 combines all alignments in a folder into a single supermatrix}
 \usage{
-superMatrix(missing = "-", file = "conc.alignment.fasta", save = T)
+SuperMatrix(missing = "-", prefix = "concatenated", save = T)
 }
 \arguments{
   \item{missing}{the character to use when no data is available for a taxa}
-  \item{file}{file name for the resulting supermatrix}
-  \item{save}{if T then supermatrix and partition file will be saved}
+  \item{prefix}{prefix for the resulting supermatrix}
+  \item{save}{if True then supermatrix and partition file will be saved}
 }
 \details{
 This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.}
@@ -24,7 +24,9 @@ Heath Blackmon
 }
 
 \examples{
+\dontrun{
 SuperMatrix(missing = "N", prefix = "DATASET2", save = T)
+}
 }
 \keyword{ concatention alignment DNA fasta }
 \keyword{ SuperMatrix, concatenation, alignment }

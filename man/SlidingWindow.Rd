@@ -5,7 +5,7 @@ Sliding window analysis}
 \description{
 Applies a function within a sliding window of a numeric vector.  Both the step size and the window size can be set by the user.}
 \usage{
-SlidingMean(FUN, data, window, step)
+SlidingWindow(FUN, data, window, step)
 }
 \arguments{
   \item{FUN}{a function to be applied within each window.}

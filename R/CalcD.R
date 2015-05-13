@@ -1,6 +1,6 @@
 CalcD <- function(alignment = "alignment.fasta", 
-                  sig.test="B",                                                    # options are "N", "B", "J"
-                  block.size = 100,                                                # size of blocks to drop in jacknife
+                  sig.test="N",                                                    # options are "N", "B", "J"
+                  block.size = 1000,                                                # size of blocks to drop in jacknife
                   replicate=1000){
   # this function is used regardless of approach
   d.calc <- function(alignment){

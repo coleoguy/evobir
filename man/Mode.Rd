@@ -5,7 +5,7 @@ Calcualtes the mode of a numeric vector}
 \description{
 R's base package function mode returns the type of object 'numeric', 'character' etc.  This give the option of an easy  to remember work around for that.}
 \usage{
-mode(x)
+Mode(x)
 }
 \arguments{
   \item{x}{a numerical vector.}

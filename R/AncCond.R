@@ -17,7 +17,7 @@
 ## iterations the number of Monte Carlo simulations per tree 
 ##                used to calc p-value
 
-AncCond <- function(trees, data, derived.state, iterations=10){
+AncCond <- function(trees, data, derived.state, iterations=1000){
 
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]

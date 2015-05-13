@@ -19,16 +19,5 @@ Returns data in the same format as supplied but reordered to match the order of 
 \author{
 Heath Blackmon
 }
-
-\examples{
-data(finch)
-phy <- finch$phy
-data <- finch$data[,"wingL"]
-# we create a second dataset with the order of taxa randomized
-data <- sample(data, size=13)
-names(data) == phy$tip.label ## order is different
-data <- ReorderData(phy, data)
-names(data) == phy$tip.label ## order is the same
-}
 \keyword{ model comparison }
 \keyword{ AICc }
