@@ -9,13 +9,12 @@
 \tabular{ll}{
 Package: \tab evobiR\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 1.1\cr
 Date: \tab 2013-10-08\cr
 License: \tab GPL (>=2)\cr
 }
-More information on \pkg{evobiR} is available at \url{http://www.uta.edu/karyodb/evobiR/}
+More information on \pkg{evobiR} is available at \url{http://coleoguy.github.io/software.html}
 
-A full list of functions in the \pkg{evobiR} package is accesible by typing library(help = evobiR)
 }
 \author{
 Heath Blackmon

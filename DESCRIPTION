@@ -1,7 +1,7 @@
 Package: evobiR
 Type: Package
 Title: evobiR: evolutionary biology in R.
-Version: 1.01
+Version: 1.1
 Date: 2014-10-08
 Author: Heath Blackmon and Richard H. Adams
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
