@@ -12,7 +12,7 @@ ViewEvo(simulation)
 }
 \details{  The wf.model was implemented to illustrate to students the effects of genetic drift.  In particular the high likelihood of losing a beneficial allele when population size is finite.  The bd.model will plot 4 phylogenetic trees based on a birth death model with a single set of parameters.  This application was developed to illustrate the high variability of a birth death process as a generating model for phylogenies and the inherint difficulty in detecting differential diversification rates.  Finally the dist.model was developed to help illustrate the relationship between common statistical distributions often used as priors and the way that parameters effect the density distribution.}
 \value{This function returns an interactive webpage.}
-\references{\url{http://www.uta.edu/karyodb/evobiR/}}
+\references{\url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
 \examples{
 \dontrun{

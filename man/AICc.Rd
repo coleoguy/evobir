@@ -15,7 +15,7 @@ AICc(loglik, K, N)
 \details{
 Returns an AICc score.}
 \references{
-\url{http://www.uta.edu/karyodb/evobiR/}}
+\url{http://coleoguy.github.io/}}
 \author{
 Heath Blackmon
 }

@@ -16,7 +16,7 @@ PPSDiscrete(trees, MCMC, states, N = 2)
 \value{
 A matrix is returned with the rownames being the species names from the tree and each column containing a result of a single PPS.
 }
-\references{\url{http://www.uta.edu/karyodb/evobiR/}}
+\references{\url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
 \examples{
 data(trees)

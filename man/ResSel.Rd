@@ -1,6 +1,5 @@
 \name{ResSel}
 \alias{ResSel}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Selection on Residuals}
 \description{
 This function takes measurements of multiple traits and performs a linear regression and identifies those records with the largest and smallest residual.  Originally it was written to perform a regression of horn size on body size allowing for high and low selection lines.}
@@ -19,7 +18,7 @@ This function returns a list
 \item{high line}{ the ID numbers for the individuals selected for the high line}
 \item{low line}{ the ID numbers of the individuals selected for the low line}
 }
-\references{\url{http://www.uta.edu/karyodb/evobiR/}}
+\references{\url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
 \examples{
 data <- read.csv(file = system.file("horn.beetle.csv", package = "evobiR"))

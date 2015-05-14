@@ -15,9 +15,9 @@ ReorderData(tree, data, taxa.names="row names")
 \details{
 Returns data in the same format as supplied but reordered to match the order of tip labels.}
 \references{
-\url{http://www.uta.edu/karyodb/evobiR/}}
+\url{http://coleoguy.github.io/}}
 \author{
 Heath Blackmon
 }
-\keyword{ model comparison }
-\keyword{ AICc }
+\keyword{ comparative analysis }
+\keyword{ data munging }

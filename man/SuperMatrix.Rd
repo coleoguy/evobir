@@ -18,7 +18,7 @@ This function reads all fasta format alignments in the working directory and con
 A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix.  The second element is a dataframe version of the supermatrix. If the argument save is set to True then both of these files are also saved to the working directory.
 }
 \references{
-\url{http://www.uta.edu/karyodb/evobiR/}}
+\url{http://coleoguy.github.io/}}
 \author{
 Heath Blackmon
 }

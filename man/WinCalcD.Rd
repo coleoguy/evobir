@@ -18,7 +18,7 @@ boot = F, replicate = 1000)
 Returns a table with the number of each type of site, Z scores and p-values for each window in the genome
 }
 \author{Heath Blackmon}
-\references{http://www.uta.edu/karyodb/evobiR/
+\references{http://coleoguy.github.io/
 
 Durand, Eric Y., et al. Testing for ancient admixture between closely related populations. Molecular biology and evolution 28.8 (2011): 2239-2252.
 

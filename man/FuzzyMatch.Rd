@@ -19,8 +19,8 @@ FuzzyMatch(tree, data, max.dist)
   Name in tree\cr
   Number of differences\cr
 }
-\references{http://www.uta.edu/karyodb/evobiR/}
-\author{Heath Blackmon and Matt Pennell}
+\references{http://coleoguy.github.io/}
+\author{Heath Blackmon}
 \examples{
 data(hym.tree)
 names <- c("Pepsis_elegans", "Plagiolepis_alluaudi", "Pheidele_lucreti",

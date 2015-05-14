@@ -14,7 +14,7 @@
 \value{
 an object of the class "multiPhylo" is returned
 }
-\references{\url{http://www.uta.edu/karyodb/evobiR/}}
+\references{\url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
 \examples{
 SampleTrees(trees = system.file("trees.nex", package = "evobiR"), 

@@ -16,7 +16,7 @@ SlidingWindow(FUN, data, window, step)
 \details{
 Returns a vector of numeric values representing the applying the selected function within each window.  The length will be unequal to the original data and will be determined primarily by the step size.}
 \references{
-\url{http://www.uta.edu/karyodb/evobiR/}}
+\url{http://coleoguy.github.io/}}
 \author{
 Heath Blackmon
 }

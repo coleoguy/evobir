@@ -13,7 +13,7 @@ Even(x)
 \details{
 Returns a vector of logical values of the same length as the input vector. If the input value is not a number it will return an error message.}
 \references{
-\url{http://www.uta.edu/karyodb/evobiR/}}
+\url{http://coleoguy.github.io/}}
 \author{
 Heath Blackmon
 }

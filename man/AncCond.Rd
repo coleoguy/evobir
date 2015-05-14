@@ -15,7 +15,7 @@ AncCond(trees, data, derived.state, iterations=1000)
 \value{Returns a plot of the null distribution and the observed data as well as empirical p-value for the observed data.
 }
 \author{Heath Blackmon and Richard H. Adams}
-\references{http://www.uta.edu/karyodb/evobiR/}
+\references{http://coleoguy.github.io/}
 \examples{
 \dontrun{
 data(data.mite)
