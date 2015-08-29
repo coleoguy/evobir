@@ -18,9 +18,9 @@ AncCond(trees, data, derived.state, iterations=1000)
 \references{http://coleoguy.github.io/}
 \examples{
 \dontrun{
-data(data.mite)
+data(mite.trait)
 data(trees.mite)
-AncCond(trees, data, derived.state = "haplodiploidy", iterations=100) 
+AncCond(trees, mite.trait, derived.state = "haplodiploidy", iterations=100) 
 }
 }
 \keyword{ comparative method }

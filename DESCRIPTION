@@ -1,12 +1,16 @@
 Package: evobiR
 Type: Package
-Title: evobiR: evolutionary biology in R.
+Title: comparative and population genetic analyses
 Version: 1.1
-Date: 2014-10-08
+Date: 2015-8-25
 Author: Heath Blackmon and Richard H. Adams
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: http://www.uta.edu/karyodb/evobiR/
-Description: evobiR is a collection of tools for use in evolutionary biology
+Description: Comparative analysis of continuous traits influencing discrete 
+states, and utility tools to facillitate comparative analyses.  Implementations
+of ABBA/BABA type statistics to test for introgression in genomic data.
+Wright-Fisher, phylogenetic tree, and statistical distribution Shiny interactive
+simulations for use in teaching.
 License: GPL (>=2)
 Imports: 
      seqinr, 
