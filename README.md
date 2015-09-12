@@ -19,8 +19,11 @@ If you want the very latest version of evobiR then you can use devtools to insta
 
 <code>
   install.packages("devtools")
+  
   library(devtools)
+  
   install_github('coleoguy/evobir')
+  
   library(evobiR)
 </code>
 
