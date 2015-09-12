@@ -6,7 +6,7 @@ evolutionary biology in R
 
 citation:
 
-*Blackmon, Heath and Richard A. Adams. 2015. EvobiR: Tools for the analysis and teaching of comaparitive data. doi:10.5281/zenodo.30938*
+*Blackmon, Heath and Richard A. Adams. 2015. EvobiR: Tools for comparative analyses and teaching evolutionary biology. doi:10.5281/zenodo.30938*
 
 Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses. Implementations of ABBA/BABA type statistics to test for introgression in genomic data. Wright-Fisher, phylogenetic tree, and statistical distribution Shiny interactive simulations for use in teaching.
 
