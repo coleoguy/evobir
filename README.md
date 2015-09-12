@@ -17,15 +17,11 @@ to install from CRAN:
 
 If you want the very latest version of evobiR then you can use devtools to install from GitHub.
 
-<code>
-  install.packages("devtools")
-  
-  library(devtools)
-  
-  install_github('coleoguy/evobir')
-  
-  library(evobiR)
-</code>
+<code>install.packages("devtools")</code>
+<code>library(devtools)</code>
+<code>install_github('coleoguy/evobir')</code>
+<code>library(evobiR)</code>
+
 
 if you have questions or problems please let me know
 coleoguy@gmail.com.
