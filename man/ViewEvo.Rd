@@ -8,7 +8,7 @@ This uses the shiny app to produce interactive pages.
 ViewEvo(simulation)
 }
 \arguments{
-  \item{simulation}{Text string indicating the application to run.  Currently options are "wf.model", "bm.model", "bd.model", "dist.model"}
+  \item{simulation}{Text string indicating the application to run.  Currently options are "wf.model", "bm.model", "bd.model", "dist.model", "clumping.model"}
 }
 \details{
 The wf.model was implemented to illustrate to students the effects of genetic drift.  In particular the high likelihood of losing a beneficial allele when population size is finite.  
@@ -17,7 +17,10 @@ The bm.model was implemented to illustrate Brownian motion to students. It provi
 
 The bd.model will plot 4 phylogenetic trees based on a birth death model with a single set of parameters.  This application was developed to illustrate the high variability of a birth death process as a generating model for phylogenies and the inherint difficulty in detecting differential diversification rates.  
 
-Finally the dist.model was developed to help illustrate the relationship between common statistical distributions often used as priors and the way that parameters effect the density distribution.}
+The dist.model was developed to help illustrate the relationship between common statistical distributions often used as priors and the way that parameters effect the density distribution.
+
+Finally the clumping.model was developed to help a student determine if beetles that she observed were avoiding or congregating with each other.  To test this we simulate many instances of the same number of individuals randomly placed in the same sized area and create a null model and compare the average pairwise distance in simulations to that measured in an experiment.  In the experiment the beetles were in a petri dish so this function is designed to take a radius of the area and then the average pairwise distance measured in the "field"
+}
 \value{This function returns an interactive webpage.}
 \references{
 \url{http://coleoguy.github.io/}
