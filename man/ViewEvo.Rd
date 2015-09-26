@@ -15,6 +15,8 @@ The wf.model was implemented to illustrate to students the effects of genetic dr
 
 The bm.model was implemented to illustrate Brownian motion to students. It provides plots of multiple iterations of a trait evolving by brownian motion over the specified number of generations.  It also allows the student to plot the distribution of iterations at any selected point in time.  
 
+The bm.tree.model was implemented to illustrate Brownian motion along a tree. In this version the users specifies a birth rate for speciation and allows a trait to evolve by Brownian motion.  It also allows the student to plot the distribution of trait values at any selected point in time.  
+
 The bd.model will plot 4 phylogenetic trees based on a birth death model with a single set of parameters.  This application was developed to illustrate the high variability of a birth death process as a generating model for phylogenies and the inherint difficulty in detecting differential diversification rates.  
 
 The dist.model was developed to help illustrate the relationship between common statistical distributions often used as priors and the way that parameters effect the density distribution.
