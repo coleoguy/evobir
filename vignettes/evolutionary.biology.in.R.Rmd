@@ -47,6 +47,8 @@ All of the function in evobiR that are designed for teaching have been wrapped i
 ViewEvo("wf.model")
 ```
 This app provides a convenient interface for students to experiment with the interaction of drift and selection.  Students are able to control: initial allele frequency, population size, generations to run simulation, fitness of all genotypes, iterations to simulate, genotype or allele to plot, and mutation rate among alleles.  The app will also show the expected outcome assuming infinite population size and reports the number of times that each allele is lost or fixed.
+
+[web app version](https://evobir.shinyapps.io/wf_model)
  
 <img src="./images/wf.png" width="650" height="400" />
  
@@ -57,7 +59,9 @@ This app provides a convenient interface for students to experiment with the int
 ViewEvo("bm.model")
 ```
 This app provides a simple color blind friendly Brownian motion simulation where students can choose the generations, replicates, and rate of evolution.  This is app has a second interactive component that allows students to view the distribution of outcomes at any generation they select.
- 
+
+[web app version](https://evobir.shinyapps.io/brownian_motion)
+
 <img src="./images/bm.png" width="650" height="400" />
 
 
@@ -69,6 +73,8 @@ ViewEvo("bd.model")
 ```
 
 This app simply plots four random birth death trees on the same page.  This was orginally created to help students appreciate the high variance that is expected under a birth death model.  Stuents are able to control the speciation rate, extinction rate, time to simulate, and if extinct lineages should be pruned from the tree.
+
+[web app version](https://evobir.shinyapps.io/bd_model)
  
 <img src="./images/bd.png" width="650" height="400" />
 
@@ -83,6 +89,8 @@ ViewEvo("dist.model")
 
 attempting to help undergrads understand basic stats as well as helping graduate student pick appropriate priors inspired this app.  It allows the user to select among normal, exponential, gamma, logistic, poisson, or beta distributions and then allows them to control the parameter that describe the distribution.  Based on the users selections the probability density is plotted.
  
+[web app version](https://evobir.shinyapps.io/dist_model)
+
 <img src="./images/dist.png" width="650" height="400" />
 
 
@@ -104,7 +112,6 @@ This function uses stochastic mapping and ancestral state reconstruction to dete
 <img src="./images/anccond.png" width="500" height="500"/>
 
 Depiction of the four steps in our approach to estimating the probability of the continuous value associated with the origin of a transition into a derived state of a binary  character.  A) Estimation of the continuous trait assuming a brownian motion model of evolution. B) Identification of the transition points in the binary character through stochastic mapping C) Categorization of nodes as either ancestral or derived as well as those that have a daughter lineage experienceing an origin of the derived state of the binary character. D) Depiction of the null distribution from sampling continuous trait value at nodes in ancestral condition compared to the observed mean of producing nodes estimate from the data.
- 
 
 &nbsp;
  
@@ -130,8 +137,6 @@ set.seed(1)
 result <- evobiR::PPSDiscrete(trees, MCMC=mcmc3, states=c(.33,.33,.34),  N=3)
 result[1:10,1:3]
 ```
-
-
 
 ## ReorderData
 
@@ -161,7 +166,6 @@ species
 now we can see that our data and our tree are in the same order.
 
 &nbsp;
- 
 
 ## SampleTrees
 
@@ -173,9 +177,6 @@ SampleTrees(trees = system.file("trees.nex", package = "evobiR"),
 This function takes as its input a large collection of trees from a program like MrBayes or Beast and allows the user to select the number of randomly drawn trees they wish to retrieve and to save them in either newick or nexus format.
 
 &nbsp;
- 
-
-
 
 ## SuperMatrix
 
@@ -183,9 +184,7 @@ This function takes as its input a large collection of trees from a program like
 
 This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.  A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix. The second element is a dataframe version of the supermatrix. If the argument save is set to True then both of these files are also saved to the working directory.
 
-
 &nbsp;
- 
 
 _______
 # Population Genetics
@@ -198,7 +197,6 @@ Durand, Eric Y., et al. Testing for ancient admixture between closely related po
 Eaton, D. A. R., and R. H. Ree. 2013. Inferring phylogeny and introgression using RADseq data: An example from flowering plants (Pedicularis: Orobanchaceae). Syst. Biol. 62:689-706
 
 &nbsp;
- 
 
 _______
 # Utility/Misc. Functions
@@ -222,7 +220,6 @@ text(x=c(3,13),y=c(259,268),c("AIC","AICc"))
 ```
 
 &nbsp;
- 
 
 ## Even
 
@@ -234,7 +231,6 @@ Even(4)
 ```
 
 &nbsp;
- 
 
 ## Mode
 
@@ -246,8 +242,6 @@ Mode(c("jeff", "emma", "matt", "laura", "matt"))
 ```
 
 &nbsp;
- 
-
 
 ## Sliding window
 
@@ -275,7 +269,6 @@ text(y=90, x=1810, "Dalton Min.", col="red",pos=4)
 now we can easily spot just how exceptional the dalton minimum of the early 1800s was.
 
 &nbsp;
- 
 
 ## ResSel
 
@@ -295,3 +288,9 @@ We can then run the residual selection function and it will provide us with both
 ```{r, fig.height=5, fig.width=5}
 ResSel(data = data, traits = c(2,3), percent = 15, identifier = 1, model = "linear")
 ```
+
+
+&nbsp;
+
+____
+For questions or comments contact [Heath Blackmon](mailto:coleoguy@gmail.com)
