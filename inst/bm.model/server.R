@@ -6,14 +6,14 @@ shinyServer(function(input, output) {
   x <- reactive({
     # insure reproducability
     set.seed <- input$seed.val
-    replicate(input$reps, cumsum(rnorm(input$gens)))
+    replicate(input$reps, cumsum(rnorm(n=input$gens, sd=input$rate)))
   })
   # Now we will build the output plot
   output$distPlot <- renderPlot({  
     # we will have two plots
     par(mfcol=c(2,1))
     # need a bit more room 
-    par(mar=c(3,1,1,1))
+    par(mar=c(3,2,1,1))
     # this just keeps our color variation from being hidden when itterations++
     cols <- sample(viridis(input$reps))
     # the primary plot
