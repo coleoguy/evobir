@@ -21,7 +21,7 @@ If you want the very latest version of evobiR then you can use devtools to insta
 
 <code>library(devtools)</code>
 
-<code>install_github('coleoguy/evobir', build_vignettes = )</code>
+<code>install_github('coleoguy/evobir', build_vignettes = T)</code>
 
 <code>library(evobiR)</code>
 
