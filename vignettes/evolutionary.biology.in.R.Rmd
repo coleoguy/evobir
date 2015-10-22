@@ -72,7 +72,7 @@ This app provides a simple color blind friendly Brownian motion simulation where
 ViewEvo("bd.model")
 ```
 
-This app simply plots four random birth death trees on the same page.  This was orginally created to help students appreciate the high variance that is expected under a birth death model.  Stuents are able to control the speciation rate, extinction rate, time to simulate, and if extinct lineages should be pruned from the tree.
+This app simply plots four random birth death trees on the same page.  This was originally created to help students appreciate the high variance that is expected under a birth death model.  Students are able to control the speciation rate, extinction rate, time to simulate, and if extinct lineages should be pruned from the tree.
 
 [web app version](https://evobir.shinyapps.io/bd_model)
  
@@ -87,7 +87,7 @@ This app simply plots four random birth death trees on the same page.  This was 
 ViewEvo("dist.model")
 ```
 
-attempting to help undergrads understand basic stats as well as helping graduate student pick appropriate priors inspired this app.  It allows the user to select among normal, exponential, gamma, logistic, poisson, or beta distributions and then allows them to control the parameter that describe the distribution.  Based on the users selections the probability density is plotted.
+attempting to help undergrads understand basic stats as well as helping graduate student pick appropriate priors inspired this app.  It allows the user to select among normal, exponential, gamma, logistic, Poisson, or beta distributions and then allows them to control the parameter that describe the distribution.  Based on the users selections the probability density is plotted.
  
 [web app version](https://evobir.shinyapps.io/dist_model)
 
@@ -111,7 +111,7 @@ This function uses stochastic mapping and ancestral state reconstruction to dete
  
 <img src="./images/anccond.png" width="500" height="500"/>
 
-Depiction of the four steps in our approach to estimating the probability of the continuous value associated with the origin of a transition into a derived state of a binary  character.  A) Estimation of the continuous trait assuming a brownian motion model of evolution. B) Identification of the transition points in the binary character through stochastic mapping C) Categorization of nodes as either ancestral or derived as well as those that have a daughter lineage experienceing an origin of the derived state of the binary character. D) Depiction of the null distribution from sampling continuous trait value at nodes in ancestral condition compared to the observed mean of producing nodes estimate from the data.
+Depiction of the four steps in our approach to estimating the probability of the continuous value associated with the origin of a transition into a derived state of a binary  character.  A) Estimation of the continuous trait assuming a Brownian motion model of evolution. B) Identification of the transition points in the binary character through stochastic mapping C) Categorization of nodes as either ancestral or derived as well as those that have a daughter lineage experiencing an origin of the derived state of the binary character. D) Depiction of the null distribution from sampling continuous trait value at nodes in ancestral condition compared to the observed mean of producing nodes estimate from the data.
 
 &nbsp;
  
@@ -127,7 +127,7 @@ FuzzyMatch(tree = hym.tree, data = names, max.dist=3)
 &nbsp;
  
 ## PPSDiscrete
-This function performs posterior predictive simulations of discrete traits. The function is written to work with the output of bayesian programs that produce a collection of rate matrix parameter estimates based on either one or a collection of trees. It then simulates new datesets matching each rate matrix with the appropriate tree.  This is an example showing the result for the first 10 species in each of 3 iterations
+This function performs posterior predictive simulations of discrete traits. The function is written to work with the output of Bayesian programs that produce a collection of rate matrix parameter estimates based on either one or a collection of trees. It then simulates new datesets matching each rate matrix with the appropriate tree.  This is an example showing the result for the first 10 species in each of 3 iterations
 
 ```{r}
 data(trees)
@@ -140,7 +140,7 @@ result[1:10,1:3]
 
 ## ReorderData
 
-This function takes a vector, matrix, or dataframe and reorders the data to match the order of tips in a phylo object.  Some R packages require that tips on a tree and data in vector or matrix be in the same order, other require them to be named the same, still others require that both of these are true.  Assuming your names match but the order is differnt this will reorder the data to match your tree.
+This function takes a vector, matrix, or dataframe and reorders the data to match the order of tips in a phylo object.  Some R packages require that tips on a tree and data in vector or matrix be in the same order, other require them to be named the same, still others require that both of these are true.  Assuming your names match but the order is different this will reorder the data to match your tree.
 
 ```{r}
 data(mite.trait)
@@ -234,7 +234,7 @@ Even(4)
 
 ## Mode
 
-Returns the most frequently occuring value in a vector. In the case of a tie it will return the mode which has the earliest initial occurence in the vector
+Returns the most frequently occurring value in a vector. In the case of a tie it will return the mode which has the earliest initial occurrence in the vector
 
 ```{r}
 Mode(c(1,2,3,4,5,6,2,5))
@@ -266,7 +266,7 @@ abline(v=1810, col="red",lwd=3)
 text(y=90, x=1810, "Dalton Min.", col="red",pos=4)
 ```
 
-now we can easily spot just how exceptional the dalton minimum of the early 1800s was.
+now we can easily spot just how exceptional the Dalton minimum of the early 1800s was.
 
 &nbsp;
 
