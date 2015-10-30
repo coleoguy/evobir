@@ -178,6 +178,19 @@ This function takes as its input a large collection of trees from a program like
 
 &nbsp;
 
+
+## ShowTree
+
+```{r, eval=F}
+data(mite.trait)
+data(trees.mite)
+ShowTree(tree = trees[[1]], tip.vals = mite.trait[,3])
+```
+
+This function takes as its input a tree and discrete tip data and plots both together.  Basically just automates the combination of APEs plot and tiplabel functions.  Under its default options it will utilize the color blind friendly color pallete viridis and pick colors equally distant from each other
+
+&nbsp;
+
 ## SuperMatrix
 
 `SuperMatrix(missing = "N", prefix = "DATASET2", save = T)`
