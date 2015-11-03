@@ -25,6 +25,7 @@ tree<-pbtree(n=100)
 tip.state.full <- SimThresh3(tree, liabilities=T)
 plot(tip.state.full[[2]],tip.state.full[[3]], col=c("red", "blue", "green")[tip.state.full[[1]]], pch=16, cex=.3)
 ShowTree(tree, tip.state.full[[1]],  cols = c("red", "blue", "green"), tip.cex=.5)
+}
 
 \keyword{ comparative methods }
 \keyword{ discrete trait evolution }
