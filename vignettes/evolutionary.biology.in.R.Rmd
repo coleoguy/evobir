@@ -115,6 +115,25 @@ Depiction of the four steps in our approach to estimating the probability of the
 
 &nbsp;
  
+ 
+ 
+
+
+## CDC model
+This function implements a hidden state in one binary trait and allows users to test whether transitions in a second binary trait occur primarily right after transitions in the first.
+```{r}
+load(url("http://coleoguy.github.io/comparative/pagel.data.sets.RData"))
+tree <- set.phy[[1]]
+x <- unrepburst1[[1]]
+y <- unrepburst2[[1]]
+rm(set.phy, perfrep1, perfrep2, unrepburst1, unrepburst2, state.darwin1, state.darwin2, transitioned1, transitioned2, dependant.data1, dependant.data2, independant.data2, independant.data1)
+result <- cdcModel(x, y, tree, model=344)
+```
+
+ 
+ 
+ 
+ 
 ## FuzzyMatch
 When assembling data from different sources typos can sometimes cause a loss of perfect matches between trees and datasets. This function helps you find these close matches that can be hand curated to keep as many species as possible in your analysis.
 
