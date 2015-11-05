@@ -1,7 +1,7 @@
 ---
 title: "evobiR tutorial"
 author: "Heath Blackmon and Richard A. Adams"
-date: "`r Sys.Date()`"
+date: "last updated: `r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
       fig_caption: yes
