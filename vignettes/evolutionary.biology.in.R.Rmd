@@ -120,19 +120,62 @@ Depiction of the four steps in our approach to estimating the probability of the
 
 
 ## CDC model
-This function implements a hidden state in one binary trait and allows users to test whether transitions in a second binary trait occur primarily right after transitions in the first.
+This function implements a model for the dependent evolution of a discrete traits.  It uses a hidden state in one binary trait (A vs a) and allows users to test whether transitions in a second binary trait (B or b) occur primarily right after transitions in from A to a.  The model has either 3 or 4 parameters.  
+
+ - rate 1 is transitions from A to a1
+
+ - rate 2 is transitions from a1 to a2
+
+ - rate 3 is transitions from B to b on the A background
+
+ - rate 4 is transitions from B to b on the a1 background
+
+ - rate 5 is transitions from b to b on the a2 background
+
+We implement three version:
+
+ - if the model argument is set to 344 then rate 4 and rate 5 are constrained to be equal
+ 
+ - if the model argument is set to 343 then rate 4 and rate 5 are constrained to be equal
+
+ - if the model argument is set to 333 then rate 4 and rate 5 are constrained to be equal
+
+We interpret the results by comparing AIC values if 333 has the lowest AIC then we infer that the evolution of trait B is not correlated in any way with the evolution of trait A.  If model 344 has the lowest likelihood then we infer that trait B has a Pagel style correlation with trait A, and finally if model 343 has the lowest AIC then we infer that we change dependent character evolution.  Where transitions in A lead to temporary increases in the rate that B evolves.
+ 
+
 ```{r}
 load(url("http://coleoguy.github.io/comparative/pagel.data.sets.RData"))
 tree <- set.phy[[1]]
 x <- unrepburst1[[1]]
 y <- unrepburst2[[1]]
-rm(set.phy, perfrep1, perfrep2, unrepburst1, unrepburst2, state.darwin1, state.darwin2, transitioned1, transitioned2, dependant.data1, dependant.data2, independant.data2, independant.data1)
-result <- cdcModel(x, y, tree, model=344)
+rm(set.phy, perfrep1, perfrep2, unrepburst1, unrepburst2, 
+   state.darwin1, state.darwin2, transitioned1, transitioned2, 
+   dependant.data1, dependant.data2, 
+   independant.data2, independant.data1)
+result344 <- cdcModel(x, y, tree, model=344)
+result343 <- cdcModel(x, y, tree, model=343)
+result333 <- cdcModel(x, y, tree, model=333)
+# now lets look at likelihoods
+result333$lnLik
+result343$lnLik
+result344$lnLik
 ```
 
+We can see that the rates of evolution are likely correlated.  The model where we force the rates in y to be the same regardless of the state of x appears poor.  Lets account for differences in the number of parameters by looking at the AIC values
+
+
+```{r}
+AIC(result333)
+AIC(result343)
+AIC(result344)
+```
+
+Looking at these it is easy to see that our trait y is evolving at a different rate in the two states of x but that there is no support for differences in the rate that Y evolves within state 2 of trait x.
  
  
+&nbsp;
  
+
  
 ## FuzzyMatch
 When assembling data from different sources typos can sometimes cause a loss of perfect matches between trees and datasets. This function helps you find these close matches that can be hand curated to keep as many species as possible in your analysis.
@@ -200,13 +243,13 @@ This function takes as its input a large collection of trees from a program like
 
 ## ShowTree
 
-```{r, eval=F}
+```{r}
 data(mite.trait)
 data(trees.mite)
 ShowTree(tree = trees[[1]], tip.vals = mite.trait[,3])
 ```
 
-This function takes as its input a tree and discrete tip data and plots both together.  Basically just automates the combination of APEs plot and tiplabel functions.  Under its default options it will utilize the color blind friendly color pallete viridis and pick colors equally distant from each other
+This function takes as its input a tree and discrete tip data and plots both together.  Basically just automates the combination of APEs plot and tiplabel functions.  Under its default options it will utilize the color blind friendly color palette viridis and pick colors equally distant from each other
 
 &nbsp;
 
@@ -214,7 +257,7 @@ This function takes as its input a tree and discrete tip data and plots both tog
 
  
 ## SimThresh3
-This is an extension of Felsenstein threshold model for a 3 state unordered trait. This assumes that a 2 dimensional liability value determines which of 3 discrete states is observed. The liabilities are allowed to evolve on an X and Y axis and then projected onto a cartesian plane. This plane is divided into three sectors that meet at the origin. The discrete trait observed is determined by which sector the X,Y values fall in: 330 to 90 degrees is state 1, 90 to 210 degrees is state 2, and 210 to 330 is state 3. This approach allows for any set of probabilites for transitions between states to be represented.
+This is an extension of Felsenstein's threshold model for a 3 state unordered trait. This assumes that a 2 dimensional liability value determines which of 3 discrete states is observed. The liabilities are allowed to evolve on an X and Y axis and then projected onto a Cartesian plane. This plane is divided into three sectors that meet at the origin. The discrete trait observed is determined by which sector the X,Y values fall in: 330 to 90 degrees is state 1, 90 to 210 degrees is state 2, and 210 to 330 is state 3. This approach allows for any set of probabilities for transitions between states to be represented.
 
 To illustrate first we will simply simulate the tree and the data
 ```{r}
@@ -223,10 +266,12 @@ tree<-phytools::pbtree(n=100)
 tip.state.full <- SimThresh3(tree, liabilities=T)
 ```
 
-Now lets plot liabilities that have evolved via Brownian motion onto a cartesian plane, and add lines to represent the thresholds between traits:
+Now lets plot liabilities that have evolved via Brownian motion onto a Cartesian plane, and add lines to represent the thresholds between traits:
 ```{r, fig.width=6, fig.height=6}
-plot(tip.state.full[[2]],tip.state.full[[3]], col=c("red", "blue", "green")[tip.state.full[[1]]], pch=16, cex=.6,
-     xlim=c(-4,4), ylim=c(-4,4), xlab="Liability 1", ylab="Liability 2")
+plot(tip.state.full[[2]],tip.state.full[[3]], 
+     col=c("red", "blue", "green")[tip.state.full[[1]]], pch=16, cex=.6,
+     xlim=c(-4,4), ylim=c(-4,4), 
+     xlab="Liability 1", ylab="Liability 2")
 lines(x=c(0,0), y=c(0,4), lwd=3, lty=3)
 lines(x=c(0,4), y=c(0,-2.31), lwd=3, lty=3)
 lines(x=c(0,-4), y=c(0,-2.31), lwd=3, lty=3)

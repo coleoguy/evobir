@@ -1,6 +1,6 @@
 \name{cdcModel}
 \alias{cdcModel}
-\title{Fits a model of change dependent correlated character change.}
+\title{Fits a model of change dependent character evolution.}
 \description{This function implements a hidden state in one binary trait and allows users to test whether transitions in a second binary trait occur primarily right after transitions in the first.}
 \usage{
 cdcModel(x, y, tree, model, initial.vals=NULL)
