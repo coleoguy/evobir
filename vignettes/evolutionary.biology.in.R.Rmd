@@ -33,7 +33,7 @@ library(evobiR)
 _______
 # Introduction
 
-evobiR is a bit of a catch all package that I began developing during graduate school.  It now contains a variety of functions including some didactic, but with a definite focus on functions that are useful in comparative methods or population genetics.
+evobiR is general package that contains a variety of functions including some didactic, but with a definite focus on functions that are useful in comparative methods or population genetics.
 
 
 _______
