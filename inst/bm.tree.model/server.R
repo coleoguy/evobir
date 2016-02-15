@@ -61,7 +61,7 @@ shinyServer(function(input, output) {
     }
     time.slice <- time.slice[!is.na(time.slice)]
     # now we plot the distribution switched from a histrogram this looks prettier IMHO
-    hist(time.slice, 
+    hist(time.slice, breaks = "Sturges",
          col = 'red', 
          xlab="Trait value",
          ylab="",
