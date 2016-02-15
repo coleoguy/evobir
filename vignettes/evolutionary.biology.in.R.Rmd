@@ -8,7 +8,7 @@ output:
       toc: true
 vignette: >
   %\VignetteIndexEntry{evobiR tutorial}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{rmarkdown::render}
   %\usepackage[utf8]{inputenc}
 ---
 
