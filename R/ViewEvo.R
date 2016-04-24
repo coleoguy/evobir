@@ -10,7 +10,7 @@ ViewEvo <- function(simulation){
   if(simulation == 'clumping.model') runApp(system.file("clumping.model", package='evobiR'))
   if(simulation == 'bm.tree.model') runApp(system.file("bm.tree.model", package='evobiR'))
   if(simulation == 'treeviz') runApp(system.file("treeviz", package='evobiR'))
-  if(!simulation %in% mods) print("The specified app was not found in evobiR")
+  if(!simulation %in% mods) print(paste("The specified app was not found in evobiR.  Available apps are:", mods))
 }
 
 
