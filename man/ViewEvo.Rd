@@ -8,7 +8,7 @@ This uses the shiny app to produce interactive pages.
 ViewEvo(simulation)
 }
 \arguments{
-  \item{simulation}{Text string indicating the application to run.  Currently options are "wf.model", "bm.model", "bd.model", "dist.model", "clumping.model", and "treeviz"}
+  \item{simulation}{Text string indicating the application to run.  Currently options are "wf.model", "bm.model", "bd.tree.model", "dist.model", "clumping.model", and "treeviz"}
 }
 \details{
 The wf.model was implemented to illustrate to students the effects of genetic drift.  In particular the high likelihood of losing a beneficial allele when population size is finite.  
