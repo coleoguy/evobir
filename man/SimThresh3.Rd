@@ -10,6 +10,8 @@ SimThresh3(tree, liabilities=F)}
 \arguments{
   \item{tree}{a phylo object}
   \item{liabilities}{TRUE or FALSE to indicate whether underlying liabilities should be returned.}
+  \item{sig2}{instantaneous variance for Brownian motion model}
+  \item{root}{numeric vector of length two that specifies the starting liabilities}
 }
 
 \details{
@@ -20,12 +22,5 @@ If liabilities is set to TRUE then this function will return a list of length 3 
 \author{
 Heath Blackmon
 }
-\examples{
-tree<-pbtree(n=100)
-tip.state.full <- SimThresh3(tree, liabilities=T)
-plot(tip.state.full[[2]],tip.state.full[[3]], col=c("red", "blue", "green")[tip.state.full[[1]]], pch=16, cex=.3)
-ShowTree(tree, tip.state.full[[1]],  cols = c("red", "blue", "green"), tip.cex=.5)
-}
-
 \keyword{ comparative methods }
 \keyword{ discrete trait evolution }

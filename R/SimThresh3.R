@@ -1,4 +1,7 @@
-SimThresh3 <- function(tree, liabilities=F){
+SimThresh3 <- function(tree, 
+                       liabilities = F, 
+                       sig2 = 1,
+                       root = c(0, 0)){
   returnState <- function(x,y){
     state <- vector()
     # angle A is at origin
@@ -17,8 +20,9 @@ SimThresh3 <- function(tree, liabilities=F){
     names(state) <- names(x)
     return(state)
   }
-  x<-fastBM(tree)
-  y<-fastBM(tree)
+  
+  x<-fastBM(tree, sig2 = sig2, a = root[1])
+  y<-fastBM(tree, sig2 = sig2, a = root[2])
   tip.state <- returnState(x,y)
   if(liabilities == F) return(tip.state)
   if(liabilities == T){
