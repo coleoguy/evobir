@@ -7,6 +7,7 @@ ShowTree <- function(tree,
                      label.cex = 1, 
                      type = "phylogram"){
   if(is.null(cols)) cols <- viridis(length(unique(tip.vals)))
+  .pardefault <- par(no.readonly = T)
   plot(tree, 
        show.tip.label = show.tip.label, 
        no.margin = T, 
@@ -17,4 +18,5 @@ ShowTree <- function(tree,
             col = cols[factor(tip.vals)], 
             frame = "none", 
             cex = tip.cex)
+  par(.pardefault)
 }
