@@ -4,18 +4,19 @@
 \title{Calculate Patterson's D-statistic}
 \description{These functions calculate Patterson's D-statistic to compare the frequencies of discordant SNP genealogies.  These tests assume equal substitution rates and unlinked loci, D-statistics significantly different from 0 suggest that introgression has occurred.}
 \usage{
-CalcD(alignment = "alignment.fasta", sig.test = "N", block.size = 1000, replicate = 1000)
+CalcD(alignment = "alignment.fasta", sig.test = "N", ambig="D", block.size = 1000, replicate = 1000)
 
 CalcPopD(alignment = "alignment.fasta")
 
 }
 \arguments{
-  \item{alignment}{This is an alignment in fasta format.  Sequences should be in the order: P1, P2, P3, Outgroup.}
+  \item{alignment}{This is an alignment in fasta format.  Sequences should be in the order: P1, P2, P3, Outgroup.  In the case of CalcPopD sequence from each populations should have identical names see file 3.fasta for an example}
   \item{sig.test}{This indicates whether or if to test for significance. Options are "B" bootstrap, "J" jackknife, or "N" none.}
+  \item{ambig}{This flag indicate how to deal with sequence ambiguities. Options are "D" drop all ambigous loci, "R" resolve each biallelic ambiguity, or "I" ignore ambiguity and perform analysis without checking sequences.  If the argument "R"" is chosen there is becomes a degree of stochasticity in the analysis and the user should run the analysis more than once.  Also it would be wise to compare this result to setting the argument to "D".}
   \item{block.size}{The number of sites to be dropped in the jackknife approach}
   \item{replicate}{Number of replicates to be used in estimating variance}
 }
-\details{ The functions CalcD and CalcPopD are implementations of the algorithm described in Durand et al. 2011.  Significance of the D-stat can be calculated either through bootstrapping or jackknifing.  Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data.  Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments.}
+\details{The functions CalcD and CalcPopD are implementations of the algorithm described in Durand et al. 2011.  Significance of the D-stat can be calculated either through bootstrapping or jackknifing.  Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data.  Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments.}
 \value{
 Returns the number of each type of site, Z scores and p-values
 }

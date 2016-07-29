@@ -1,5 +1,6 @@
 CalcD <- function(alignment = "alignment.fasta", 
                   sig.test="N",                                                    # options are "N", "B", "J"
+                  ambig="D", #options are D R I
                   block.size = 1000,                                                # size of blocks to drop in jacknife
                   replicate=1000){
   # this function is used regardless of approach
@@ -25,11 +26,60 @@ CalcD <- function(alignment = "alignment.fasta",
   }
   
   #### Test of empirical data
-  alignment <- read.alignment(alignment, format = "fasta")                         #  read in the alignment
+  alignment <- read.alignment(alignment, format = "fasta", forceToLower=T)                         #  read in the alignment
   alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
   for(i in 1:length(alignment$nam)){
     alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))               #  fill in the matrix
   }
+  #### This section is being added to deal with reccurent 
+  #### Requests to deal with ambiguity in sequence data
+  # R A or G
+  # Y C or T
+  # S G or C
+  # W A or T
+  # K G or T
+  # M A or C
+  
+  ## First we deal with the situation where the user
+  ## wishes to simply drop ambig sites
+  if(ambig == "D"){
+    target <- c("a","c","g","t")
+    keep <- vector()
+    for(i in 1:ncol(alignment.matrix)){
+      keep[i] <- all(alignment.matrix[,i] %in% target)
+    }
+    alignment.matrix <- alignment.matrix[,keep]
+  }
+  
+  ## Next we deal with the situation where users want to
+  ## randomly resolve ambigous sites
+  if(ambig == "R"){
+    # I still want to limit sites so we first drop 
+    # those sites that look like 3 or 4 possibilities
+    target <- c("a", "c", "g", "t", "r",
+                "y", "s", "w", "k", "m")
+    keep <- vector()
+    for(i in 1:ncol(alignment.matrix)){
+      keep[i] <- all(alignment.matrix[,i] %in% target)
+    }
+    alignment.matrix <- alignment.matrix[,keep]
+    
+    # this function will be applied to each site in our data
+    # it resolves ambiguities randomly
+    resolver <- function(x){
+      if(x=="r") z <- sample(c("a", "g"), 1)
+      if(x=="y") z <- sample(c("c", "t"), 1)
+      if(x=="s") z <- sample(c("g", "c"), 1)
+      if(x=="w") z <- sample(c("a", "t"), 1)
+      if(x=="k") z <- sample(c("g", "t"), 1)
+      if(x=="m") z <- sample(c("a", "c"), 1)
+      if(x %in% c("a", "c", "g", "t")) z <- x
+      return(z)
+    }
+    alignment.matrix <- apply(alignment.matrix, c(1,2), resolver)
+  }
+  
+  
   results <- d.calc(alignment.matrix)
   d <- results[[1]]
   if(is.nan(d)) d <- 0
@@ -61,7 +111,7 @@ CalcD <- function(alignment = "alignment.fasta",
     cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
     cat("\n\nResults from ", replicate, "bootstraps")
     cat("\nSD D statistic =", sd(sim.d))
-    cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
+    cat("\nP-value (that D=0) = ",new.pval,"\n\n") #after Eaton and Ree 2013 
   }
 
 ## THIS SECTION WILL CALCULATE THE P-VAL BASED ON JACKKNIFING
@@ -113,16 +163,17 @@ if(sig.test=="J"){
   cat("\nZ-score = ", z)
   cat("\n\nResults from", replicate2, "jackknifes with block size of", block.size)
   cat("\nSD D statistic =", sd(sim.d))
-  cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
+  cat("\nP-value (that D=0) = ",new.pval,"\n\n") #after Eaton and Ree 2013 
 }
   if(sig.test=="N"){
     cat("\nSites in alignment =", ncol(alignment.matrix))
     cat("\nNumber of sites with ABBA pattern =", abba)
     cat("\nNumber of sites with BABA pattern =", baba)
-    cat("\n\nD raw statistic = ", d)
+    cat("\n\nD raw statistic = ", d,"\n\n")
   }
+  return(d)
 }
-CalcPopD <- function(alignment = "alignment.fasta"){
+CalcPopD <- function(alignment = "alignment.fasta", ambig="D"){
   ##  Now we have eqn. 2 from page 2240
   ##  input is an alignment the can take multiple sequences from each 
   ##  population of interest.  IMPORTANT MAKE SURE SEQUENCES ARE IN ORDER
@@ -148,12 +199,68 @@ CalcPopD <- function(alignment = "alignment.fasta"){
     ux <- unique(x)
     ux[which.max(tabulate(match(x, ux)))]
   }  
-  alignment<-read.alignment(alignment, format="fasta")                                       #  read in the alignment
+  alignment<-read.alignment(alignment, format="fasta", forceToLower = TRUE)                                       #  read in the alignment
   alignment.matrix<-matrix(,length(alignment$nam),nchar(alignment$seq[[1]])+1)               #  make a matrix for the alignment
   for(i in 1:length(alignment$nam)){
     alignment.matrix[i,2:ncol(alignment.matrix)]<-unlist(strsplit(alignment$seq[[i]],""))    #  fill in the matrix
   }
-  alignment.matrix[,1]<-alignment$nam                                                        #  get those names into our matrix row names dont work :(
+  alignment.matrix[,1]<-alignment$nam #  get those names into our matrix row names dont work :(
+  
+  # This will be the section that deals with
+  # the ambiguities
+  
+  # first we deal with dropping all ambig loci
+  if(ambig == "D"){
+    target <- c("a","c","g","t")
+    keep <- T
+    for(i in 2:ncol(alignment.matrix)){
+      keep[i] <- all(alignment.matrix[,i] %in% target)
+    }
+    alignment.matrix <- alignment.matrix[,keep]
+  }
+  
+  
+  
+  ## next we deal with the situation where users want to
+  ## randomly resolve ambigous sites
+  if(ambig == "R"){
+    # I still want to limit sites so we first drop 
+    # those sites that look like 3 or 4 possibilities
+    target <- c("a", "c", "g", "t", "r",
+                "y", "s", "w", "k", "m")
+    keep <- TRUE
+    for(i in 2:ncol(alignment.matrix)){
+      keep[i] <- all(alignment.matrix[,i] %in% target)
+    }
+    alignment.matrix <- alignment.matrix[,keep]
+    
+    # this function will be applied to each site in our data
+    # it resolves ambiguities randomly
+    resolver <- function(x){
+      if(x=="r") z <- sample(c("a", "g"), 1)
+      if(x=="y") z <- sample(c("c", "t"), 1)
+      if(x=="s") z <- sample(c("g", "c"), 1)
+      if(x=="w") z <- sample(c("a", "t"), 1)
+      if(x=="k") z <- sample(c("g", "t"), 1)
+      if(x=="m") z <- sample(c("a", "c"), 1)
+      if(x %in% c("a", "c", "g", "t")) z <- x
+      return(z)
+    }
+    temp.mat <- alignment.matrix[,-1]
+    alignment.matrix[,2:ncol(alignment.matrix)] <- apply(temp.mat, c(1,2), resolver)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   groups<-unique(alignment$nam)
   p1 <- p2 <- p3 <- p4 <- 0                                                                  #  lets just set up the variable names from the durand paper
   numerator <- denominator <- 0
