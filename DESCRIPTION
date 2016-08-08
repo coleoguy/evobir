@@ -11,6 +11,7 @@ License: GPL (>=2)
 Imports: 
      seqinr, 
      ape, 
+     diversitree,
      geiger, 
      shiny, 
      viridis,
