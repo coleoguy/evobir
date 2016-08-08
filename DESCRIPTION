@@ -13,6 +13,7 @@ Imports:
      ape, 
      geiger, 
      shiny, 
+     viridis,
      phytools 
 Suggests: knitr
 VignetteBuilder: knitr
