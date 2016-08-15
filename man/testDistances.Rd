@@ -1,5 +1,5 @@
-\name{getDist}
-\alias{getDist}
+\name{testDistances}
+\alias{testDistances}
 \title{test distances between changes}
 \description{
 This function takes a phylogeny and two binary traits (values should be coded as 1 and 2).  It then uses stochastic maps and an anova to determine whether any pair of trait transitions are closer together than expect if both traits are evolving neutrally.  A positive result suggests that there is a form of contingency between the traits.}

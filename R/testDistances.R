@@ -1,20 +1,25 @@
 testDistances <- function(tree, trait1, trait2, n=100, model="ARD", verbose=F){
+  ###### HELPER FUNCTIONS ######
   results <- list()  
   map1 <- make.simmap(tree, x=trait1, nsim=n, model=model)
   map2 <- make.simmap(tree, x=trait2, nsim=n, model=model)
-  for(i in 1:n){
-    results[[i]] <- getDist(map1[[i]], map2[[i]])
+  if(n > 1){
+    for(i in 1:n){
+      results[[i]] <- getDist(map1[[i]], map2[[i]])
+    }
   }
+  if(n==1) results[[1]] <- getDist(map1, map2)
+  
   Ff=Fr=Rf=Rr=fF=fR=rF=rR<-vector()
   for(i in 1:n){
     Ff <- c(Ff, results[[i]]$Ff)
-    Fr <- c(Ff, results[[i]]$Fr)
-    Rf <- c(Ff, results[[i]]$Rf)
-    Rr <- c(Ff, results[[i]]$Rf)
-    fF <- c(Ff, results[[i]]$fF)
-    fR <- c(Ff, results[[i]]$fR)
-    rF <- c(Ff, results[[i]]$rF)
-    rR <- c(Ff, results[[i]]$rR)
+    Fr <- c(Fr, results[[i]]$Fr)
+    Rf <- c(Rf, results[[i]]$Rf)
+    Rr <- c(Rr, results[[i]]$Rf)
+    fF <- c(fF, results[[i]]$fF)
+    fR <- c(fR, results[[i]]$fR)
+    rF <- c(rF, results[[i]]$rF)
+    rR <- c(rR, results[[i]]$rR)
   }  
   # we now have vectors describing the distances between
   # each type of change pairing
@@ -41,4 +46,3 @@ testDistances <- function(tree, trait1, trait2, n=100, model="ARD", verbose=F){
     return(list(pval,df))
   }
 }
-
