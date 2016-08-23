@@ -1,6 +1,8 @@
 SuperMatrix <- function(missing = "-",
                         prefix = "concatenated",
-                        save = T){
+                        save = T,
+                        format.in = "f",
+                        format.out = "f"){
   # get file names
   file.names <- list.files()
   # read DNA
@@ -8,7 +10,7 @@ SuperMatrix <- function(missing = "-",
   for(i in 1:length(file.names)){
     print(paste("Reading alignment", i))
     DNA[[i]] <- read.dna(file=file.names[i], 
-                         format = "f", 
+                         format = format.in, 
                          as.character=T)
   }
   # calculate total alignment length
@@ -54,7 +56,7 @@ SuperMatrix <- function(missing = "-",
     print("saving files")
     write.dna(seqmatrix, 
               file = paste(prefix, ".fasta", sep = ""), 
-              format = "f")
+              format = format.out)
     write.csv(partitions, 
               row.names = F, 
               file = paste(prefix, ".partitions.csv", sep = ""))
