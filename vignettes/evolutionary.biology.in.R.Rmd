@@ -1,5 +1,5 @@
 ---
-title: "evobiR tutorial"
+title: "Evolutionary biology in R (evobiR) tutorial"
 author: "Heath Blackmon and Richard A. Adams"
 date: "last updated: `r Sys.Date()`"
 output:
@@ -8,8 +8,8 @@ output:
       toc: true
 vignette: >
   %\VignetteIndexEntry{evobiR tutorial}
-  %\VignetteEngine{rmarkdown::render()}
-  %\usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 _______
