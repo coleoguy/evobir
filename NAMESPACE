@@ -1,5 +1,6 @@
 export(AICc)
 export(AncCond)
+export(BranchTimes)
 export(CalcD)
 export(CalcPopD)
 export(Even)

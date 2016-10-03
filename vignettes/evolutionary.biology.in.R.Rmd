@@ -119,6 +119,18 @@ Depiction of the four steps in our approach to estimating the probability of the
  
 
 
+
+## BranchTimes: 
+```{}
+data(trees.mite)
+BranchTimes(tree[[1]])
+```
+
+Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the matrix tree$edge, and that the lengths are listed in tree$edge.length.
+
+&nbsp;
+ 
+
 ## CDC model
 This function implements a model for the dependent evolution of a discrete traits.  It uses a hidden state in one binary trait (A vs a) and allows users to test whether transitions in a second binary trait (B or b) occur primarily right after transitions in from A to a.  The model has either 3 or 4 parameters.  
 
