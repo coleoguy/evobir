@@ -118,13 +118,14 @@ Depiction of the four steps in our approach to estimating the probability of the
 
 ## BranchTimes: 
 ```{r}
+library(ape)
 data(trees.mite)
 bt <- BranchTimes(trees[[1]])
 plot(trees[[1]], cex = .01, type = "cladogram", no.margin=T)
-#edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
+edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
 ```
 
-Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the matrix tree$edge, and that the lengths are listed in tree$edge.length.
+Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the edge matrix, and that the lengths are listed in the edge.length vector.
 
 &nbsp;
  
@@ -206,8 +207,8 @@ data(trees)
 data(mcmc3)
 # 10 trees 100 q-mats 3 states
 set.seed(1)
-result <- evobiR::PPSDiscrete(trees, MCMC=mcmc3, states=c(.33,.33,.34),  N=3)
-result[1:10,1:3]
+result <- evobiR::PPSDiscrete(trees, MCMC = mcmc3, states=c(.33, .33, .34),  N = 3)
+result[1:10, 1:3]
 ```
 
 ## ReorderData
@@ -219,7 +220,7 @@ data(mite.trait)
 data <- mite.trait
 data(trees.mite)
 tree <- trees[[1]]
-species <- cbind(as.character(data[,1])[1:5],
+species <- cbind(as.character(data[, 1])[1:5],
                  tree$tip.label[1:5])
 colnames(species) <- c("data", "tree")
 species
@@ -229,7 +230,7 @@ here we can see that the tree and data are not in the same order
 
 ```{r}
 new.data <- ReorderData(tree, data, taxa.names=1)
-species<- cbind(as.character(data[,1])[1:5],as.character(new.data[,1])[1:5],
+species<- cbind(as.character(data[, 1])[1:5], as.character(new.data[, 1])[1:5],
                  trees[[1]]$tip.label[1:5])
 colnames(species) <- c("old.data", "new.data", "tree")
 species
