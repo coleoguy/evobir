@@ -116,7 +116,7 @@ Depiction of the four steps in our approach to estimating the probability of the
 &nbsp;
 
 
-## BranchTimes: 
+## BranchTimes
 ```{r}
 library(ape)
 data(trees.mite)
