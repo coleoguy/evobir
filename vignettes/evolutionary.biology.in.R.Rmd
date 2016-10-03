@@ -114,16 +114,14 @@ This function uses stochastic mapping and ancestral state reconstruction to dete
 Depiction of the four steps in our approach to estimating the probability of the continuous value associated with the origin of a transition into a derived state of a binary  character.  A) Estimation of the continuous trait assuming a Brownian motion model of evolution. B) Identification of the transition points in the binary character through stochastic mapping C) Categorization of nodes as either ancestral or derived as well as those that have a daughter lineage experiencing an origin of the derived state of the binary character. D) Depiction of the null distribution from sampling continuous trait value at nodes in ancestral condition compared to the observed mean of producing nodes estimate from the data.
 
 &nbsp;
- 
- 
- 
-
 
 
 ## BranchTimes: 
-```{}
+```{r}
 data(trees.mite)
-BranchTimes(tree[[1]])
+bt <- BranchTimes(trees[[1]])
+plot(trees[[1]], cex = .01, type = "cladogram", no.margin=T)
+edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
 ```
 
 Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the matrix tree$edge, and that the lengths are listed in tree$edge.length.
