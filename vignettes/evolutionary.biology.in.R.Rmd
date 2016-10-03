@@ -121,7 +121,7 @@ Depiction of the four steps in our approach to estimating the probability of the
 data(trees.mite)
 bt <- BranchTimes(trees[[1]])
 plot(trees[[1]], cex = .01, type = "cladogram", no.margin=T)
-edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
+#edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
 ```
 
 Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the matrix tree$edge, and that the lengths are listed in tree$edge.length.
