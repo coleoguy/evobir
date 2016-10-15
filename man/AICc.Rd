@@ -3,7 +3,7 @@
 \title{
 Computes an AICc score}
 \description{
-Supplied with a log likelihood, and the number of model parameters, and sample size calculates the small sample size version of the AIC score.}
+Supplied with a log likelihood, the number of model parameters, and sample size calculates the small sample size version of the AIC score.}
 \usage{
 AICc(loglik, K, N)
 }
