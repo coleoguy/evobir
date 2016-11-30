@@ -5,8 +5,7 @@
 \usage{normalize(x)}
 \arguments{
   \item{x}{A vector list or matrix of numbers to be normalized.}
-  \item{MARGIN}{If 1 then rows are normalized and if 2 then columns are normalized}
-}
+  \item{MARGIN}{indicates the nature of the normalization options are 1, 2, and 3. 1 indicates that each row should be normalized. 2 indicates that columns should be normalized. 3 indicates that the whole matrix should be normalized.}
 \details{Returns the same type of object as x with all the data normalized using the function: \code{x = ((x - min(x)) / (max(x) - min(x))})}
 \references{
 \url{http://coleoguy.github.io/}}
