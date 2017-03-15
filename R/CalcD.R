@@ -2,7 +2,8 @@ CalcD <- function(alignment = "alignment.fasta",
                   sig.test="N",                                                    # options are "N", "B", "J"
                   ambig="D", #options are D R I
                   block.size = 1000,                                                # size of blocks to drop in jacknife
-                  replicate=1000){
+                  replicate=1000,
+                  align.format='fasta'){
   # this function is used regardless of approach
   d.calc <- function(alignment){
     abba <- 0                                                                         #  set up my variables
@@ -26,7 +27,7 @@ CalcD <- function(alignment = "alignment.fasta",
   }
   
   #### Test of empirical data
-  alignment <- read.alignment(alignment, format = "fasta", forceToLower=T)                         #  read in the alignment
+  alignment <- read.alignment(alignment, format = align.format, forceToLower=T)                         #  read in the alignment
   alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
   for(i in 1:length(alignment$nam)){
     alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))               #  fill in the matrix
@@ -173,7 +174,8 @@ if(sig.test=="J"){
   }
   return(d)
 }
-CalcPopD <- function(alignment = "alignment.fasta", ambig="D"){
+CalcPopD <- function(alignment = "alignment.fasta", ambig="D",
+                     align.format='fasta'){
   ##  Now we have eqn. 2 from page 2240
   ##  input is an alignment the can take multiple sequences from each 
   ##  population of interest.  IMPORTANT MAKE SURE SEQUENCES ARE IN ORDER
@@ -199,7 +201,7 @@ CalcPopD <- function(alignment = "alignment.fasta", ambig="D"){
     ux <- unique(x)
     ux[which.max(tabulate(match(x, ux)))]
   }  
-  alignment<-read.alignment(alignment, format="fasta", forceToLower = TRUE)                                       #  read in the alignment
+  alignment<-read.alignment(alignment, format=align.format, forceToLower = TRUE)                                       #  read in the alignment
   alignment.matrix<-matrix(,length(alignment$nam),nchar(alignment$seq[[1]])+1)               #  make a matrix for the alignment
   for(i in 1:length(alignment$nam)){
     alignment.matrix[i,2:ncol(alignment.matrix)]<-unlist(strsplit(alignment$seq[[i]],""))    #  fill in the matrix
