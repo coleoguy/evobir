@@ -1,4 +1,4 @@
-normalize <- function(x, MARGIN=1){
+Normalize <- function(x, MARGIN=1){
   vec.norm <- function(x){
     x[1:length(x)] <- ((x - min(x)) / (max(x) - min(x)))
     return(x)
