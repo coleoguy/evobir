@@ -12,5 +12,5 @@
 \url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
 \examples{Normalize(c(-32, 3, 100))}
-\keyword{ data transformation }
-\keyword{ Normalize }
+\keyword{data transformation }
+\keyword{Normalize }
