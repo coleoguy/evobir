@@ -29,7 +29,7 @@ FastaFilter <- function(f.in, folder = F, prefix="pruned"){
       names(final.list)[i] <- names(possible)[z]
     }
     # save the result as a fasta file
-    write.dna(x=final.list, file=paste(prefix, ".", nbcol=-1, f.in, sep = ""), 
+    write.dna(x=final.list, file=paste(prefix, ".", f.in, sep = ""), 
               format = "fasta")
   }
   # here we call our function for a single file
