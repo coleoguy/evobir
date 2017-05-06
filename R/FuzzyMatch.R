@@ -1,4 +1,8 @@
 FuzzyMatch <- function(tree, data, max.dist){
+  if(class(tree)=="multiPhylo"){
+    warning("Multiple trees were supplied only first is being used")
+    tree <- tree[[1]]
+  }
   tree.names <- tree$tip.label    # lets get the names on the tree
   close.taxa <- data.frame()
   counter <- 1
