@@ -25,10 +25,11 @@ FastaFilter <- function(f.in, folder = F, prefix="pruned"){
       hits <- which(names(seqs) == taxa.present[[i]])
       possible <- seqs[hits]
       z <- which.max(unlist(lapply(possible,length)))
-      final.list[[i]] <- possible[z]
+      final.list[i] <- possible[z]
+      names(final.list)[i] <- names(possible)[z]
     }
     # save the result as a fasta file
-    write.dna(x=final.list, file=paste(prefix, ".", f.in, sep = ""), 
+    write.dna(x=final.list, file=paste(prefix, ".", nbcol=-1, f.in, sep = ""), 
               format = "fasta")
   }
   # here we call our function for a single file
