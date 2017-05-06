@@ -23,6 +23,4 @@ Saves a fasta formatted file that has been reduced to unique sequences.
 Heath Blackmon
 }
 
-\examples{
-
 \keyword{ alignment DNA fasta }
