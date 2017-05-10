@@ -6,7 +6,7 @@ ShowTree <- function(tree,
                      tip.cex = 1, 
                      label.cex = 1, 
                      type = "phylogram"){
-  if(is.null(cols)) cols <- viridis(length(unique(tip.vals)))
+  if(is.null(cols)) cols <- rainbow(length(unique(tip.vals)))
   .pardefault <- par(no.readonly = T)
   plot(tree, 
        show.tip.label = show.tip.label, 

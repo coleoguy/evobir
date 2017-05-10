@@ -35,69 +35,6 @@ _______
 
 evobiR is general package that contains a variety of functions including some didactic, but with a definite focus on functions that are useful in comparative methods or population genetics.
 
-
-_______
-# Teaching with evobiR
-
-All of the function in evobiR that are designed for teaching have been wrapped into shiny apps.  These shiny apps are available online but are also included in evobiR to make it easy for instructors to use them on their own system and to make it easy for you to modify them to your own purposes.  To access these apps we use the ViewEvo function:
-
-
-## Wright Fisher simulator:
-```{}
-ViewEvo("wf.model")
-```
-This app provides a convenient interface for students to experiment with the interaction of drift and selection.  Students are able to control: initial allele frequency, population size, generations to run simulation, fitness of all genotypes, iterations to simulate, genotype or allele to plot, and mutation rate among alleles.  The app will also show the expected outcome assuming infinite population size and reports the number of times that each allele is lost or fixed.
-
-[web app version](https://evobir.shinyapps.io/wf_model)
- 
-<img src="./images/wf.png" width="650" height="400" />
- 
- &nbsp;
- 
-## Brownian motion simulator:
-```{}
-ViewEvo("bm.model")
-```
-This app provides a simple color blind friendly Brownian motion simulation where students can choose the generations, replicates, and rate of evolution.  This is app has a second interactive component that allows students to view the distribution of outcomes at any generation they select.
-
-[web app version](https://evobir.shinyapps.io/brownian_motion)
-
-<img src="./images/bm.png" width="650" height="400" />
-
-
-&nbsp;
-
-## Birth death tree model simulator:
-```{}
-ViewEvo("bd.model")
-```
-
-This app simply plots four random birth death trees on the same page.  This was originally created to help students appreciate the high variance that is expected under a birth death model.  Students are able to control the speciation rate, extinction rate, time to simulate, and if extinct lineages should be pruned from the tree.
-
-[web app version](https://evobir.shinyapps.io/bd_model)
- 
-<img src="./images/bd.png" width="650" height="400" />
-
-
-&nbsp;
-
-
-## Statistical distribution simulator: 
-```{}
-ViewEvo("dist.model")
-```
-
-attempting to help undergrads understand basic stats as well as helping graduate student pick appropriate priors inspired this app.  It allows the user to select among normal, exponential, gamma, logistic, Poisson, or beta distributions and then allows them to control the parameter that describe the distribution.  Based on the users selections the probability density is plotted.
- 
-[web app version](https://evobir.shinyapps.io/dist_model)
-
-<img src="./images/dist.png" width="650" height="400" />
-
-
-&nbsp;
-
-_______
-
 # Comparative Methods
 
 ## AncCond: 
@@ -115,20 +52,6 @@ Depiction of the four steps in our approach to estimating the probability of the
 
 &nbsp;
 
-
-## BranchTimes
-```{r}
-library(ape)
-data(trees.mite)
-bt <- BranchTimes(trees[[1]])
-plot(trees[[1]], cex = .01, type = "cladogram", no.margin=T)
-edgelabels(text = round(bt, digits = 1), cex = .75, frame = "none")
-```
-
-Returns a numeric vector of distances from the tip of the tree to the origin of each branch on the phylogeny.  This vector is in the same order as the branches are listed in the edge matrix, and that the lengths are listed in the edge.length vector.
-
-&nbsp;
- 
 
 ## CDC model
 This function implements a model for the dependent evolution of a discrete traits.  It uses a hidden state in one binary trait (A vs a) and allows users to test whether transitions in a second binary trait (B or b) occur primarily right after transitions in from A to a.  The model has either 3 or 4 parameters.  
@@ -199,17 +122,6 @@ FuzzyMatch(tree = hym.tree, data = names, max.dist=3)
 
 &nbsp;
  
-## PPSDiscrete
-This function performs posterior predictive simulations of discrete traits. The function is written to work with the output of Bayesian programs that produce a collection of rate matrix parameter estimates based on either one or a collection of trees. It then simulates new datesets matching each rate matrix with the appropriate tree.  This is an example showing the result for the first 10 species in each of 3 iterations
-
-```{r}
-data(trees)
-data(mcmc3)
-# 10 trees 100 q-mats 3 states
-set.seed(1)
-result <- evobiR::PPSDiscrete(trees, MCMC = mcmc3, states=c(.33, .33, .34),  N = 3)
-result[1:10, 1:3]
-```
 
 ## ReorderData
 
