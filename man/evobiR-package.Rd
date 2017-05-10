@@ -10,10 +10,10 @@
 Package: \tab evobiR\cr
 Type: \tab Package\cr
 Version: \tab 1.1\cr
-Date: \tab 2013-10-08\cr
+Date: \tab 2017-5-05\cr
 License: \tab GPL (>=2)\cr
 }
-More information on \pkg{evobiR} is available at \url{http://coleoguy.github.io/software.html}
+More information on \pkg{evobiR} is available at \url{https://github.com/coleoguy/evobir}
 
 }
 \author{

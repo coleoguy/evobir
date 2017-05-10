@@ -7,7 +7,7 @@ check case}
 These functions test whether a character is upper or lower case.  If applied to a string it will return True only if all characters match the test. For example both \code{isupper("Abbi")} and \code{islower("Abbi")} will return False.  These functions are vectorized and may be applied to vectors of any length.}
 \usage{
 isupper(x)
-islowere(x)
+islower(x)
 }
 \arguments{
   \item{x}{a vector of characters or strings}

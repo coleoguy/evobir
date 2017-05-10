@@ -1,11 +1,11 @@
 Package: evobiR
 Type: Package
 Title: Comparative and Population Genetic Analyses
-Version: 1.1
-Date: 2015-8-25
+Version: 1.2
+Date: 2017-5-05
 Author: Heath Blackmon and Richard H. Adams
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
-URL: http://www.uta.edu/karyodb/evobiR/
+URL: https://github.com/coleoguy/evobir
 Description: Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses.  Implementations of ABBA/BABA type statistics to test for introgression in genomic data. Wright-Fisher, phylogenetic tree, and statistical distribution Shiny interactive simulations for use in teaching.
 License: GPL (>=2)
 Imports: 

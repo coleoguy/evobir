@@ -5,7 +5,8 @@ creates a supermatrix from multiple gene alignments}
 \description{
 combines all alignments in a folder into a single supermatrix}
 \usage{
-SuperMatrix(missing = "-", prefix = "concatenated", save = T, format.in = "f", format.out = "f")
+SuperMatrix(missing = "-", prefix = "concatenated", save = T, 
+format.in = "f", format.out = "f")
 }
 \arguments{
   \item{missing}{the character to use when no data is available for a taxa}

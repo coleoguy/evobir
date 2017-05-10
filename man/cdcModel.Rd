@@ -35,7 +35,6 @@ load(url("http://coleoguy.github.io/comparative/pagel.data.sets.RData"))
 tree <- set.phy[[1]]
 x <- unrepburst1[[1]]
 y <- unrepburst2[[1]]
-rm(set.phy, perfrep1, perfrep2, unrepburst1, unrepburst2, state.darwin1, state.darwin2, transitioned1, transitioned2, dependant.data1, dependant.data2, independant.data2, independant.data1)
 result <- cdcModel(x, y, tree, model=344)
 }
 }

@@ -5,7 +5,8 @@ Plots a tree and discrete tip data}
 \description{
 This function takes a tree of class phylo and a named vector of tip states.}
 \usage{
-ShowTree(tree, tip.vals, pch = 16, cols = NULL, show.tip.label = F, label.cex = 1, type = "fan", tip.cex = 1)
+ShowTree(tree, tip.vals, pch = 16, cols = NULL, show.tip.label = F, 
+tip.cex = 1, label.cex = 1, type = "phylogram")
 }
 \arguments{
   \item{tree}{a phylo object}
