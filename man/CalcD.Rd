@@ -7,7 +7,7 @@
 CalcD(alignment = "alignment.fasta", sig.test = "N", ambig="D", 
 block.size = 1000, replicate = 1000, align.format='fasta')
 
-CalcPopD(alignment = "alignment.fasta", align.format='fasta')
+CalcPopD(alignment = "alignment.fasta", ambig="D", align.format='fasta')
 
 }
 \arguments{

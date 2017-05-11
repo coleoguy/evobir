@@ -11,6 +11,6 @@
 \references{
 \url{http://coleoguy.github.io/}}
 \author{Heath Blackmon}
-\examples{Normalize(c(-32, 3, 100)), MARGIN = 1}
+\examples{Normalize(c(-32, 3, 100), MARGIN = 1)}
 \keyword{data transformation }
 \keyword{Normalize }
