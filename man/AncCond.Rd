@@ -3,7 +3,7 @@
 \title{Calculate the mean of a continuous character at the origin of derived state of a binary charachter}
 \description{This function uses stochastic mapping and ancestral state reconstruction to determine if the derived state of a binary trait originates when a continuous trait has an extreme value.}
 \usage{
-AncCond(trees, data)
+AncCond(trees, data, iter)
 }
 \arguments{
   \item{trees}{tree of class phylo}
