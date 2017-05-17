@@ -41,7 +41,7 @@ evobiR is general package that contains a variety of functions including some di
 ```{}
 data(mite.trait)
 data(trees.mite)
-AncCond(trees, mite.trait, derived.state = "haplodiploidy", iterations=100) 
+AncCond(trees, mite.trait, iter=100) 
 ```
 
 This function uses stochastic mapping and ancestral state reconstruction to determine if the derived state of a binary trait originates when a continuous trait has an extreme value.
