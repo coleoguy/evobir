@@ -24,7 +24,7 @@ Installing from CRAN
 Installing from github
 
     library(devtools)
-    install_github("coleoguy/evobir", build_vignettes = TRUE)
+    install_github("coleoguy/evobiR", build_vignettes = TRUE)
 
 ```{r, echo=F, tidy=T}
 library(evobiR)
@@ -33,7 +33,7 @@ library(evobiR)
 _______
 # Introduction
 
-evobiR is general package that contains a variety of functions including some didactic, but with a definite focus on functions that are useful in comparative methods or population genetics.
+evobiR is general package that contains a variety of functions to facilitate comparative and population genetics analyses.
 
 # Comparative Methods
 
@@ -169,7 +169,7 @@ This function takes as its input a large collection of trees from a program like
 ```{r}
 data(mite.trait)
 data(trees.mite)
-ShowTree(tree = trees[[1]], tip.vals = mite.trait[,3])
+ShowTree(tree = trees[[1]], tip.vals = mite.trait[,3], tip.cex = .5, type = "fan")
 ```
 
 This function takes as its input a tree and discrete tip data and plots both together.  Basically just automates the combination of APEs plot and tiplabel functions.  Under its default options it will utilize the color blind friendly color palette viridis and pick colors equally distant from each other
@@ -227,6 +227,15 @@ Durand, Eric Y., et al. Testing for ancient admixture between closely related po
 
 Eaton, D. A. R., and R. H. Ree. 2013. Inferring phylogeny and introgression using RADseq data: An example from flowering plants (Pedicularis: Orobanchaceae). Syst. Biol. 62:689-706
 
+
+```{r}
+CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test = "N")
+
+CalcPopD(alignment = system.file("3.fasta", package = "evobiR"))
+
+```
+
+
 &nbsp;
 
 _______
@@ -259,6 +268,12 @@ Just a simple function that returns True if a number is even and False otherwise
 ```{r}
 Even(3)
 Even(4)
+```
+
+Internally this is just does a quick modulo 2 division:
+```{r}
+3 %% 2 == 0
+4 %% 2 == 0
 ```
 
 &nbsp;
