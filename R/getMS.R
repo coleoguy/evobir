@@ -1,4 +1,4 @@
-getEJ <- function(tree){
+getMS <- function(tree, samps, report, n.site=NULL){
   # add a demes tracking column to the edge matrix
   tree$edge <- cbind(tree$edge, rep(NA, nrow(tree$edge)))
   output <- vector()
@@ -68,5 +68,19 @@ getEJ <- function(tree){
       check <- F
     }
   }
+  z <- paste(rep("1", length(tree$tip)), collapse=" ")
+  outz <- paste("-", report, sep="")
+  output <- paste(length(tree$tip), 
+                  samps, "-I",
+                  length(tree$tip), 
+                  z, 
+                  output,
+                  outz,
+                  n.site)
   return(output)
 }
+library(ape)
+tree <- rcoal(4)
+plot(tree)
+getMS(tree, samps=2, report="T")
+getMS(tree, samps=20, report="s", n.site=50)
