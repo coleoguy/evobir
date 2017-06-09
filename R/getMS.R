@@ -70,6 +70,10 @@ getMS <- function(tree, samps, report, n.site=NULL){
   }
   z <- paste(rep("1", length(tree$tip)), collapse=" ")
   outz <- paste("-", report, sep="")
+  
+  
+  # added migration code paste in before "output"
+  
   output <- paste(length(tree$tip), 
                   samps, "-I",
                   length(tree$tip), 
@@ -79,8 +83,3 @@ getMS <- function(tree, samps, report, n.site=NULL){
                   n.site)
   return(output)
 }
-library(ape)
-tree <- rcoal(4)
-plot(tree)
-getMS(tree, samps=2, report="T")
-getMS(tree, samps=20, report="s", n.site=50)
