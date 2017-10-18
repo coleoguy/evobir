@@ -3,18 +3,19 @@
 \title{
 Sliding window analysis}
 \description{
-Applies a function within a sliding window of a numeric vector.  Both the step size and the window size can be set by the user.}
+Applies a function within a sliding window of a numeric vector or matrix.  Both the step size and the window size can be set by the user.  For the matrix impelentation the step size and window size is constrained to be the same in both the X and Y dimensions.}
 \usage{
-SlidingWindow(FUN, data, window, step)
+SlidingWindow(FUN, data, window, step, strict)
 }
 \arguments{
   \item{FUN}{a function to be applied within each window.}
-  \item{data}{a numerical vector.}
-  \item{window}{an integer setting the size of the window.}
-  \item{step}{an integer setting the size of step between windows.}
+  \item{data}{a numerical vector or matrix}
+  \item{window}{an integer setting the size of the window}
+  \item{step}{an integer setting the size of step between windows}
+  \item{strict}{TRUE or FALSE indicating whether validation testing should be performed}
 }
 \details{
-Returns a vector of numeric values representing the applying the selected function within each window.  The length will be unequal to the original data and will be determined primarily by the step size.}
+If the input data is a vector then returns a vector of numeric values representing the application of the selected function within each window.  If the input data is a matrix then returns a matrix of numeric values representing the application fo the selected function within each window.}
 \references{
 \url{http://coleoguy.github.io/}}
 \author{
@@ -22,8 +23,14 @@ Heath Blackmon
 }
 
 \examples{
-data <- c(1,2,1,2,10,2,1,2,1,2,3,4,5,6,2,5)
-SlidingWindow("mean", data, 3, 1)
+# vector example
+x1 <- rnorm(100, sd=3)
+z1 <- SlidingWindow(FUN="mean", data=x2, window=10, step=5, strict=T)
+
+# matrix example
+x2 <- matrix(rnorm(10000),100,100)
+z2 <- SlidingWindow(FUN="mean", data=x1, window=10, step=5, strict=T)
+
 }
 \keyword{ basic stats }
 \keyword{ sliding window }
