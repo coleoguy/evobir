@@ -8,7 +8,7 @@ Function to remove duplicate sequences.}
 FastaFilter(f.in, folder = F, prefix="pruned")
 }
 \arguments{
-  \item{f.in}{Iif a single file is being processed then this is the filename including the relative path.}
+  \item{f.in}{If a single file is being processed then this is the filename including the relative path.}
   \item{folder}{if TRUE then all files in the current working directory will be processed if FALSE then a single file from f.in will be processed}
   \item{prefix}{A character string specifying the prefix to be added to the file names after filtering.}
 }

@@ -24,7 +24,7 @@ FastaFilter <- function(f.in, folder = F, prefix="pruned"){
     for(i in 1:length(taxa.present)){
       hits <- which(names(seqs) == taxa.present[[i]])
       possible <- seqs[hits]
-      z <- which.max(unlist(lapply(possible,length)))
+      z <- which.max(unlist(lapply(possible, length)))
       final.list[i] <- possible[z]
       names(final.list)[i] <- names(possible)[z]
     }
