@@ -295,7 +295,7 @@ Applies a function within a sliding window of a numeric vector. Both the step si
 
 ```{r, fig.height=5, fig.width=5}
 data(sunspot.month)
-foo <- sunspot.month
+foo <- as.vector(sunspot.month)
 plot(foo)
 ```
 
@@ -303,10 +303,20 @@ When we look at the data at this scale the pattern that really catches our atten
 
 ```{r, fig.height=5, fig.width=5}
 # first lets use the sliding window function to get the number sun spots 
+
 # average over 11 years and do this moving in 1 year steps through time
-sunspots <- SlidingWindow("mean", foo, 132, 12)
+sunspots <- SlidingWindow(FUN = "mean", 
+                          data = foo, 
+                          window = 132, 
+                          step = 12, 
+                          strict = F)
+
 # we repeat this on the years so we can plot agains a sensible x axis
-years <- round(SlidingWindow("mean", rep(1749:2013, each=12)[1:3177], 132, 12))
+years <- round(SlidingWindow("mean", 
+                             data = rep(1749:2013, each=12)[1:3177], 
+                             window = 132, 
+                             step = 12, 
+                             strict=F))
 plot(x=years,y=sunspots, type="l", lwd=3)
 abline(v=1810, col="red",lwd=3)
 text(y=90, x=1810, "Dalton Min.", col="red",pos=4)
