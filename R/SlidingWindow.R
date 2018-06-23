@@ -1,5 +1,5 @@
 
-SlidingWindow <- function(FUN, data, window, step, strict){
+SlidingWindow <- function(FUN, data, window, step, strict=F){
   # Validation testing
   if(strict) {
     
