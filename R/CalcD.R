@@ -97,10 +97,9 @@ CalcD <- function(alignment = "alignment.fasta",
     sim.matrix<-matrix(,4,foo)
     cat("\nperforming bootstrap")
     for(k in 1:replicate){
-      if(k/(replicate/100) == round(k/(replicate/100))) cat(".")
+      if(k%%100 == 0) cat(".")
       sim.matrix[1:4,1:foo] <- alignment.matrix[1:4, sample(1:foo, replace=T)]
-      results <- d.calc(sim.matrix)
-      sim.d[k] <- results[[1]]
+      sim.d[k] <- d.calc(sim.matrix)[[1]]
     }
     sim.d[is.nan(sim.d)] <- 0
     z <- abs(d/sd(sim.d))
@@ -150,8 +149,7 @@ if(sig.test=="J"){
   for(k in 1:replicate2){  
     if(k/2 == round(k/2)) cat(".")
     sim.matrix[1:4,1:(foo-block.size-1)] <-alignment.matrix[1:4, -drop.pos[k]:-(drop.pos[k]+block.size)]
-    results <- d.calc(sim.matrix)
-    sim.d[k] <- results[[1]]
+    sim.d[k] <- d.calc(sim.matrix)[[1]]
   }
   sim.d[is.nan(sim.d)] <- 0
   z <- abs(d/sd(sim.d))
@@ -174,6 +172,8 @@ if(sig.test=="J"){
   }
   return(d)
 }
+
+
 CalcPopD <- function(alignment = "alignment.fasta", ambig="D",
                      align.format='fasta'){
   ##  Now we have eqn. 2 from page 2240
@@ -259,7 +259,7 @@ CalcPopD <- function(alignment = "alignment.fasta", ambig="D",
   
   
   
-  
+  # make 264 to 305 into a function
   
   
   
