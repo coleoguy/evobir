@@ -30,7 +30,7 @@ SlidingWindow <- function(FUN, data, window, step, strict=F){
   # code for vectors
   if(is.vector(data)) {
     total <- length(data)
-    spots <- seq(from = 1, to = (total - window), by = step)
+    spots <- seq(from = 1, to = (total - window + 1), by = step)
     result <- vector(length = length(spots))
     for(i in 1:length(spots)){
       result[i] <- match.fun(FUN)(data[spots[i]:(spots[i] + window - 1)])
@@ -40,9 +40,9 @@ SlidingWindow <- function(FUN, data, window, step, strict=F){
   # code for matrices
   if(is.matrix(data)){
     total.x <- ncol(data)
-    spots.x <- seq(from = 1, to = (total.x - window), by = step)
+    spots.x <- seq(from = 1, to = (total.x - window + 1), by = step)
     total.y <- nrow(data)
-    spots.y <- seq(from = 1, to = (total.y - window), by = step)
+    spots.y <- seq(from = 1, to = (total.y - window + 1), by = step)
     result <- matrix(, length(spots.y), length(spots.x))
     for(i in 1:length(spots.y)){
       for(j in 1:length(spots.x)){
@@ -58,3 +58,6 @@ SlidingWindow <- function(FUN, data, window, step, strict=F){
   # return the result to the user
   return(result)
 }
+
+
+
