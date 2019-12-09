@@ -7,7 +7,10 @@
 ##################################################################
 ##
 ## INPUT DATA
-## trees: a phylo object
+## tree: a phylo object
+## - for multiphylo analysis. Loop through every tree and compile the the 
+##   of each loop to create a distribution of observed values and a multiphylo 
+##   null distribution
 
 ## data: a dataframe with three columns (Labels, cont trait, disc trait)
 ## - Labels should match taxa labels in the phylogeny
@@ -36,7 +39,7 @@
 ## n.tails: either 1 or 2 depending on whether user has apriori hypothesis about a certain state
 
 
-AncCond <- function(tree, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
+AncCond <- function(tree, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = TRUE) {
   ##### testing inputs #####
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
@@ -114,7 +117,6 @@ AncCond <- function(tree, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="
     producing.nodes12 <- unique(producing.nodes12)
     producing.nodes21 <- unique(producing.nodes21)
     ## get the mean ancestral value for the cont trait
-    ## at nodes producing the derived state marginalizing across trees
     anc.states <- anc.states.cont.trait
     orig.val12 <- mean(anc.states$ace[names(anc.states$ace) %in%
                                         producing.nodes12])
@@ -209,7 +211,6 @@ AncCond <- function(tree, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="
     wanted_nodes <- gsub(",.*", "", wanted_nodes)
     producing.nodes <- unique(wanted_nodes)
     ## get the mean ancestral value for the cont trait
-    ## at nodes producing the derived state marginalizing across trees
     anc.states <- anc.states.cont.trait
     orig.val <- mean(anc.states$ace[names(anc.states$ace) %in%
                                       producing.nodes])

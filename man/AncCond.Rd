@@ -10,7 +10,7 @@ AncCond(tree,
         mat=c(0,2,1,0), 
         pi="equal", 
         n.tails = 1, 
-        message = T
+        message = TRUE)
 }
 \arguments{
   \item{tree}{tree of class phylo}
@@ -33,7 +33,7 @@ AncCond(tree,
 
 
 }
-\author{Nathan Anderson, Richard H. Adams, and Heath Blackmon}
+\author{Nathan Anderson, Jeffery P. Demuth, Richard H. Adams, and Heath Blackmon}
 \references{http://coleoguy.github.io/}
 \examples{
 \dontrun{

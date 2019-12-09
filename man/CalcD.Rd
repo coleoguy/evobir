@@ -7,7 +7,8 @@
 CalcD(alignment = "alignment.fasta", sig.test = "N", ambig="D", 
 block.size = 1000, replicate = 1000, align.format='fasta')
 
-CalcPopD(alignment = "alignment.fasta", ambig="D", align.format='fasta')
+CalcPopD(alignment = "alignment.fasta", sig.test = "N", ambig="D", 
+block.size = 1000, replicate = 1000, align.format='fasta')
 
 }
 \arguments{
@@ -32,7 +33,7 @@ Eaton, D. A. R., and R. H. Ree. 2013. Inferring phylogeny and introgression usin
 \examples{
 CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test = "N")
 
-CalcPopD(alignment = system.file("3.fasta", package = "evobiR"))
+CalcPopD(alignment = system.file("3.fasta", package = "evobiR"), sig.test = "N")
   }
 \keyword{ introgression }
 \keyword{ SNP }

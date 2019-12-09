@@ -25,11 +25,11 @@ Heath Blackmon
 \examples{
 # vector example
 x1 <- rnorm(100, sd=3)
-z1 <- SlidingWindow(FUN="mean", data=x2, window=10, step=5, strict=T)
+z1 <- SlidingWindow(FUN="mean", data=x1, window=10, step=5, strict=TRUE)
 
 # matrix example
 x2 <- matrix(rnorm(10000),100,100)
-z2 <- SlidingWindow(FUN="mean", data=x1, window=10, step=5, strict=T)
+z2 <- SlidingWindow(FUN="mean", data=x2, window=10, step=5, strict=TRUE)
 
 }
 \keyword{ basic stats }

@@ -1,12 +1,12 @@
 Package: evobiR
 Type: Package
-Title: Comparative and Population Genetic Analyses
+Title: Evolutionary Biology in R
 Version: 1.3
 Date: 2019-12-09
 Author: Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: https://github.com/coleoguy/evobir
-Description: Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses.  Implementations of ABBA/BABA type statistics to test for introgression in genomic data. Wright-Fisher, phylogenetic tree, and statistical distribution Shiny interactive simulations for use in teaching.
+Description: Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses.  Implementations of ABBA/BABA type statistics to test for introgression in genomic data.
 License: GPL (>=2)
 Imports: 
      seqinr, 

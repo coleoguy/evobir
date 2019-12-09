@@ -1,6 +1,5 @@
 \name{1.fasta}
 \alias{1.fasta}
-\alias{2.fasta}
 \alias{3.fasta}
 \docType{data}
 \title{simulated SNP data}
