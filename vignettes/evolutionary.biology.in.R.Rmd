@@ -15,11 +15,7 @@ vignette: >
 _______
 # Installing
 
-A stable tested version of evobiR is available from the CRAN repository or the most recent version may be installed from github using the devtools package: 
-
-Installing from CRAN
-
-    install.packages("evobiR")
+The most recent version may be installed from github using the devtools package: 
 
 Installing from github
 
@@ -31,10 +27,6 @@ library(evobiR)
 ```
 
 _______
-# Introduction
-
-evobiR is general package that contains a variety of functions to facilitate comparative and population genetics analyses.
-
 # Comparative Methods
 
 ## AncCond: 
@@ -48,7 +40,7 @@ This function uses stochastic mapping and ancestral state reconstruction to dete
  
 <img src="./images/anccond.png" width="500" height="500"/>
 
-Depiction of the four steps in our approach to estimating the probability of the continuous value associated with the origin of a transition into a derived state of a binary  character.  A) Estimation of the continuous trait assuming a Brownian motion model of evolution. B) Identification of the transition points in the binary character through stochastic mapping C) Categorization of nodes as either ancestral or derived as well as those that have a daughter lineage experiencing an origin of the derived state of the binary character. D) Depiction of the null distribution from sampling continuous trait value at nodes in ancestral condition compared to the observed mean of producing nodes estimate from the data.
+The four steps in the ancestral condition test. A) Ancestral states are estimated for the continuous character assuming a Brownian motion model of evolution. B) Possible evolutionary histories for the discrete trait are generated through stochastic mapping C) Nodes are categorized as either ancestral or derived, and ancestral nodes that subtend an origin of the derived state of the discrete character are annotated. D) Depiction of the null distribution and the observed mean of producing nodes estimated from the data. In this example the producing nodes have a lower continuous value than expected if there is no relationship between the traits.
 
 &nbsp;
 
@@ -101,7 +93,7 @@ _______
 # Population Genetics
 
 ## CalcD & WinCalcD
-The functions CalcD and CalcPopD are implementations of the algorithm introgression in genomic data. Significance of the D-stat can be calculated either through bootstrapping or jackknifing. Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data. Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments.
+The functions CalcD and CalcPopD are implementations of the algorithm introgression in genomic data. Significance of the D-stat can be calculated either through bootstrapping or jackknifing. Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data. Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments. The WinCalcD function is identical to CalcD but performs testing in windows along an alignment.
 
 Durand, Eric Y., et al. Testing for ancient admixture between closely related populations. Molecular biology and evolution 28.8 (2011): 2239-2252.
 
@@ -111,7 +103,7 @@ Eaton, D. A. R., and R. H. Ree. 2013. Inferring phylogeny and introgression usin
 ```{r}
 CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test = "N")
 
-CalcPopD(alignment = system.file("3.fasta", package = "evobiR"))
+CalcPopD(alignment = system.file("3.fasta", package = "evobiR"), sig.test = "N")
 
 ```
 
@@ -129,7 +121,7 @@ Applies a function within a sliding window of a numeric vector. Both the step si
 ```{r, fig.height=5, fig.width=5}
 data(sunspot.month)
 foo <- as.vector(sunspot.month)
-plot(foo)
+plot(foo, ylab="Number of sunspots", xlab="record number")
 ```
 
 When we look at the data at this scale the pattern that really catches our attention is the 25 peaks that we see across these 260 years.  This is the well documented 11-year sunspot cycle.  However, our sun has longer cycles that are less evident in this graphing.
