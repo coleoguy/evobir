@@ -39,7 +39,7 @@ AncCond(tree,
 \dontrun{
 data(mite.trait)
 data(trees.mite)
-AncCond(trees, mite.trait) 
+AncCond(trees[[1]], mite.trait) 
 }
 }
 \keyword{ comparative method }
