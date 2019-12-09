@@ -14,7 +14,7 @@ FuzzyMatch(tree, data, max.dist)
 
 \value{
   A dataframe with the following rows:
-  
+
   Name in data\cr
   Name in tree\cr
   Number of differences\cr
