@@ -72,6 +72,7 @@ FuzzyMatch(tree = hym.tree, data = names, max.dist=3)
 
 &nbsp;
 
+
 ## SampleTrees
 
 ```{r, eval=F}
@@ -81,45 +82,18 @@ SampleTrees(trees = system.file("trees.nex", package = "evobiR"),
 
 This function takes as its input a large collection of trees from a program like MrBayes or Beast and allows the user to select the number of randomly drawn trees they wish to retrieve and to save them in either newick or nexus format.
 
+
 &nbsp;
 
-
-
-
- 
-## SimThresh3
-This is an extension of Felsenstein's threshold model for a 3 state unordered trait. This assumes that a 2 dimensional liability value determines which of 3 discrete states is observed. The liabilities are allowed to evolve on an X and Y axis and then projected onto a Cartesian plane. This plane is divided into three sectors that meet at the origin. The discrete trait observed is determined by which sector the X,Y values fall in: 330 to 90 degrees is state 1, 90 to 210 degrees is state 2, and 210 to 330 is state 3. This approach allows for any set of probabilities for transitions between states to be represented.
-
-To illustrate first we will simply simulate the tree and the data
-```{r}
-set.seed(3)
-tree<-phytools::pbtree(n=100)
-tip.state.full <- SimThresh3(tree, liabilities=T)
-```
-
-Now lets plot liabilities that have evolved via Brownian motion onto a Cartesian plane, and add lines to represent the thresholds between traits:
-```{r, fig.width=6, fig.height=6}
-plot(tip.state.full[[2]],tip.state.full[[3]], 
-     col=c("red", "blue", "green")[tip.state.full[[1]]], pch=16, cex=.6,
-     xlim=c(-4,4), ylim=c(-4,4), 
-     xlab="Liability 1", ylab="Liability 2")
-lines(x=c(0,0), y=c(0,4), lwd=3, lty=3)
-lines(x=c(0,4), y=c(0,-2.31), lwd=3, lty=3)
-lines(x=c(0,-4), y=c(0,-2.31), lwd=3, lty=3)
-text(x=c(-2,0,2), y=c(3,-3,3), labels=c("state 1", "state 2", "state 3"), cex=.75)
-```
-
-Alternatively we can view the outcome of this model on our tree:
-```{r, fig.width=2, fig.height=6}
-ShowTree(tree, tip.state.full[[1]],  cols = c("red", "blue", "green"), tip.cex=.5)
-```
 
 &nbsp;
 
 
 ## SuperMatrix
 
-`SuperMatrix(missing = "N", prefix = "DATASET2", save = T)`
+```{r, eval=F}
+SuperMatrix(missing = "N", prefix = "DATASET2", save = T)
+```
 
 This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.  A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix. The second element is a dataframe version of the supermatrix. If the argument save is set to True then both of these files are also saved to the working directory.
 
@@ -149,53 +123,6 @@ CalcPopD(alignment = system.file("3.fasta", package = "evobiR"))
 _______
 # Utility/Misc. Functions
 
-## AICc
-Supplied with a log likelihood, the number of model parameters, and sample size calculates the small sample size version of the AIC score. In my opinion this is preferable in general use since it will converge on AIC as sample size increases and reduces the risk of overfitting otherwise.  Below we can illustrate this convergence using the R cars dataset and a simple linear model.
-
-```{r, fig.height=5, fig.width=5}
-data(cars)
-fit<-lm(cars)
-aic <- AIC(fit)
-plot(0,0,xlim=c(0,50),ylim=c(250,270),xlab="sample size", 
-     main="model with 3 param.", ylab="Score (AIC/AICc)")
-abline(h=aic, col="red", lwd=3)
-foo <- vector(length=100, mode="numeric")
-for(i in 3:100){
-  foo[i] <- AICc(-127.3877, 3, i)
-}
-lines(foo, col="darkgreen", lwd=3)
-text(x=c(3,13),y=c(259,268),c("AIC","AICc"))
-```
-
-&nbsp;
-
-## Even
-
-Just a simple function that returns True if a number is even and False otherwise.
-
-```{r}
-Even(3)
-Even(4)
-```
-
-Internally this is just does a quick modulo 2 division:
-```{r}
-3 %% 2 == 0
-4 %% 2 == 0
-```
-
-&nbsp;
-
-## Mode
-
-Returns the most frequently occurring value in a vector. In the case of a tie it will return the mode which has the earliest initial occurrence in the vector
-
-```{r}
-Mode(c(1,2,3,4,5,6,2,5))
-Mode(c("jeff", "emma", "matt", "laura", "matt"))
-```
-
-&nbsp;
 
 ## Sliding window
 
@@ -225,9 +152,9 @@ years <- round(SlidingWindow("mean",
                              window = 132, 
                              step = 12, 
                              strict=F))
-plot(x=years,y=sunspots, type="l", lwd=3)
+{plot(x=years,y=sunspots, type="l", lwd=3)
 abline(v=1810, col="red",lwd=3)
-text(y=90, x=1810, "Dalton Min.", col="red",pos=4)
+text(y=90, x=1810, "Dalton Min.", col="red",pos=4)}
 ```
 
 now we can easily spot just how exceptional the Dalton minimum of the early 1800s was.
