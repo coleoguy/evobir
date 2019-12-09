@@ -91,9 +91,7 @@ This function takes as its input a large collection of trees from a program like
 
 ## SuperMatrix
 
-```{r, eval=F}
-SuperMatrix(missing = "N", prefix = "DATASET2", save = T)
-```
+`SuperMatrix(missing = "N", prefix = "DATASET2", save = T)`
 
 This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.  A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix. The second element is a dataframe version of the supermatrix. If the argument save is set to True then both of these files are also saved to the working directory.
 
