@@ -6,13 +6,13 @@ FuzzyMatch <- function(tree, data, max.dist){
   tree.names <- tree$tip.label    # lets get the names on the tree
   close.taxa <- data.frame()
   counter <- 1
-  data.names <- unique(data)
+  data.names <- unique(names(data))
   for(i in 1:length(data.names)){
     name.dist <- min(adist(data.names[i], as.character(tree.names)))
     if( name.dist <= max.dist & name.dist > 0){
       fuq <- which.min(adist(data.names[i], as.character(tree.names)))
       close.taxa[counter, 1] <- data.names[i]
-      close.taxa[counter, 2] <- tree.names[fuq]  
+      close.taxa[counter, 2] <- tree.names[fuq]
       close.taxa[counter, 3] <- name.dist
       counter <- counter + 1
     }
