@@ -1,4 +1,4 @@
-countTrees <- function(collection = NULL, ref = NULL, types=T, verbose=T){
+countTrees <- function(collection = NULL, ref = NULL, classes=T, verbose=T){
   if(is.null(collection)) stop("supply a path to a collection of trees in a Newick format file")
   if(is.null(ref)) stop("supply a path to a set of topologies to count in a Newick format file")
   trees <- read.tree(collection)
@@ -30,7 +30,7 @@ countTrees <- function(collection = NULL, ref = NULL, types=T, verbose=T){
       print(paste("Some trees do match available topologies. You may want to check trees:", bad))
     }
   }
-  if(types==T){
+  if(classes==T){
     classification <- list(classification, tree.class)
     return(classfication)
   }else{
