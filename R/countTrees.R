@@ -3,9 +3,9 @@ countTrees <- function(collection = NULL, ref = NULL, classes=T, verbose=T){
   if(is.null(ref)) stop("supply a path to a set of topologies to count in a Newick format file")
   trees <- read.tree(collection)
   types <- read.tree(ref)
-  top.num <- length(types)
-  tree.class <- vector(length=length(trees))
   class(types) <- "multiPhylo"
+  top.num <- length(types)
+  tree.class <- as.numeric(rep(NA, times=length(trees)))
   classification <- vector(length=top.num)
   bad <- c()
   for(i in 1:length(trees)){
@@ -19,7 +19,6 @@ countTrees <- function(collection = NULL, ref = NULL, classes=T, verbose=T){
         missing <- F
       }else if(counter == top.num){
         bad <- c(bad, i)
-        tree.class[i] <- NA
         missing <- F
       }
       counter <- counter + 1
