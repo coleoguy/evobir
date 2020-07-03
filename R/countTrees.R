@@ -32,7 +32,7 @@ countTrees <- function(collection = NULL, ref = NULL, classes=T, verbose=T){
   }
   if(classes==T){
     classification <- list(classification, tree.class)
-    return(classfication)
+    return(classification)
   }else{
     return(classification)
   }
