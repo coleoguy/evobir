@@ -30,7 +30,7 @@ countTrees <- function(collection = NULL, ref = NULL, types=T, verbose=T){
       print(paste("Some trees do match available topologies. You may want to check trees:", bad))
     }
   }
-  if(types=T){
+  if(types==T){
     classification <- list(classification, tree.class)
     return(classfication)
   }else{
