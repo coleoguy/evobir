@@ -8,7 +8,7 @@ countTrees(collection = NULL, ref = NULL, types = T, verbose=T)
 \arguments{
   \item{collection}{path to a collection of trees in a Newick format file}
   \item{ref}{path to a Newick format file with the topologies of interest}
-  \types{types}{if T then will return a vector with classification of each tree}
+  \item{types}{if T then will return a vector with classification of each tree}
 }
 \details{}
 
