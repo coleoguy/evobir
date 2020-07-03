@@ -1,9 +1,10 @@
-countTrees <- function(collection = NULL, ref = NULL, verbose=T){
+countTrees <- function(collection = NULL, ref = NULL, types=T, verbose=T){
   if(is.null(collection)) stop("supply a path to a collection of trees in a Newick format file")
   if(is.null(ref)) stop("supply a path to a set of topologies to count in a Newick format file")
   trees <- read.tree(collection)
   types <- read.tree(ref)
   top.num <- length(types)
+  tree.class <- vector(length=length(trees))
   class(types) <- "multiPhylo"
   classification <- vector(length=top.num)
   bad <- c()
@@ -14,9 +15,11 @@ countTrees <- function(collection = NULL, ref = NULL, verbose=T){
       x <- all.equal.phylo(trees[[i]], types[[counter]], use.edge.length=F)
       if(x){
         classification[counter] <- classification[counter] + 1
+        tree.class[i] <- counter
         missing <- F
       }else if(counter == top.num){
         bad <- c(bad, i)
+        tree.class[i] <- NA
         missing <- F
       }
       counter <- counter + 1
@@ -27,5 +30,10 @@ countTrees <- function(collection = NULL, ref = NULL, verbose=T){
       print(paste("Some trees do match available topologies. You may want to check trees:", bad))
     }
   }
-  return(classification)
+  if(types=T){
+    classification <- list(classification, tree.class)
+    return(classfication)
+  }else{
+    return(classification)
+  }
 }
