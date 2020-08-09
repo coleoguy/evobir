@@ -1,17 +1,21 @@
 SuperMatrix <- function(missing = "-",
                         prefix = "concatenated",
                         save = T,
+                        input = "",
                         format.in = "f",
                         format.out = "f",
                         concatenate = T){
   # get file names
   file.names <- list.files()
+  if(input != ""){
+    file.names <- grep(input, file.names, value=T)
+  }
   # read DNA
   DNA <- list()
   for(i in 1:length(file.names)){
     print(paste("Reading alignment", i))
-    DNA[[i]] <- read.dna(file=file.names[i], 
-                         format = format.in, 
+    DNA[[i]] <- read.dna(file=file.names[i],
+                         format = format.in,
                          as.character=T)
   }
   # get all taxa names
@@ -19,11 +23,11 @@ SuperMatrix <- function(missing = "-",
   for(i in 1:length(DNA)){
     counter <- length(taxa) + 1
     for(j in 1:nrow(DNA[[i]])){
-      taxa <- c(taxa, 
+      taxa <- c(taxa,
                 row.names(DNA[[i]])[!row.names(DNA[[i]]) %in% taxa])
     }
   }
-  
+
   if(concatenate == T){
     # calculate total alignment length
     total.length <- 0
@@ -57,11 +61,11 @@ SuperMatrix <- function(missing = "-",
     results[[2]] <- seqmatrix
     if(save == T){
       print("saving files")
-      write.dna(seqmatrix, 
-                file = paste(prefix, ".fasta", sep = ""), 
+      write.dna(seqmatrix,
+                file = paste(prefix, ".fasta", sep = ""),
                 format = format.out)
-      write.csv(partitions, 
-                row.names = F, 
+      write.csv(partitions,
+                row.names = F,
                 file = paste(prefix, ".partitions.csv", sep = ""))
     }
   }
@@ -79,8 +83,8 @@ SuperMatrix <- function(missing = "-",
       }
       results[[i]] <- seqmatrix
       if(save == T){
-      write.dna(seqmatrix, 
-                file = paste(prefix, file.names[i], ".fasta", sep = ""), 
+      write.dna(seqmatrix,
+                file = paste(prefix, file.names[i], ".fasta", sep = ""),
                 format = format.out)
       }
     }
