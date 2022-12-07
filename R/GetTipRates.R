@@ -3,7 +3,7 @@
 GetTipRates <- function(tree = NULL,
                         Q = NULL,
                         tip.states = NULL,
-                        hyper = NULL,
+                        hyper = FALSE,
                         p.mat = NULL){
   
   ### --- define inputs --- ###
@@ -20,11 +20,7 @@ GetTipRates <- function(tree = NULL,
  
   ### --- set default parameters --- ###
   
-  #the default argument for hyper will be false
-  if(is.null(hyper)){
-    hyper <- FALSE
-  }
-  
+
   ### --- perform checks --- ###
   
   #if the tree is not ultrametric, stop function and ask user to resolve

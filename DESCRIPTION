@@ -13,7 +13,8 @@ Imports:
      ape, 
      geiger, 
      phytools,
-     castor 
+     castor,
+     methods 
 Suggests: knitr
 VignetteBuilder: knitr
 

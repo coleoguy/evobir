@@ -5,9 +5,9 @@
 \title{Calculate the proportion of different classes of fusions as a fraction of all fusions}
 \description{Thes three functions, Pfsa, Pfaa, and Pfss use sex chromosome systems and diploid autosome number to calculate the proportion of all fusions that are expected to be sex chromosome autosome fusions (Pfsa), autosome autosome fusions (Pfaa), and sex chromosome sex chromosome fusions (Pfss). }
 \usage{
-Pfsa(Da = 26, scs = "XY", mud = 0.5)
-Pfaa(Da = 26, scs = "XY", mud = 0.5)
-Pfss(Da = 26, scs = "XXY", mud = 0.5)
+Pfsa(Da, scs, mud)
+Pfaa(Da, scs, mud)
+Pfss(Da, scs, mud)
 }
 \arguments{
   \item{Da}{the diploid autosome count}
