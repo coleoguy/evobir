@@ -13,7 +13,7 @@ Imports:
      ape, 
      geiger, 
      phytools,
-     Castor 
+     castor 
 Suggests: knitr
 VignetteBuilder: knitr
 
