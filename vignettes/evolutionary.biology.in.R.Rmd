@@ -1,6 +1,6 @@
 ---
 title: "Evolutionary biology in R (evobiR) tutorial"
-author: "Nathan Anderson, Jeffery Demuth, and Richard A. Adams, and Heath Blackmon "
+author: "Michelle Jonika, Jeffery Demuth, and Richard A. Adams, and Heath Blackmon "
 date: "last updated: `r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
