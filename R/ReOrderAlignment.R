@@ -21,7 +21,6 @@ ReOrderAlignment <- function(file, newfile, ref=NULL){
   ### no reference
   if (is.null(ref)){
     result = c()
-    print("No reference")
     print("Re-ordering...")
     for (j in 1:length(dat)){
       dash = 0
@@ -44,7 +43,7 @@ ReOrderAlignment <- function(file, newfile, ref=NULL){
   if (!is.null(ref)){
     for (i in 1:length(ref)){
       if ((names(dat[ref][i])) %in% names(dat)){
-        print(paste("The reference you picked: ", names(dat[ref][i])))
+        print(paste("The sequence you picked: ", names(dat[ref][i])))
         if (i == length(ref)){
           print("Re-ordering...")
           # taking off the reference(s) for the original data and run re-order
@@ -70,7 +69,7 @@ ReOrderAlignment <- function(file, newfile, ref=NULL){
       }
       # if the references are not in the file
       else if (!(names(dat[ref][i])) %in% names(dat)){
-        print(paste("Oops! the reference,'",ref[i],"',is not in your file. Please check again."))
+        print(paste("Oops! the sequence,'",ref[i],"',is not in your file. Please check again."))
         break
         # stop the whole process
       }
