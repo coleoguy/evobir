@@ -7,7 +7,7 @@ GetTipRates(tree, Q, tip.states, hyper, p.mat)
 }
 \arguments{
   \item{tree}{an ultrametric tree of class phylo}
-  \item{Q}{transition matrix containing estimated rates}
+  \item{Q}{transition matrix containing estimated rates with column names}
   \item{tip.states}{An integer vector with a length equal to the number of species on the phylogeny. It should have values of 1 to N with N being the number of total states. Elements of the vector should match the tip names for the phylogeny.}
   \item{hyper}{logical vector of length one. TRUE indicates the model includes a binary hyperstate. Default is FALSE and indicates no binary hyperstate}
   \item{p.mat}{a probability matrix where each column represent a discrete state and each row is a species. Values in the matrix describe the probability of being in any of these states}
