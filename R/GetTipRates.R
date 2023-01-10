@@ -7,19 +7,17 @@ GetTipRates <- function(tree = NULL,
                         p.mat = NULL){
   
   ### --- define inputs --- ###
-  # tree: a rooted tree of class phylo
-  # Q: a transition matrix
-  # tip.states: a named vector of size Ntips specifying the state of each tip in terms
-        # of an integer from 1 to Nstates where the names are species names that
-        # match the tip labels in the provided tree. 
-  # hyper: TRUE if you want the model to include a binary hyper state. FALSE if
-        # you do not want the model to include a binary hyper state.
-  # p.mat: a probability matrix where each column represent a discrete state and 
-        #each row is a species. Values in the matrix describe the probability of
-        #being in any of these states. 
- 
-  ### --- set default parameters --- ###
-  
+  # tree: an ultrametric tree of class phylo
+  # Q: a transition matrix containing estimated rates with column names
+  # tip.states: An integer vector with a length equal to the number of species 
+    #non the phylogeny. It should have values of 1 to N with N being the number 
+    # of total states. Elements of the vector should match the tip names for 
+    # the phylogeny. 
+  # hyper: logical vector of length one. TRUE indicates the model includes a 
+    # binary hyperstate. Default is FALSE and indicates no binary hyperstate
+  # p.mat: a probability matrix where each column represent a discrete state 
+    # and each row is a species. Values in the matrix describe the probability 
+    # of being in any of these states. 
 
   ### --- perform checks --- ###
   
