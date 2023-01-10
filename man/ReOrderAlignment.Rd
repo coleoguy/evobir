@@ -6,7 +6,7 @@
 This function re-orders aligned sequences based on physical map.  
 }
 \usage{
-ReOrderAlignment(file, newfile, ref = (""))
+ReOrderAlignment(file, newfile, ref = "")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
