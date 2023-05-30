@@ -5,7 +5,7 @@
 \usage{
 scaleTreeRates(tree, tip.states, model, fixedQ = NULL, 
                max.ratio = 2, nbins = 10, max.transition = 1, 
-               var.start = FALSE, pi = "Fitzjohn")
+               var.start = FALSE, pi = "fitzjohn")
 }
 \arguments{
   \item{tree}{a tree of class \code{phylo}}
@@ -18,7 +18,7 @@ scaleTreeRates(tree, tip.states, model, fixedQ = NULL,
   \item{var.start}{\code{logical} whether or not to increment scalar values at the root of the tree. If \code{TRUE}, the analysis will be iterated across all pssible root scalar values and the best tree (highest likelihood) returned. If \code{FALSE} (default), root scalar is set to one and only a single iteration is performed}
   \item{pi}{\code{string} giving method to be used for estimating prior. Takes any option which can be passed to phytool's \code{fitMk}, defaults to \code{"fitzjohn"}}
 }
-
+\details{}
 \value{A phylogeny of class \code{phylo} and \code{phyloscaled}. Phylogeny has all elements normally included in an object of class \code{phylo}, with an additional element:
 \item{scalar}{a \code{numeric} vector of scalars equal in length to the number of edges in phylogeny. Ordering of scalars is identical to the ordering of edges}}
 \seealso{
