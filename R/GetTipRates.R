@@ -151,6 +151,7 @@ GetTipRates <- function(tree = NULL,
   nodepulls <- c()
   #loop through to store the parent node of each tip
   for(i in 1:length(tree$tip.label)){
+    #stores the node number for each tip in the tree
     nodepulls[i] <- getParent(tree, nodes[i])
   }
   
