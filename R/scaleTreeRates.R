@@ -263,6 +263,21 @@ scaleTreeRates <- function(tree,tip.states,
     e_x
   }
   
+  statdist<-function(Q){
+    foo<-function(theta,Q){
+      Pi<-c(theta[1:(nrow(Q)-1)],1-sum(theta[1:(nrow(Q)-1)]))
+      sum((Pi%*%Q)^2)
+    }
+    k<-nrow(Q)
+    if(nrow(Q)>2){ 
+      fit<-optim(rep(1/k,k-1),foo,Q=Q,control=list(reltol=1e-16))
+      return(setNames(c(fit$par[1:(k-1)],1-sum(fit$par[1:(k-1)])),rownames(Q)))
+    } else {
+      fit<-optimize(foo,interval=c(0,1),Q=Q)
+      return(setNames(c(fit$minimum,1-fit$minimum),rownames(Q)))
+    }
+  }
+  
   #Get tip states
   x <- tip.states[order(factor(names(tip.states), levels=tree$tip.label))]
   
