@@ -1,15 +1,20 @@
-\name{plot.phyloscaled}
+\name{plot}
 \alias{plot.phyloscaled}
 \title{Phylogenetic visualization of heterogenity in discrete character evolution}
 \description{This function provides two methods for visualizing a \code{phyloscaled} tree produced by \code{scaleTreeRates}.}
 \usage{
-plot.phyloscaled(tree,method="multiply",palette="RdYlGn",
-                 edge.width=1,cex=1,show.tip.label = T)
+\method{plot}{phyloscaled}(tree, method = "multiply", palette = "RdYlGn",
+     edge.width = 1, cex = 1, show.tip.label = T)
 }
+
+
 \arguments{
   \item{tree}{a tree of class \code{phylo} and \code{phyloscaled}}
   \item{method}{a \code{string} describing the method to be used for visualization. Can either be "multiply" or "color", see \strong{Details}}
   \item{palette}{a \code{string} giving the palette to be used for edge coloring, only taken into account if \code{method = "color"}. See \strong{Details}}
+  \item{edge.width}{numeric value that determines branch width}
+  \item{cex}{numeric value for size}
+  \item{show.tip.label}{logical indicating whether to print tip labels}
 }
 \details{The two plotting methods currently supported are \code{"multiply"} and \code{"color"}.
 

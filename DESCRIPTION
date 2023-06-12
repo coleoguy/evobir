@@ -14,7 +14,10 @@ Imports:
      geiger, 
      phytools,
      castor,
-     methods 
+     methods,
+     viridis,
+     RColorBrewer,
+     expm
 Suggests: knitr
 VignetteBuilder: knitr
 
