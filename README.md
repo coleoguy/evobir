@@ -5,7 +5,8 @@ Evolutionary biology in R (last update: 2023-5-13)
 
 citation:
 
-*Michelle M. Jonika, Maximos Chin, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon. 2023. EvobiR: Tools for comparative analyses and teaching evolutionary biology.*
+*Michelle M. Jonika, Maximos Chin, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon. 2023. EvobiR: Tools for comparative analyses and teaching evolutionary biology. [![DOI](https://zenodo.org/badge/13571380.svg)](https://zenodo.org/badge/latestdoi/13571380)
+*
 
 EvobiR is a collection of functions that have proven convenient in our lab for a broad range of analyses:
 
