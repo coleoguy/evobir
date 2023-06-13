@@ -1,23 +1,40 @@
-evobir
+EvobiR 2.1
 ======
 
-evolutionary biology in R
-
+Evolutionary biology in R (last update: 2023-5-13)
 
 citation:
 
-*Blackmon, Heath and Richard A. Adams. 2015. EvobiR: Tools for comparative analyses and teaching evolutionary biology. doi:10.5281/zenodo.30938*
+*Michelle M. Jonika, Maximos Chin, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon. 2023. EvobiR: Tools for comparative analyses and teaching evolutionary biology.*
 
-Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses. Implementations of ABBA/BABA type statistics to test for introgression in genomic data.
+EvobiR is a collection of functions that have proven convenient in our lab for a broad range of analyses:
 
-If you want the very latest version of evobiR then you can use devtools to install from GitHub.
+- Comparative analysis of continuous traits influencing discrete states
+
+- ABBA/BABA tests of introgression
+
+- Tools for evaluating and measuring rate heterogeneity in Mk models
+
+- Calculation of probabilities of sex chromosome to autosome fusions
+
+- Counting topologies
+
+- Working with sequence alignments
+
+- Utility functions to ease comparative, phylogenetic, and quantitative genetic analyses
+
+### Installation
+
+EvobiR can be installed using devtools to install from GitHub.
 
 <code>library(devtools)</code>
 
-<code>install_github('coleoguy/evobir', build_vignettes = T)</code>
+<code>install_github('coleoguy/evobir', build_vignettes=T)</code>
 
 <code>library(evobiR)</code>
 
+
+### Help
 
 if you have questions or problems please let me know
 coleoguy@gmail.com.

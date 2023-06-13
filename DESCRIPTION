@@ -1,9 +1,9 @@
 Package: evobiR
 Type: Package
 Title: Evolutionary Biology in R
-Version: 2.0
-Date: 2022-12-15
-Author: Michelle M. Jonika, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
+Version: 2.1
+Date: 2023-5-13
+Author: Michelle M. Jonika, Maximos Chin, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: https://github.com/coleoguy/evobir
 Description: Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses.  Implementations of ABBA/BABA type statistics to test for introgression in genomic data.
