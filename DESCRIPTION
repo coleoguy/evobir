@@ -8,7 +8,7 @@ Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: https://github.com/coleoguy/evobir
 Description: Comparative analysis of continuous traits influencing discrete states, and utility tools to facilitate comparative analyses.  Implementations of ABBA/BABA type statistics to test for introgression in genomic data.
 License: GPL (>=2)
-Imports: 
+Imports:
      seqinr, 
      ape, 
      geiger, 
@@ -17,7 +17,8 @@ Imports:
      methods,
      viridis,
      RColorBrewer,
-     expm
+     expm,
+     igraph
 Suggests: knitr
 VignetteBuilder: knitr
 
