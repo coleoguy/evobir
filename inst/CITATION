@@ -1,0 +1,15 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "evobiR: Tools for Comparative Analyses and Teaching Evolutionary Biology",
+  author   = c(
+    person("Michelle M.", "Jonika"),
+    person("Maximos", "Chin"),
+    person("Nathan", "Anderson"),
+    person("Richard H.", "Adams"),
+    person("Jeffery P.", "Demuth"),
+    person("Heath", "Blackmon")
+  ),
+  year     = "2025",
+  note     = "R package version 2.2",
+  url      = "https://github.com/coleoguy/evobir"
+)

@@ -3,7 +3,7 @@
 \alias{Pfaa}
 \alias{Pfss}
 \title{Calculate the proportion of different classes of fusions as a fraction of all fusions}
-\description{Thes three functions, Pfsa, Pfaa, and Pfss use sex chromosome systems and diploid autosome number to calculate the proportion of all fusions that are expected to be sex chromosome autosome fusions (Pfsa), autosome autosome fusions (Pfaa), and sex chromosome sex chromosome fusions (Pfss). }
+\description{These three functions use sex chromosome systems and diploid autosome number to calculate the proportion of all fusions that are expected to be sex chromosome-autosome fusions (\code{Pfsa}), autosome-autosome fusions (\code{Pfaa}), and sex chromosome-sex chromosome fusions (\code{Pfss}).}
 \usage{
 Pfsa(Da, scs, mud)
 Pfaa(Da, scs, mud)
@@ -11,14 +11,18 @@ Pfss(Da, scs, mud)
 }
 \arguments{
   \item{Da}{the diploid autosome count}
-  \item{scs}{a text string describing the sex chromosome system for instance: "XO", "XXO", "XY", "ZO"", or "ZWW"}
-    \item{mud}{the proportion of fusions that originate in females.}
+  \item{scs}{a text string describing the sex chromosome system, for instance: \code{"XO"}, \code{"XXO"}, \code{"XY"}, \code{"ZO"}, or \code{"ZWW"}}
+    \item{mud}{the proportion of fusions that originate in females. Defaults to 0.5.}
 }
-\details{This approach assumes that all chromosomes have equal probability of being involved in a fusion and that X and Y (or Z and W) chromosomes are not able to fuse. It will provide accurate results for any sex chromosome system that has any number of one sex chromosomes and either zero or one of the other. For instance it will work for XO, XY, XXY, XYYYY, but not for XXYY. It is applicable to both male and female heterogameic systems.}
+\details{This approach assumes that all chromosomes have equal probability of being involved in a fusion and that X and Y (or Z and W) chromosomes are not able to fuse with each other. It will provide accurate results for any sex chromosome system that has any number of one sex chromosome and either zero or one of the other. For instance it will work for XO, XY, XXY, XYYYY, but not for XXYY. It is applicable to both male and female heterogametic systems.}
 
 \value{Returns a numeric vector of length 1 which contains the proportion of fusions expected to be of the specified type.}
 \author{Nathan Anderson and Heath Blackmon}
 \references{http://coleoguy.github.io/}
-\examples{Pfsa(Da = 26, scs = "XY", mud=0.4)}
+\examples{
+Pfsa(Da = 26, scs = "XY", mud = 0.4)
+Pfaa(Da = 26, scs = "XY", mud = 0.4)
+Pfss(Da = 26, scs = "XY", mud = 0.4)
+}
 \keyword{ sex chromosome }
 \keyword{ fusion }

@@ -127,11 +127,11 @@ make.simmap2 <- function (tree, x, model="SYM", nsim=1, monitor = FALSE, rejmax 
       if (pm) 
         printmessage(Q, pi, method = "fixed")
       
-      mtrees <- replicate(nsim,
-                          c(sim <<- sim + 1,
-                            if(monitor == TRUE){print(paste("simulation", sim, "of", nsim, sep = " "))},
-                            smap2(tree, x, N, m, root, L, Q, pi, logL, rejmax, rejint, monitor, sim)),
-                          simplify = FALSE)
+      mtrees <- vector("list", nsim)
+      for(sim in 1:nsim){
+        if(monitor == TRUE){print(paste("simulation", sim, "of", nsim, sep = " "))}
+        mtrees[[sim]] <- smap2(tree, x, N, m, root, L, Q, pi, logL, rejmax, rejint, monitor, sim)
+      }
     }
     if (nsim==1) {
       mtrees <- mtrees[[1]]

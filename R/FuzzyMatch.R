@@ -1,5 +1,5 @@
 FuzzyMatch <- function(tree, data, max.dist){
-  if(is(tree)=="multiPhylo"){
+  if(inherits(tree, "multiPhylo")){
     warning("Multiple trees were supplied only first is being used")
     tree <- tree[[1]]
   }

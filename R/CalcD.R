@@ -378,4 +378,5 @@ CalcPopD <- function(alignment = "alignment.fasta",
   user.result$align.length <- ncol(alignment.matrix) - 1
   user.result$useful.sites <- results[[2]]
   user.result$seg.sites <- results[[3]]
+  return(user.result)
 }

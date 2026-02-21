@@ -34,9 +34,11 @@ GetTipRates <- function(tree = NULL,
          a probability matrix to create tip states for given data.")
   }
   
-  #if tip states are not integers, stop function and ask user to resolve
-  if(is.integer(tip.states)){
-    stop("\n Tip states are not integers. Please provide tip states as integers.")
+  #if tip states are provided, check they are numeric whole numbers
+  if(!is.null(tip.states)){
+    if(!is.numeric(tip.states) || any(tip.states != round(tip.states))){
+      stop("\n Tip states are not whole numbers. Please provide tip states as integers.")
+    }
   }
   
   #if tip states are not present, but a probability matrix is provided, fill in 

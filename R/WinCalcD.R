@@ -55,9 +55,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50
       z <- abs(d/sd(sim.d, na.rm = T))
       z[is.nan(z)] <- 0
       new.pval <- 2 * (1 - pnorm(z))
-      ## NOW WE MAKE THE OUTPUTS  
-      cat("\n\n TEST FUNCTION\n\n")
-      print(sim.d)
+      ## NOW WE MAKE THE OUTPUTS
       cat("\nSites in alignment =", ncol(alignment.matrix))
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)

@@ -1,6 +1,6 @@
 ---
 title: "Evolutionary biology in R (evobiR) tutorial"
-author: "Michelle Jonika, Jeffery Demuth, and Richard A. Adams, and Heath Blackmon "
+author: "Michelle Jonika, Jeffery Demuth, Richard H. Adams, and Heath Blackmon"
 date: "last updated: `r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -15,7 +15,7 @@ vignette: >
 _______
 # Installing
 
-The most recent version may be installed from github using the devtools package: 
+The most recent version may be installed from github using the devtools package:
 
 Installing from github
 
@@ -29,15 +29,15 @@ library(evobiR)
 _______
 # Comparative Methods
 
-## AncCond: 
-```{}
+## AncCond
+```{r, eval=FALSE}
 data(mite.trait)
 data(trees.mite)
-AncCond(trees[[1]], mite.trait) 
+AncCond(trees[[1]], mite.trait)
 ```
 
 This function uses stochastic mapping and ancestral state reconstruction to determine if the derived state of a binary trait originates when a continuous trait has an extreme value.
- 
+
 <img src="./images/anccond.png" width="500" height="500"/>
 
 The four steps in the ancestral condition test. A) Ancestral states are estimated for the continuous character assuming a Brownian motion model of evolution. B) Possible evolutionary histories for the discrete trait are generated through stochastic mapping C) Nodes are categorized as either ancestral or derived, and ancestral nodes that subtend an origin of the derived state of the discrete character are annotated. D) Depiction of the null distribution and the observed mean of producing nodes estimated from the data. In this example the producing nodes have a lower continuous value than expected if there is no relationship between the traits.
@@ -45,11 +45,11 @@ The four steps in the ancestral condition test. A) Ancestral states are estimate
 &nbsp;
 
 
- 
-&nbsp;
- 
 
- 
+&nbsp;
+
+
+
 ## FuzzyMatch
 When assembling data from different sources typos can sometimes cause a loss of perfect matches between trees and datasets. This function helps you find these close matches that can be hand curated to keep as many species as possible in your analysis.
 
@@ -60,19 +60,19 @@ FuzzyMatch(tree = hym.tree, data = names, max.dist=3)
 ```
 
 &nbsp;
- 
+
 
 &nbsp;
 
 
 ## SampleTrees
 
-```{r, eval=F}
-SampleTrees(trees = system.file("trees.nex", package = "evobiR"), 
+```{r, eval=FALSE}
+SampleTrees(trees = system.file("trees.nex", package = "evobiR"),
             burnin = .1, final.number = 20, format = 'new', prefix = 'sample')
 ```
 
-This function takes as its input a large collection of trees from a program like MrBayes or Beast and allows the user to select the number of randomly drawn trees they wish to retrieve and to save them in either newick or nexus format.
+This function takes as its input a large collection of trees from a program like MrBayes or BEAST and allows the user to select the number of randomly drawn trees they wish to retrieve and to save them in either Newick or Nexus format.
 
 
 &nbsp;
@@ -83,9 +83,56 @@ This function takes as its input a large collection of trees from a program like
 
 ## SuperMatrix
 
-`SuperMatrix(missing = "N", prefix = "DATASET2", save = T)`
+`SuperMatrix(missing = "N", prefix = "DATASET2", save = TRUE)`
 
-This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.  A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix. The second element is a dataframe version of the supermatrix. If the argument save is set to True then both of these files are also saved to the working directory.
+This function reads all fasta format alignments in the working directory and constructs a single supermatrix that includes all taxa present in any of the fasta files and inserts missing symbols for taxa that are missing sequences for some loci.  A list with two elements is returned. The first element contains partition data that records the alignment positions of each input fasta file in the combined supermatrix. The second element is a dataframe version of the supermatrix. If the argument save is set to TRUE then both of these files are also saved to the working directory.
+
+&nbsp;
+
+_______
+# Phylogenetic Rate Analysis
+
+## scaleTreeRates & plot.phyloscaled
+
+The `scaleTreeRates` function analyzes heterogeneity in rates of discrete character evolution across a phylogeny. It estimates a scalar multiplier for each edge that modifies the overall transition rate matrix, allowing rates to vary across the tree.
+
+```{r, eval=FALSE}
+library(ape)
+library(phytools)
+
+## Fit rate heterogeneity model
+tree <- rtree(20)
+tip.states <- sample(1:2, 20, replace = TRUE)
+names(tip.states) <- tree$tip.label
+result <- scaleTreeRates(tree, tip.states, model = "ER", nbins = 3)
+
+## Visualize with scaled branch lengths
+plot(result, method = "multiply")
+
+## Visualize with colored branches
+plot(result, method = "color")
+```
+
+The `plot.phyloscaled` function provides two visualization methods: `"multiply"` scales branch lengths by their associated scalar, and `"color"` assigns colors from a diverging palette to indicate rate variation.
+
+&nbsp;
+
+## make.simmap2 & fix.simmap
+
+The `make.simmap2` function is an extension of phytools' `make.simmap` that adds rejection monitoring and a maximum rejection limit per edge. When the rejection limit is exceeded, the edge is assigned a "fail" state rather than stalling the simulation. The `fix.simmap` function uses graph theory to resolve these failed edges.
+
+```{r, eval=FALSE}
+library(ape)
+library(phytools)
+tree <- rtree(20)
+x <- sample(c("a","b"), 20, replace = TRUE)
+names(x) <- tree$tip.label
+
+## Run stochastic mapping with rejection limit
+result <- make.simmap2(tree, x, model = "ER", nsim = 10,
+                       monitor = FALSE, rejmax = 100000)
+```
+
 
 &nbsp;
 
@@ -93,7 +140,7 @@ _______
 # Population Genetics
 
 ## CalcD & WinCalcD
-The functions CalcD and CalcPopD are implementations of the algorithm introgression in genomic data. Significance of the D-stat can be calculated either through bootstrapping or jackknifing. Bootstrapping is appropriate for datasets where SNPs are unlinked for instance unmapped RADSeq data. Jackknifing is the appropriate approach when SNPs are potentially in linkage for instance gene alignments or genome alignments. The WinCalcD function is identical to CalcD but performs testing in windows along an alignment.
+The functions CalcD and CalcPopD are implementations of the algorithm for detecting introgression in genomic data. Significance of the D-statistic can be calculated either through bootstrapping or jackknifing. Bootstrapping is appropriate for datasets where SNPs are unlinked, for instance unmapped RADSeq data. Jackknifing is the appropriate approach when SNPs are potentially in linkage, for instance gene alignments or genome alignments. The WinCalcD function is identical to CalcD but performs testing in windows along an alignment.
 
 Durand, Eric Y., et al. Testing for ancient admixture between closely related populations. Molecular biology and evolution 28.8 (2011): 2239-2252.
 
@@ -105,6 +152,33 @@ CalcD(alignment = system.file("1.fasta", package = "evobiR"), sig.test = "N")
 
 CalcPopD(alignment = system.file("3.fasta", package = "evobiR"), sig.test = "N")
 
+```
+
+## getNe
+
+Calculate the variance effective population size due to unequal sex ratio. Formulas are available for both autosomal loci and X chromosome loci.
+
+```{r}
+# Effective population size for autosomal locus
+getNe(males = 100, females = 200)
+
+# Effective population size for X-linked locus
+getNe(males = 100, females = 200, locus = "X")
+```
+
+## Pfsa, Pfaa, Pfss
+
+These functions calculate the expected proportion of different classes of chromosomal fusions (sex chromosome-autosome, autosome-autosome, and sex chromosome-sex chromosome) given a sex chromosome system and diploid autosome number.
+
+```{r}
+# Proportion of sex-autosome fusions
+Pfsa(Da = 26, scs = "XY", mud = 0.4)
+
+# Proportion of autosome-autosome fusions
+Pfaa(Da = 26, scs = "XY", mud = 0.4)
+
+# Proportion of sex-sex chromosome fusions
+Pfss(Da = 26, scs = "XY", mud = 0.4)
 ```
 
 
@@ -127,27 +201,30 @@ plot(foo, ylab="Number of sunspots", xlab="record number")
 When we look at the data at this scale the pattern that really catches our attention is the 25 peaks that we see across these 260 years.  This is the well documented 11-year sunspot cycle.  However, our sun has longer cycles that are less evident in this graphing.
 
 ```{r, fig.height=5, fig.width=5}
-# first lets use the sliding window function to get the number sun spots 
+# first lets use the sliding window function to get the number sun spots
 
 # average over 11 years and do this moving in 1 year steps through time
-sunspots <- SlidingWindow(FUN = "mean", 
-                          data = foo, 
-                          window = 132, 
-                          step = 12, 
+sunspots <- SlidingWindow(FUN = "mean",
+                          data = foo,
+                          window = 132,
+                          step = 12,
                           strict = F)
 
-# we repeat this on the years so we can plot agains a sensible x axis
-years <- round(SlidingWindow("mean", 
-                             data = rep(1749:2013, each=12)[1:3177], 
-                             window = 132, 
-                             step = 12, 
+# generate year labels using the length of the data
+n.months <- length(foo)
+start.year <- 1749
+year.seq <- rep(start.year:(start.year + ceiling(n.months/12) - 1), each = 12)[1:n.months]
+years <- round(SlidingWindow("mean",
+                             data = year.seq,
+                             window = 132,
+                             step = 12,
                              strict=F))
 {plot(x=years,y=sunspots, type="l", lwd=3)
 abline(v=1810, col="red",lwd=3)
 text(y=90, x=1810, "Dalton Min.", col="red",pos=4)}
 ```
 
-now we can easily spot just how exceptional the Dalton minimum of the early 1800s was.
+Now we can easily spot just how exceptional the Dalton minimum of the early 1800s was.
 
 &nbsp;
 
@@ -164,7 +241,7 @@ The first column of the data file should contain the identifier i.e. the specime
 data[1:10,]
 ```
 
-We can then run the residual selection function and it will provide us with both a visual depiction of the data and will return a list with elements (high line and low line providing us with ID numbers of selected individuals.
+We can then run the residual selection function and it will provide us with both a visual depiction of the data and will return a list with elements (high line and low line) providing us with ID numbers of selected individuals.
 
 ```{r, fig.height=5, fig.width=5}
 ResSel(data = data, traits = c(2,3), percent = 15, identifier = 1, model = "linear")

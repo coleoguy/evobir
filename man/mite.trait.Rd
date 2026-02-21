@@ -1,6 +1,16 @@
 \name{mite.trait}
 \alias{mite.trait}
 \docType{data}
-\title{phenotype data for mites}
-\description{A dataframe of sexual system and chromosome number data for mites.  The first column has species names, the second column has diploid numbers, and the third column contains 0 and 1 to indicate diplodiploidy or haplodiploidy sex determination.}
+\title{Phenotype data for mites}
+\description{A dataframe of sexual system and chromosome number data for mites. Contains three columns:
+\describe{
+  \item{Column 1}{species names matching the tip labels of \code{\link{trees.mite}}}
+  \item{Column 2}{diploid chromosome numbers (continuous trait)}
+  \item{Column 3}{sex determination system coded as 0 (diplodiploidy) or 1 (haplodiploidy) (discrete binary trait)}
+}
+Used in examples for the \code{\link{AncCond}} function.}
+\examples{
+data(mite.trait)
+head(mite.trait)
+}
 \keyword{datasets}

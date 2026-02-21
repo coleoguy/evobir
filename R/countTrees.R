@@ -26,7 +26,7 @@ countTrees <- function(collection = NULL, ref = NULL, classes=T, verbose=T){
   }
   if(verbose){
     if(length(bad)>0){
-      print(paste("Some trees do match available topologies. You may want to check trees:", bad))
+      print(paste("Some trees do not match available topologies. You may want to check trees:", bad))
     }
   }
   if(classes==T){
