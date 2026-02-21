@@ -3,18 +3,19 @@
 \title{Phylogenetic visualization of heterogeneity in discrete character evolution}
 \description{This function provides two methods for visualizing a \code{phyloscaled} tree produced by \code{\link{scaleTreeRates}}.}
 \usage{
-\method{plot}{phyloscaled}(tree, method = "multiply", palette = "RdYlGn",
-     edge.width = 1, cex = 1, show.tip.label = T)
+\method{plot}{phyloscaled}(x, method = "multiply", palette = "RdYlGn",
+     edge.width = 1, cex = 1, show.tip.label = T, \dots)
 }
 
 
 \arguments{
-  \item{tree}{a tree of class \code{phylo} and \code{phyloscaled}, as produced by \code{\link{scaleTreeRates}}}
+  \item{x}{a tree of class \code{phylo} and \code{phyloscaled}, as produced by \code{\link{scaleTreeRates}}}
   \item{method}{a string describing the method to be used for visualization. Can either be \code{"multiply"} or \code{"color"}, see \strong{Details}.}
   \item{palette}{a string giving the palette to be used for edge coloring, only taken into account if \code{method = "color"}. See \strong{Details}.}
   \item{edge.width}{numeric value that determines branch width}
   \item{cex}{numeric value for tip label size}
   \item{show.tip.label}{logical indicating whether to print tip labels}
+  \item{\dots}{additional arguments passed to plotting functions}
 }
 \details{The two plotting methods currently supported are \code{"multiply"} and \code{"color"}.
 

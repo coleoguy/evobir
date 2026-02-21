@@ -8,26 +8,26 @@ make.simmap2(tree, x, model="SYM", nsim=1 ,
              ...)
 }
 \arguments{
-  \item{tree}{a phylogenetic tree of class \code{phylo} or \code{multiPhylo}. See \code{\link{make.simmap}} for details.}
-  \item{x}{a named vector or matrix of tip states. See \code{\link{make.simmap}} for details.}
-  \item{model}{a character string or matrix describing the model. Options include \code{"ER"}, \code{"SYM"}, \code{"ARD"}, or a custom rate matrix. See \code{\link{make.simmap}} for details.}
+  \item{tree}{a phylogenetic tree of class \code{phylo} or \code{multiPhylo}. See \code{\link[phytools]{make.simmap}} for details.}
+  \item{x}{a named vector or matrix of tip states. See \code{\link[phytools]{make.simmap}} for details.}
+  \item{model}{a character string or matrix describing the model. Options include \code{"ER"}, \code{"SYM"}, \code{"ARD"}, or a custom rate matrix. See \code{\link[phytools]{make.simmap}} for details.}
   \item{nsim}{number of stochastic maps to simulate. Defaults to 1.}
     \item{monitor}{logical; whether or not to print the number of rejections per edge to the console. Defaults to \code{FALSE}.}
   \item{rejmax}{integer giving the maximum number of rejections permitted before an edge is skipped. Defaults to \code{NULL} (no upper limit on rejections).}
   \item{rejint}{integer giving the interval at which the rejection count is printed to the console (when \code{monitor = TRUE}). Defaults to 1000000.}
-  \item{...}{optional arguments passed to \code{\link{make.simmap}}, such as \code{Q}, \code{pi}, \code{burnin}, \code{samplefreq}, or \code{prior}.}
+  \item{...}{optional arguments passed to \code{\link[phytools]{make.simmap}}, such as \code{Q}, \code{pi}, \code{burnin}, \code{samplefreq}, or \code{prior}.}
 }
-\value{An object of class \code{simmap} (if \code{nsim = 1}) or \code{multiSimmap} (if \code{nsim > 1}). See \code{\link{make.simmap}} for general structure.
+\value{An object of class \code{simmap} (if \code{nsim = 1}) or \code{multiSimmap} (if \code{nsim > 1}). See \code{\link[phytools]{make.simmap}} for general structure.
 
 In addition to the states present in the model, an additional state \code{"fail"} in the \code{maps} and \code{mapped.edge} elements is assigned to edges which are skipped due to exceeding the rejection limit. A \code{fail} element on the tree object lists the edge indices that failed.
 }
 \seealso{
-  \code{\link{make.simmap}}, \code{\link{fix.simmap}}
+  \code{\link[phytools]{make.simmap}}, \code{\link{fix.simmap}}
 }
 \author{Matthew Marano, Maximos Chin, and Heath Blackmon}
 \references{http://coleoguy.github.io/}
 \examples{
-\donttest{
+\dontrun{
 library(ape)
 library(phytools)
 ## Simulate a tree and discrete character

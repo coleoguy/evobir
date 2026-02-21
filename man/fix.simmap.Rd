@@ -10,7 +10,7 @@ fix.simmap(hists, tips, transition.matrix)
   \item{tips}{a two-column dataframe with the first column listing species names as shown in tree tip labels and the second column listing the known state for each species}
   \item{transition.matrix}{a square matrix describing possible transitions between states. Non-zero entries indicate that a direct transition is possible between those states.}
 }
-\value{An object of class \code{simmap} or \code{multiSimmap}, see \code{\link{make.simmap}}.
+\value{An object of class \code{simmap} or \code{multiSimmap}, see \code{\link[phytools]{make.simmap}}.
 
 All edges which were assigned a \code{"fail"} state in the original stochastic maps will be resolved with inferred transitional histories.
 }
@@ -20,7 +20,7 @@ All edges which were assigned a \code{"fail"} state in the original stochastic m
 \author{Maximos Chin, Matthew Marano, and Heath Blackmon}
 \references{http://coleoguy.github.io/}
 \examples{
-\donttest{
+\dontrun{
 library(ape)
 library(phytools)
 ## Simulate a tree and discrete character

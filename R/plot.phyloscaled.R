@@ -1,8 +1,9 @@
 # methods to plot a scaled phylogeny produced by scaleTreeRates
 
-plot.phyloscaled <- function (tree,method="multiply",palette="RdYlGn",
-                              edge.width=1,cex=1,show.tip.label = T)
+plot.phyloscaled <- function (x,method="multiply",palette="RdYlGn",
+                              edge.width=1,cex=1,show.tip.label = T, ...)
 {
+  tree <- x
   # Arguments
   # tree: tree of class phyloscaled
   # method: whether to multiply or color edges 

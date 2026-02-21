@@ -10,5 +10,6 @@ test_that("FuzzyMatch finds close matches", {
   # Intentionally misspelled names
   names <- c("Pepsis_elegans")
   result <- FuzzyMatch(tree = hym.tree, data = names, max.dist = 3)
-  expect_true(nrow(result) >= 0)
+  # result is a data.frame when matches are found, NULL otherwise
+  expect_true(is.null(result) || (is.data.frame(result) && nrow(result) > 0))
 })
