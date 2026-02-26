@@ -1,194 +1,195 @@
-#Write function that calculates tip rates
-
+#' Calculate Evolutionary Rates at Tree Tips
+#'
+#' Estimates how fast a discrete character has been evolving at each tip
+#' of a phylogenetic tree.  For example, if you are studying chromosome
+#' number evolution, this tells you which species have recently experienced
+#' rapid changes in chromosome number on the branch leading to the present.
+#'
+#' The "rate" for a tip is calculated as:
+#' \code{|tip_state - parent_state| / branch_length}.
+#' In plain English: how much the trait changed on the last branch of the
+#' tree (between the species and its most recent ancestor), divided by the
+#' length of that branch (a proxy for time).  Bigger values mean faster
+#' recent evolution; a rate of zero means no change occurred on that branch.
+#'
+#' @param tree An ultrametric phylogenetic tree of class \code{"phylo"}.
+#'   "Ultrametric" means all tips are the same distance from the root
+#'   (i.e., the tree represents time, not just branching pattern).
+#' @param Q A transition rate matrix (square matrix) with column names
+#'   matching the possible character states.  This matrix tells the model
+#'   how likely each type of state change is.  It is used internally for
+#'   ancestral state reconstruction (estimating what states the ancestors
+#'   had).
+#' @param tip.states An integer vector of observed states at the tips,
+#'   with names matching the tree's tip labels.  Values should be integers
+#'   from 1 to N where N is the number of possible states.  For example,
+#'   if your trait has 3 states, each tip gets a value of 1, 2, or 3.
+#'   If \code{NULL}, states will be derived from \code{p.mat}.
+#' @param hyper Logical.  If \code{TRUE}, the model includes a binary
+#'   hyperstate (state labels contain "h" which gets stripped during
+#'   processing).  This is an advanced option; most users should leave
+#'   it as \code{FALSE} (the default).
+#' @param p.mat A probability matrix where rows are species (with row
+#'   names matching tree tips) and columns are states.  Each row should
+#'   have exactly one 1 and the rest 0s (i.e., you know each species'
+#'   state with certainty).  This is an alternative way to provide tip
+#'   states instead of \code{tip.states}.
+#'
+#' @return A named numeric vector of tip rates, one value per tip.
+#'   Names correspond to tree tip labels.  Higher values indicate
+#'   faster evolution on that terminal branch.
+#'
+#' @details
+#' The function works in three steps:
+#' \enumerate{
+#'   \item \strong{Ancestral state reconstruction}: Uses
+#'     \code{\link[castor]{asr_mk_model}} with the supplied transition
+#'     matrix to estimate what state each internal node (ancestor)
+#'     most likely had.
+#'   \item \strong{Compare tip to parent}: For each species (tip), it
+#'     looks at the reconstructed state of the immediately ancestral
+#'     node (the parent node).
+#'   \item \strong{Calculate rate}: The rate is the absolute difference
+#'     between the tip state and its parent state, divided by the branch
+#'     length connecting them.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' library(ape)
+#' library(castor)
+#' tree <- rcoal(10)
+#' # Make a simple 3-state transition matrix
+#' Q <- matrix(c(-0.2, 0.1, 0.1,
+#'                0.1, -0.2, 0.1,
+#'                0.1, 0.1, -0.2), 3, 3)
+#' colnames(Q) <- rownames(Q) <- c("1", "2", "3")
+#' tip.states <- setNames(sample(1:3, 10, replace = TRUE), tree$tip.label)
+#' rates <- GetTipRates(tree, Q, tip.states)
+#' # Species with high rates evolved rapidly on their terminal branch
+#' }
+#'
+#' @importFrom ape is.ultrametric
+#' @importFrom phytools getParent
+#' @importFrom castor asr_mk_model
+#' @importFrom stats setNames
+#' @export
 GetTipRates <- function(tree = NULL,
                         Q = NULL,
                         tip.states = NULL,
                         hyper = FALSE,
-                        p.mat = NULL){
-  
-  ### --- define inputs --- ###
-  # tree: an ultrametric tree of class phylo
-  # Q: a transition matrix containing estimated rates with column names
-  # tip.states: An integer vector with a length equal to the number of species 
-    #non the phylogeny. It should have values of 1 to N with N being the number 
-    # of total states. Elements of the vector should match the tip names for 
-    # the phylogeny. 
-  # hyper: logical vector of length one. TRUE indicates the model includes a 
-    # binary hyperstate. Default is FALSE and indicates no binary hyperstate
-  # p.mat: a probability matrix where each column represent a discrete state 
-    # and each row is a species. Values in the matrix describe the probability 
-    # of being in any of these states. 
+                        p.mat = NULL) {
 
-  ### --- perform checks --- ###
-  
-  #if the tree is not ultrametric, stop function and ask user to resolve
-  if(is.ultrametric(tree) == FALSE){
-    stop("\n Tree is not ultrametric. Please use a formal method to ultrametricize your tree. 
-        If your tree is failing is.ultrametric due to rounding, you can use force.ultrametric, 
+  # ---- Input validation ----
+  # Tree must be ultrametric (all tips at same distance from root)
+  if (is.ultrametric(tree) == FALSE) {
+    stop("\n Tree is not ultrametric. Please use a formal method to ultrametricize your tree.
+        If your tree is failing is.ultrametric due to rounding, you can use force.ultrametric,
         but this does not serve as a substitute for formal rate-smoothing methods.")
   }
-  
-  #if tip states are null, stop function and ask user to resolve
-  if(is.null(tip.states) && is.null(p.mat)){
+
+  # Must have either tip.states or a probability matrix
+  if (is.null(tip.states) && is.null(p.mat)) {
     stop("\n Tip states are not present. Please provide tip states as integers or provide
          a probability matrix to create tip states for given data.")
   }
-  
-  #if tip states are provided, check they are numeric whole numbers
-  if(!is.null(tip.states)){
-    if(!is.numeric(tip.states) || any(tip.states != round(tip.states))){
+
+  # Tip states must be whole numbers
+  if (!is.null(tip.states)) {
+    if (!is.numeric(tip.states) || any(tip.states != round(tip.states))) {
       stop("\n Tip states are not whole numbers. Please provide tip states as integers.")
     }
   }
-  
-  #if tip states are not present, but a probability matrix is provided, fill in 
-  # tip states using the given probability matrix
-  if(is.null(tip.states) && !is.null(p.mat)){
-    #create vector to store tip states in
+
+  # If no explicit tip states given, derive them from the probability matrix
+  # (each species gets the state where it has probability = 1)
+  if (is.null(tip.states) && !is.null(p.mat)) {
     tip.states <- c()
-    #create tip states from probability matrix
-    for(i in 1:nrow(p.mat)){
-      tip.states[i] <- which(p.mat[i,] == 1)}
+    for (i in 1:nrow(p.mat)) {
+      tip.states[i] <- which(p.mat[i, ] == 1)
+    }
     names(tip.states) <- row.names(p.mat)
   }
-  
-  #loop through to store whether tip states and tree tip labels are matching for
-  #each tip on the tree
- 
-  #empty vector to store the correct order in
+
+  # ---- Reorder data to match tree tip order ----
   hit <- c()
-  #loop through to store the correct order of the data to match the tree tips
-  for(j in 1:length(tree$tip.label)){
+  for (j in 1:length(tree$tip.label)) {
     hit[j] <- which(tree$tip.label[j] == names(tip.states))
   }
-  #reorder the data into the data frame using the correct order
   tip.states <- tip.states[hit]
-  
-  #check to see if the tip states and tree tip labels are in the same order
-  
+
+  # Verify the reordering worked
   print("Checking the order of tree tip labels and provided data.")
-  
-  order <- c()
-  for(i in 1:length(tree$tip.label)){
-    order[i] <- tree$tip.label[i] == names(tip.states)[i]
-  }
-  
-  if(sum(order) == length(tree$tip.label)){
+  order <- vapply(1:length(tree$tip.label), function(i) {
+    tree$tip.label[i] == names(tip.states)[i]
+  }, logical(1))
+  if (sum(order) == length(tree$tip.label)) {
     print("Tree tip labels and provided data are in the correct order.")
-  } else{
+  } else {
     print("Tree tip labels and provided data are not in the correct order.")
   }
-  
 
-  ### --- perform ancestral state reconstruction --- ###
-  
-  #reconstruct the ancestral states
+  # ---- Ancestral state reconstruction ----
+  # Use the Mk model from castor to estimate states at internal nodes
   recon <- asr_mk_model(tree = tree,
-                       tip_states = tip.states,
-                       transition_matrix = Q,
-                       Nstates = ncol(Q),
-                       include_ancestral_likelihoods = T)
-  
-  ### --- back transform the states from 1:Nstates into their actual state --- ###
-  
-  # change back the state names to the actual chromosome numbers for tip rate 
-  # calculation
+                        tip_states = tip.states,
+                        transition_matrix = Q,
+                        Nstates = ncol(Q),
+                        include_ancestral_likelihoods = TRUE)
+
+  # ---- Convert states back to real labels ----
+  # The ASR uses column indices; restore the original state names
   colnames(recon$ancestral_likelihoods) <- colnames(Q)
-  
-  # if there is a hyper state associated with the model, run additional code to 
-  # calculate tip rates without the hyperstate labels
-  if(hyper == TRUE){
-    for(i in 1:ncol(recon$ancestral_likelihoods)){
-      colnames(recon$ancestral_likelihoods) <- as.numeric(gsub("h", 
-                                                               "", 
-                                                               colnames(recon$ancestral_likelihoods)))
-    }
+
+  # If hyperstates are present, strip the "h" prefix from labels
+  if (hyper == TRUE) {
+    colnames(recon$ancestral_likelihoods) <-
+      as.numeric(gsub("h", "", colnames(recon$ancestral_likelihoods)))
   }
-  
-  #store the state names from the ASR in a vector
+
+  # Get the actual state names (e.g., chromosome numbers)
   states <- colnames(recon$ancestral_likelihoods)
-  
-  #vector to store the transformed tip states
-  tip.state <- c()
-  
-  #loop through the integer tip states from 1:Nstates and change them back to 
-  #the actual tip states supplied
-  for(i in 1:length(tip.states)){
-    #grabs the tip state that matches the modified tip state for the ASR
-    tip.state[i] <- states[tip.states[i]]
-    #ensures that the tip states are numeric 
-    tip.state <- as.numeric(tip.state)
-  }
-  
-  
-  ### --- gather data for parent and tip states for tip rate calculation--- ###
-  
-  #create a vector to store likelihoods at each node
+
+  # Convert integer tip states back to actual state values
+  tip.state <- as.numeric(states[tip.states])
+
+  # ---- Get parent node states ----
+  # For each internal node, pick the most likely state (highest posterior)
   est <- c()
-  #loop through to store the maximum likelihood at each node
-  for(i in 1:nrow(recon$ancestral_likelihoods)){
-    #grabs the maximum likelihood at each node within the supplied tree
-    est[i] <- which.max(as.vector(recon$ancestral_likelihoods[i,]))
-    names(est) <- seq(from = 1+length(tree$tip.label), to = length(tree$tip.label)+length(est))
+  for (i in 1:nrow(recon$ancestral_likelihoods)) {
+    est[i] <- which.max(as.vector(recon$ancestral_likelihoods[i, ]))
+    names(est) <- seq(from = 1 + length(tree$tip.label),
+                      to = length(tree$tip.label) + length(est))
   }
-  
-  #get the node numbers for each of the tips
+
+  # Map tip labels to their node numbers
   tips <- tree$tip.label
-  #store the node number that matches each tip label in a named vector
-  nodes <- c()
-  #loop through to store the tip label node numbers
-  for(i in 1:length(tree$tip.label)){
-    nodes[i] <- which(tree$tip.label[i] == tips)
-  }
-  #name the nodes
+  nodes <- seq_along(tree$tip.label)
   names(nodes) <- names(tip.states)
-    
-  #get the edge lengths for each node
-  edge.lengths <- c()
-  #loop through to store the edge lengths that correspond to each node
-  edge.lengths <- setNames(tree$edge.length[sapply(nodes,
-                                                    function(x,y) which(y==x),y=tree$edge[,2])],names(nodes))
-  
-  #store the parent nodes for each tip
+
+  # Get the branch length leading to each tip
+  edge.lengths <- setNames(
+    tree$edge.length[sapply(nodes, function(x, y) which(y == x), y = tree$edge[, 2])],
+    names(nodes)
+  )
+
+  # Find the parent node of each tip
   nodepulls <- c()
-  #loop through to store the parent node of each tip
-  for(i in 1:length(tree$tip.label)){
-    #stores the node number for each tip in the tree
+  for (i in 1:length(tree$tip.label)) {
     nodepulls[i] <- getParent(tree, nodes[i])
   }
-  
-  #store the state at each of the nodes
-  node.state <- c()
+
+  # Look up the state at each parent node
   node.states <- c()
-  #loop through to store the state corresponding to each node
-  for(i in 1:length(nodepulls)){
-    node.state[i] <- which(names(est) == nodepulls[i])
-    #pull the 
-    node.states[i] <- est[node.state[i]]
-    #pull the actual chromosome number value for each node
-    node.states[i] <- states[node.states[i]]
-    #ensures that the node states are numeric 
-    node.states <- as.numeric(node.states)
+  for (i in 1:length(nodepulls)) {
+    node.state.idx <- which(names(est) == nodepulls[i])
+    node.states[i] <- as.numeric(states[est[node.state.idx]])
   }
-  
-  #store the tip rate for each of the tips
-  tip.changes <- c()
-  #loop through to calculate the tip rate for each tip on the tree, given 
-  #the node and tip state information
-  for(i in 1:length(tip.state)){
-    #calculate the tip rates
-    tip.changes[i] <- abs((tip.state[i]-node.states[i]))/edge.lengths[i]
-  }
+
+  # ---- Calculate tip rates ----
+  # Rate = |tip_state - parent_state| / branch_length
+  tip.changes <- abs(tip.state - node.states) / edge.lengths
   names(tip.changes) <- tree$tip.label
-return(tip.changes)
+
+  return(tip.changes)
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,45 +1,94 @@
-# function to analyze heterogeneity in rates of discrete character evolution 
-# across a phylogeny
+#' Analyze Rate Heterogeneity in Discrete Character Evolution
+#'
+#' Tests whether different branches of a phylogeny have different rates
+#' of discrete character evolution.  The function assigns a "scalar"
+#' multiplier to each edge: scalar > 1 means faster-than-average
+#' evolution, scalar < 1 means slower, and scalar = 1 means the
+#' background rate.
+#'
+#' The method works by trying different scalar values for each edge
+#' (via dynamic programming) and keeping whichever value maximizes
+#' the likelihood.
+#'
+#' @param tree A phylogenetic tree of class \code{"phylo"}.
+#' @param tip.states A named vector of discrete character states at
+#'   the tips.  Names must match \code{tree$tip.label}.
+#' @param model Character or matrix.  The model for
+#'   \code{\link[phytools]{fitMk}}:
+#'   \itemize{
+#'     \item \code{"ER"} -- equal rates
+#'     \item \code{"SYM"} -- symmetric rates
+#'     \item \code{"ARD"} -- all rates different
+#'     \item A custom rate index matrix
+#'   }
+#' @param fixedQ A pre-estimated Q (transition rate) matrix.
+#'   If \code{NULL} (default), rates are estimated from the data.
+#' @param max.ratio Numeric.  Maximum rate scalar to test (default 2).
+#'   The function tests scalars from \code{1/max.ratio} to
+#'   \code{max.ratio}.
+#' @param nbins Integer.  Number of scalar bins above and below 1
+#'   (default 10).  More bins gives finer resolution but takes longer.
+#' @param max.transition Integer.  Maximum number of bin steps an edge's
+#'   scalar can differ from its parent's scalar (default 1).  This
+#'   prevents rate estimates from jumping wildly between adjacent
+#'   branches.
+#' @param var.start Logical.  If \code{TRUE}, tries multiple starting
+#'   scalar values at the root and returns the best tree.  If
+#'   \code{FALSE} (default), fixes the root scalar at 1.
+#' @param pi Character.  Method for estimating the root state prior.
+#'   Passed to \code{\link[phytools]{fitMk}}.  Default is
+#'   \code{"fitzjohn"}.
+#'
+#' @return A tree of class \code{c("phylo", "phyloscaled")} with an
+#'   additional \code{$scalar} element: a numeric vector (one value
+#'   per edge) of rate multipliers.  Plot with
+#'   \code{\link{plot.phyloscaled}}.
+#'
+#' @details
+#' The algorithm proceeds edge-by-edge from root to tips.  For each
+#' edge, it tries every allowed scalar value (constrained to be within
+#' \code{max.transition} bins of the parent's scalar), fits the Mk
+#' model with scaled branch lengths, and picks the scalar that gives
+#' the highest likelihood.
+#'
+#' @examples
+#' \dontrun{
+#' library(phytools)
+#' tree <- rcoal(20)
+#' states <- setNames(sample(1:3, 20, replace = TRUE), tree$tip.label)
+#' scaled <- scaleTreeRates(tree, states, model = "ARD", nbins = 5)
+#' plot(scaled, method = "color")
+#' }
+#'
+#' @importFrom phytools fitMk nodeHeights
+#' @importFrom expm expm
+#' @importFrom stats optim nlminb reorder optimize
+#' @export
+scaleTreeRates <- function(tree, tip.states, model, fixedQ = NULL,
+                           max.ratio = 2, nbins = 10,
+                           max.transition = 1, var.start = FALSE,
+                           pi = "fitzjohn") {
 
-scaleTreeRates <- function(tree,tip.states,
-                           model,
-                           fixedQ=NULL,
-                           max.ratio=2,
-                           nbins=10,
-                           max.transition = 1,
-                           var.start = FALSE,
-                           pi="fitzjohn"){
-  
-  # Arguments
-  # tree: phylogenetic tree for analysis
-  # tip.states: vector of tip states associated with tree (can be unordered)
-  # model: model for likelihood calculation, character (any argument that fitMk takes) or matrix
-  # fixedQ: Qmatrix with pre-estimated rates, default is Null (rates will be estimated using fitMk)
-  # max.ratio: maximum ratio of scalars to one, integer, default is 10
-  # nbins: number of bins above and below one, integer,default is 10
-  # var.start: whether or not to increment scalar values at root of tree. If true, all scalar
-  #            values will be tested and best tree returned. If false, root scalar is set to one.
-  # pi: method to use for estimating prior (state at root of tree), can take any character taken by fitMk
-  
-  #fitMkNew Functions
-  fitMkNew <- function (tree, x, model = "SYM", fixedQ = NULL, ...) 
-  {
-    if (hasArg(output.liks)) 
+  # ---- Internal helper: custom fitMk for likelihood calculations ----
+  # This is a local version of phytools::fitMk needed for the
+  # edge-by-edge likelihood computations
+  fitMkNew <- function(tree, x, model = "SYM", fixedQ = NULL, ...) {
+    if (hasArg(output.liks))
       output.liks <- list(...)$output.liks
     else output.liks <- FALSE
-    if (hasArg(q.init)) 
+    if (hasArg(q.init))
       q.init <- list(...)$q.init
-    else q.init <- length(unique(x))/sum(tree$edge.length)
-    if (hasArg(opt.method)) 
+    else q.init <- length(unique(x)) / sum(tree$edge.length)
+    if (hasArg(opt.method))
       opt.method <- list(...)$opt.method
     else opt.method <- "nlminb"
-    if (hasArg(min.q)) 
+    if (hasArg(min.q))
       min.q <- list(...)$min.q
     else min.q <- 1e-12
-    if (hasArg(max.q)) 
+    if (hasArg(max.q))
       max.q <- list(...)$max.q
     else max.q <- max(nodeHeights(tree)) * 100
-    if (hasArg(logscale)) 
+    if (hasArg(logscale))
       logscale <- list(...)$logscale
     else logscale <- FALSE
     N <- Ntip(tree)
@@ -48,36 +97,33 @@ scaleTreeRates <- function(tree,tip.states,
       x <- x[tree$tip.label, ]
       m <- ncol(x)
       states <- colnames(x)
-    }
-    else {
+    } else {
       x <- to.matrix(x, sort(unique(x)))
       m <- ncol(x)
       states <- colnames(x)
     }
-    if (hasArg(pi)) 
+    if (hasArg(pi))
       pi <- list(...)$pi
     else pi <- "equal"
-    if (is.numeric(pi)) 
+    if (is.numeric(pi))
       root.prior <- "given"
     if (pi[1] == "equal") {
       pi <- setNames(rep(1/m, m), states)
       root.prior <- "flat"
-    }
-    else if (pi[1] == "estimated") {
-      pi <- if (!is.null(fixedQ)) 
+    } else if (pi[1] == "estimated") {
+      pi <- if (!is.null(fixedQ))
         statdist(fixedQ)
       else statdist(summary(fitMk(tree, x, model), quiet = TRUE)$Q)
-      cat(paste("Using pi estimated from the stationary", 
+      cat(paste("Using pi estimated from the stationary",
                 "distribution of Q assuming a flat prior.\npi =\n"))
       print(round(pi, 6))
       cat("\n")
       root.prior <- "stationary"
-    }
-    else if (pi[1] == "fitzjohn") 
+    } else if (pi[1] == "fitzjohn")
       root.prior <- "nuisance"
     if (is.numeric(pi)) {
-      pi <- pi/sum(pi)
-      if (is.null(names(pi))) 
+      pi <- pi / sum(pi)
+      if (is.null(names(pi)))
         pi <- setNames(pi, states)
       pi <- pi[states]
     }
@@ -87,67 +133,58 @@ scaleTreeRates <- function(tree,tip.states,
         if (model == "ER") {
           k <- rate[] <- 1
           diag(rate) <- NA
-        }
-        else if (model == "ARD") {
+        } else if (model == "ARD") {
           k <- m * (m - 1)
           rate[col(rate) != row(rate)] <- 1:k
-        }
-        else if (model == "SYM") {
-          k <- m * (m - 1)/2
+        } else if (model == "SYM") {
+          k <- m * (m - 1) / 2
           ii <- col(rate) < row(rate)
           rate[ii] <- 1:k
           rate <- t(rate)
           rate[ii] <- 1:k
         }
-      }
-      else {
-        if (ncol(model) != nrow(model)) 
+      } else {
+        if (ncol(model) != nrow(model))
           stop("model is not a square matrix")
         rate <- model
         m <- ncol(rate)
         states <- as.character(1:ncol(rate))
         k <- max(rate)
-        
-        if(length(states) != ncol(x)){
+        if (length(states) != ncol(x)) {
           missing <- states[which(!states %in% colnames(x))]
-          x <- cbind(x,matrix(data=0,nrow=nrow(x),ncol=length(missing),
-                              dimnames = list(rownames(x),
-                                              missing)))
-          x <- x[,states]
-          
+          x <- cbind(x, matrix(data = 0, nrow = nrow(x), ncol = length(missing),
+                                dimnames = list(rownames(x), missing)))
+          x <- x[, states]
         }
       }
       Q <- matrix(0, m, m)
-    }
-    else {
+    } else {
       m <- ncol(fixedQ)
       states <- as.character(1:ncol(fixedQ))
       rate <- matrix(NA, m, m)
       k <- m * (m - 1)
       rate[col(rate) != row(rate)] <- 1:k
       Q <- fixedQ
-      if(ncol(fixedQ) != ncol(x)){
+      if (ncol(fixedQ) != ncol(x)) {
         missing <- states[which(!states %in% colnames(x))]
-        x <- cbind(x,matrix(data=0,nrow=nrow(x),ncol=length(missing),
-                            dimnames = list(rownames(x),
-                                            missing)))
+        x <- cbind(x, matrix(data = 0, nrow = nrow(x), ncol = length(missing),
+                              dimnames = list(rownames(x), missing)))
       }
     }
     index.matrix <- rate
     tmp <- cbind(1:m, 1:m)
     rate[tmp] <- 0
     rate[rate == 0] <- k + 1
-    liks <- rbind(x, matrix(0, M, m, dimnames = list(1:M + N, 
-                                                     states)))
+    liks <- rbind(x, matrix(0, M, m, dimnames = list(1:M + N, states)))
     pw <- reorder(tree, "pruningwise")
+
+    # Likelihood function (pruning algorithm)
     lik <- function(Q, output.liks = FALSE, pi, ...) {
-      if (hasArg(output.pi)) 
+      if (hasArg(output.pi))
         output.pi <- list(...)$output.pi
       else output.pi <- FALSE
-      if (is.Qmatrix(Q)) 
-        Q <- unclass(Q)
-      if (any(is.nan(Q)) || any(is.infinite(Q))) 
-        return(1e+50)
+      if (is.Qmatrix(Q)) Q <- unclass(Q)
+      if (any(is.nan(Q)) || any(is.infinite(Q))) return(1e+50)
       comp <- vector(length = N + M, mode = "numeric")
       parents <- unique(pw$edge[, 1])
       root <- min(parents)
@@ -158,327 +195,222 @@ scaleTreeRates <- function(tree,tip.states,
         el <- pw$edge.length[ii]
         v <- vector(length = length(desc), mode = "list")
         for (j in 1:length(v)) {
-          v[[j]] <- EXPM(Q * el[j]) %*% liks[desc[j], 
-          ]
+          v[[j]] <- EXPM(Q * el[j]) %*% liks[desc[j], ]
         }
         if (anc == root) {
-          if (is.numeric(pi)) 
+          if (is.numeric(pi))
             vv <- Reduce("*", v)[, 1] * pi
           else if (pi[1] == "fitzjohn") {
             D <- Reduce("*", v)[, 1]
-            pi <- D/sum(D)
-            vv <- D * D/sum(D)
+            pi <- D / sum(D)
+            vv <- D * D / sum(D)
           }
+        } else {
+          vv <- Reduce("*", v)[, 1]
         }
-        else vv <- Reduce("*", v)[, 1]
         comp[anc] <- sum(vv)
-        liks[anc, ] <- vv/comp[anc]
+        liks[anc, ] <- vv / comp[anc]
       }
-      if (output.liks) 
-        return(liks[1:M + N, , drop = FALSE])
-      else if (output.pi) 
-        return(pi)
+      if (output.liks) return(liks[1:M + N, , drop = FALSE])
+      else if (output.pi) return(pi)
       else {
         logL <- -sum(log(comp[1:M + N]))
-        if (is.na(logL)) 
-          logL <- Inf
+        if (is.na(logL)) logL <- Inf
         return(logL)
       }
     }
+
     if (is.null(fixedQ)) {
-      if (length(q.init) != k) 
+      if (length(q.init) != k)
         q.init <- rep(q.init[1], k)
-      q.init <- if (logscale) 
-        log(q.init)
-      else q.init
+      q.init <- if (logscale) log(q.init) else q.init
       if (opt.method == "optim") {
-        fit <- if (logscale) 
-          optim(q.init, function(p) lik(makeQ(m, exp(p), 
-                                              index.matrix), pi = pi), method = "L-BFGS-B", 
-                lower = rep(log(min.q), k), upper = rep(log(max.q), 
-                                                        k))
-        else optim(q.init, function(p) lik(makeQ(m, p, index.matrix), 
-                                           pi = pi), method = "L-BFGS-B", lower = rep(min.q, 
-                                                                                      k), upper = rep(max.q, k))
+        fit <- if (logscale)
+          optim(q.init, function(p) lik(makeQ(m, exp(p), index.matrix), pi = pi),
+                method = "L-BFGS-B",
+                lower = rep(log(min.q), k), upper = rep(log(max.q), k))
+        else
+          optim(q.init, function(p) lik(makeQ(m, p, index.matrix), pi = pi),
+                method = "L-BFGS-B",
+                lower = rep(min.q, k), upper = rep(max.q, k))
+      } else if (opt.method == "none") {
+        fit <- list(objective = lik(makeQ(m, q.init, index.matrix), pi = pi),
+                    par = q.init)
+      } else {
+        fit <- if (logscale)
+          nlminb(q.init, function(p) lik(makeQ(m, exp(p), index.matrix), pi = pi),
+                 lower = rep(log(min.q), k), upper = rep(log(max.q), k))
+        else
+          nlminb(q.init, function(p) lik(makeQ(m, p, index.matrix), pi = pi),
+                 lower = rep(0, k), upper = rep(max.q, k))
       }
-      else if (opt.method == "none") {
-        fit <- list(objective = lik(makeQ(m, q.init, index.matrix), 
-                                    pi = pi), par = q.init)
-      }
-      else {
-        fit <- if (logscale) 
-          nlminb(q.init, function(p) lik(makeQ(m, exp(p), 
-                                               index.matrix), pi = pi), lower = rep(log(min.q), 
-                                                                                    k), upper = rep(log(max.q), k))
-        else nlminb(q.init, function(p) lik(makeQ(m, p, 
-                                                  index.matrix), pi = pi), lower = rep(0, k), 
-                    upper = rep(max.q, k))
-      }
-      if (logscale) 
-        fit$par <- exp(fit$par)
-      if (pi[1] == "fitzjohn") 
-        pi <- setNames(lik(makeQ(m, fit$par, index.matrix), 
+      if (logscale) fit$par <- exp(fit$par)
+      if (pi[1] == "fitzjohn")
+        pi <- setNames(lik(makeQ(m, fit$par, index.matrix),
                            FALSE, pi = pi, output.pi = TRUE), states)
-      obj <- list(logLik = if (opt.method == "optim") -fit$value else -fit$objective, 
-                  rates = fit$par, index.matrix = index.matrix, states = states, 
-                  pi = pi, method = opt.method, root.prior = root.prior)
-      if (output.liks) 
-        obj$lik.anc <- lik(makeQ(m, obj$rates, index.matrix), 
-                           TRUE, pi = pi)
-    }
-    else {
+      obj <- list(
+        logLik = if (opt.method == "optim") -fit$value else -fit$objective,
+        rates = fit$par, index.matrix = index.matrix, states = states,
+        pi = pi, method = opt.method, root.prior = root.prior)
+      if (output.liks)
+        obj$lik.anc <- lik(makeQ(m, obj$rates, index.matrix), TRUE, pi = pi)
+    } else {
       fit <- lik(Q, pi = pi)
-      if (pi[1] == "fitzjohn") 
-        pi <- setNames(lik(Q, FALSE, pi = pi, output.pi = TRUE), 
-                       states)
-      obj <- list(logLik = -fit, rates = Q[sapply(1:k, function(x, 
-                                                                y) which(x == y), index.matrix)], index.matrix = index.matrix, 
-                  states = states, pi = pi, root.prior = root.prior)
-      if (output.liks) 
-        obj$lik.anc <- lik(makeQ(m, obj$rates, index.matrix), 
-                           TRUE, pi = pi)
+      if (pi[1] == "fitzjohn")
+        pi <- setNames(lik(Q, FALSE, pi = pi, output.pi = TRUE), states)
+      obj <- list(
+        logLik = -fit,
+        rates = Q[sapply(1:k, function(x, y) which(x == y), index.matrix)],
+        index.matrix = index.matrix, states = states,
+        pi = pi, root.prior = root.prior)
+      if (output.liks)
+        obj$lik.anc <- lik(makeQ(m, obj$rates, index.matrix), TRUE, pi = pi)
     }
-    lik.f <- function(q) -lik(q, output.liks = FALSE, pi = if (root.prior == 
-                                                               "nuisance") 
-      "fitzjohn"
-      else pi)
+    lik.f <- function(q) -lik(q, output.liks = FALSE,
+                               pi = if (root.prior == "nuisance") "fitzjohn" else pi)
     obj$lik <- lik.f
     class(obj) <- "fitMk"
     return(obj)
   }
-  
-  is.Qmatrix<-function(x) "Qmatrix" %in% class(x)
-  
-  makeQ<-function(m,q,index.matrix){
-    Q<-matrix(0,m,m)
-    Q[]<-c(0,q)[index.matrix+1]
-    diag(Q)<-0
-    diag(Q)<--rowSums(Q)
+
+  # ---- Small helper functions ----
+  is.Qmatrix <- function(x) "Qmatrix" %in% class(x)
+
+  makeQ <- function(m, q, index.matrix) {
+    Q <- matrix(0, m, m)
+    Q[] <- c(0, q)[index.matrix + 1]
+    diag(Q) <- 0
+    diag(Q) <- -rowSums(Q)
     Q
   }
-  
-  EXPM<-function(x,...){
-    e_x<-if(isSymmetric(x)) matexpo(x) else expm(x,...)
-    dimnames(e_x)<-dimnames(x)
+
+  EXPM <- function(x, ...) {
+    e_x <- if (isSymmetric(x)) matexpo(x) else expm(x, ...)
+    dimnames(e_x) <- dimnames(x)
     e_x
   }
-  
-  statdist<-function(Q){
-    foo<-function(theta,Q){
-      Pi<-c(theta[1:(nrow(Q)-1)],1-sum(theta[1:(nrow(Q)-1)]))
-      sum((Pi%*%Q)^2)
+
+  statdist <- function(Q) {
+    foo <- function(theta, Q) {
+      Pi <- c(theta[1:(nrow(Q) - 1)], 1 - sum(theta[1:(nrow(Q) - 1)]))
+      sum((Pi %*% Q)^2)
     }
-    k<-nrow(Q)
-    if(nrow(Q)>2){ 
-      fit<-optim(rep(1/k,k-1),foo,Q=Q,control=list(reltol=1e-16))
-      return(setNames(c(fit$par[1:(k-1)],1-sum(fit$par[1:(k-1)])),rownames(Q)))
+    k <- nrow(Q)
+    if (nrow(Q) > 2) {
+      fit <- optim(rep(1/k, k - 1), foo, Q = Q,
+                   control = list(reltol = 1e-16))
+      return(setNames(c(fit$par[1:(k - 1)], 1 - sum(fit$par[1:(k - 1)])),
+                      rownames(Q)))
     } else {
-      fit<-optimize(foo,interval=c(0,1),Q=Q)
-      return(setNames(c(fit$minimum,1-fit$minimum),rownames(Q)))
+      fit <- optimize(foo, interval = c(0, 1), Q = Q)
+      return(setNames(c(fit$minimum, 1 - fit$minimum), rownames(Q)))
     }
   }
-  
-  #Get tip states
-  x <- tip.states[order(factor(names(tip.states), levels=tree$tip.label))]
-  
-  if(!is.null(fixedQ)){
-    
+
+  # ---- Sort tip states to match tree order ----
+  x <- tip.states[order(factor(names(tip.states), levels = tree$tip.label))]
+
+  # ---- Estimate or use supplied Q matrix ----
+  if (!is.null(fixedQ)) {
     print("using supplied Q-matrix")
-    
     Q <- fixedQ
   } else {
-    
     print("estimating rates")
-    
-    #fit model and extract rates + index matrix
-    fit <- fitMkNew(tree, x, model=model,pi=pi)
+    fit <- fitMkNew(tree, x, model = model, pi = pi)
     rates <- fit$rates
-    
     print("building Q-matrix")
-    
-    #Build matrix
     Q <- fit$index.matrix
     Q[is.na(Q)] <- 0
-    
-    for(i in 1:length(rates)){
-      
+    for (i in 1:length(rates)) {
       Q[Q == i] <- rates[i]
-      
     }
-    
     diag(Q) <- -rowSums(Q)
   }
-  
-  #Get max deviation from parent
+
+  # ---- Define the scalar bins to test ----
+  # Creates a symmetric set of bins around 1
   set.range <- max.transition
-  
-  #Set bins
-  bins <- c(1/seq(from = max.ratio, to = 1,length.out = nbins + 1),
+  bins <- c(1 / seq(from = max.ratio, to = 1, length.out = nbins + 1),
             seq(from = 1, to = max.ratio, length.out = nbins + 1))
   bins <- unique(bins)
-  
-  #Set scalar
-  tree$scalar <- rep(1,times = length(tree$edge.length))
+
+  # Initialize all edges with scalar = 1 (background rate)
+  tree$scalar <- rep(1, times = length(tree$edge.length))
   trees <- list()
-  
-  #Determine whether to increment or start from 1
-  if(var.start == F){
+
+  # Determine starting scalars to try
+  if (var.start == FALSE) {
     start.bins <- 1
   } else {
     start.bins <- bins
   }
-  
-  #Loop through starting scalars and edges
-  for(i in 1:length(start.bins)){
-    
-    print(paste0("starting scalar: ",start.bins[i]))
-    #Get start state
+
+  # ---- Main optimization loop ----
+  # For each starting scalar, traverse edges and find best scalar per edge
+  for (i in 1:length(start.bins)) {
+    print(paste0("starting scalar: ", start.bins[i]))
     start.scalar <- start.bins[i]
-    
-    for(j in 1:length(tree$edge.length)){
-      
-      print(paste0("starting scalar ", start.bins[i] ,", edge ",j))
-      
-      #Check if edge is starting edge
-      if(tree$edge[j,1] == length(tree$tip.label)+1){
-        
-        #Set previous state to start state
+
+    for (j in 1:length(tree$edge.length)) {
+      print(paste0("starting scalar ", start.bins[i], ", edge ", j))
+
+      # Get parent edge's scalar (or use starting scalar for root edges)
+      if (tree$edge[j, 1] == length(tree$tip.label) + 1) {
         prev.scalar <- start.scalar
-        
       } else {
-        
-        #Get parent edge
-        prev.edge <- which(tree$edge[,2] == tree$edge[j,1])
-        
-        #Get parent state
+        prev.edge <- which(tree$edge[, 2] == tree$edge[j, 1])
         prev.scalar <- tree$scalar[prev.edge]
-        
       }
-      
-      #Determine range of scalars possible
-      if(which(bins == prev.scalar) - set.range <= 0){
-        
-        #Get number of bins lower
-        low.range <- which(bins == prev.scalar) - 1
-        
-        #Determine possible values
-        poss.scalars <- bins[(which(bins == prev.scalar) - low.range):
-                               (which(bins == prev.scalar)+set.range)]
-        
-      } else if(which(bins == prev.scalar) + set.range >= length(bins)){
-        
-        #Get number of bins higher
-        high.range <- length(bins) - which(bins == prev.scalar)
-        
-        #Determine possible values
-        poss.scalars <- bins[(which(bins == prev.scalar) - set.range):
-                               (which(bins == prev.scalar)+high.range)]
-        
-      } else {
-        
-        poss.scalars <- bins[(which(bins == prev.scalar) - set.range):
-                               (which(bins == prev.scalar)+set.range)]
-        
-      }
-      
-      #Get temporary tree
-      temp.tree <- tree
-      
-      #Assign previous scalar to temporary tree
-      temp.tree$scalar[j] <- prev.scalar
-      
-      #vector for likelihoods
+
+      # Determine which scalar bins are reachable from the parent
+      parent.bin <- which(bins == prev.scalar)
+      low.bound <- max(1, parent.bin - set.range)
+      high.bound <- min(length(bins), parent.bin + set.range)
+      poss.scalars <- bins[low.bound:high.bound]
+
+      # Test each possible scalar and pick the best likelihood
       liks <- c()
-      
-      for(k in 1:length(poss.scalars)){
-        
-        #Set current scalar
-        cur.scalar <- poss.scalars[k]
-        
-        #Reassign temp.tree
+      for (k in 1:length(poss.scalars)) {
         temp.tree <- tree
-        
-        #Assign current scalar to temporary tree
-        temp.tree$scalar[j] <- cur.scalar
-        
+        temp.tree$scalar[j] <- poss.scalars[k]
         temp.tree$edge.length <- temp.tree$edge.length * temp.tree$scalar
-        
-        liks[k] <- fitMkNew(temp.tree,
-                            x, 
-                            model=model,
-                            pi=pi,
-                            fixedQ = Q)$logLik
-        
+        liks[k] <- fitMkNew(temp.tree, x, model = model,
+                            pi = pi, fixedQ = Q)$logLik
       }
-      
-      #Get best index
+
+      # Select the scalar with highest likelihood
       index.best <- which(liks == max(liks))
-      
-      #check for multiple scalars with max likelihood
-      if(length(index.best) > 1){
-        
-        index.best = which(poss.scalars == prev.scalar)
-        
+      # If tied, keep the parent's scalar (parsimony)
+      if (length(index.best) > 1) {
+        index.best <- which(poss.scalars == prev.scalar)
       }
-      
-      #Extract best scalar
-      best.scalar <- poss.scalars[index.best]
-      
-      #Assign best scalar to scalar object in tree
-      tree$scalar[j] <- best.scalar
-      
+      tree$scalar[j] <- poss.scalars[index.best]
     }
-    
-    #Assign to list of trees
+
     trees[[i]] <- tree
   }
-  
-  if(var.start == F){
-    
+
+  # ---- Select the best starting scalar (if var.start) ----
+  if (var.start == FALSE) {
     final.tree <- trees[[1]]
-    
   } else {
-    #Calculate final likelihoods for each starting scalar tree
-    
-    #Vector to store
     final.liks <- c()
-    
-    for(i in 1:length(trees)){
-      
+    for (i in 1:length(trees)) {
       print(paste0("getting final likelihood for starting scalar ", start.bins[i]))
-      
-      #Get tree to temporary object
       temp.tree <- trees[[i]]
-      
-      #Multiply temp.tree edge.lengths by scalar
       temp.tree$edge.length <- temp.tree$edge.length * temp.tree$scalar
-      
-      #Get logLik
-      final.liks[i] <- fitMkNew(temp.tree, 
-                                x, 
-                                model=model, 
+      final.liks[i] <- fitMkNew(temp.tree, x, model = model,
                                 fixedQ = Q)$logLik
     }
-    
-    #Get maximum likelihood
     max.final.lik <- max(final.liks)
-    
-    #Get index assoc. with maximum likelihood
     max.index <- which(final.liks == max(final.liks))
-    
-    #Get final start state
     final.start <- bins[max.index]
-    
-    #Extract final tree
     final.tree <- trees[[max.index]]
-    
-    print(paste0("the best starting scalar is ", final.start, ", associated logLik is ", max.final.lik))
+    print(paste0("the best starting scalar is ", final.start,
+                 ", associated logLik is ", max.final.lik))
   }
-  
-  class(final.tree) <- c("phylo","phyloscaled")
-  
+
+  class(final.tree) <- c("phylo", "phyloscaled")
   print(paste0("returning tree with scalar"))
-  
   return(final.tree)
-  
 }

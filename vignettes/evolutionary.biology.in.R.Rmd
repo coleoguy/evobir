@@ -166,19 +166,14 @@ getNe(males = 100, females = 200)
 getNe(males = 100, females = 200, locus = "X")
 ```
 
-## Pfsa, Pfaa, Pfss
+## Prop_SA
 
-These functions calculate the expected proportion of different classes of chromosomal fusions (sex chromosome-autosome, autosome-autosome, and sex chromosome-sex chromosome) given a sex chromosome system and diploid autosome number.
+This function calculates the expected proportion of different classes of chromosomal fusions (sex chromosome-autosome, autosome-autosome, and sex chromosome-sex chromosome) given a sex chromosome system and diploid autosome number.
 
 ```{r}
-# Proportion of sex-autosome fusions
-Pfsa(Da = 26, scs = "XY", mud = 0.4)
-
-# Proportion of autosome-autosome fusions
-Pfaa(Da = 26, scs = "XY", mud = 0.4)
-
-# Proportion of sex-sex chromosome fusions
-Pfss(Da = 26, scs = "XY", mud = 0.4)
+# Calculate fusion proportions for an XY system
+result <- Prop_SA(Da = 26, scs = "XY", mud = 0.4)
+result
 ```
 
 

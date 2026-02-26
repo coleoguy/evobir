@@ -12,7 +12,6 @@ License: GPL (>=2)
 Imports:
      seqinr,
      ape,
-     geiger,
      phytools,
      castor,
      methods,
@@ -23,4 +22,6 @@ Imports:
 Suggests: knitr, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+RoxygenNote: 7.3.3
+Encoding: UTF-8
 

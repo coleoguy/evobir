@@ -1,80 +1,146 @@
-WinCalcD <- function(alignment = "alignment.fasta", win.size = 100, step.size=50,
-                     boot = F, replicate=1000){
-  alignment <- read.alignment(alignment, format = "fasta")                         #  read in the alignment
-  alignment.matrix <- matrix(, length(alignment$nam), nchar(alignment$seq[[1]]))    #  make a matrix for the alignment
-  for(i in 1:length(alignment$nam)){
-    alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))               #  fill in the matrix
+#' Windowed Patterson's D-Statistic
+#'
+#' Calculates Patterson's D-statistic in sliding windows across a
+#' sequence alignment.  This lets you see how introgression signal
+#' varies along the genome -- some regions may show strong introgression
+#' while others don't.
+#'
+#' Like \code{\link{CalcD}}, the alignment must have exactly 4 sequences
+#' in the order P1, P2, P3, Outgroup.
+#'
+#' @param alignment Character.  Path to the FASTA alignment file
+#'   (default \code{"alignment.fasta"}).
+#' @param win.size Integer.  Width of each window in base pairs
+#'   (default 100).
+#' @param step.size Integer.  How far the window slides between
+#'   calculations (default 50).  Setting \code{step.size < win.size}
+#'   gives overlapping windows for smoother results.
+#' @param boot Logical.  If \code{TRUE}, performs bootstrap significance
+#'   testing within each window.  Default is \code{FALSE}.
+#' @param replicate Integer.  Number of bootstrap replicates per window
+#'   (default 1000).  Only used when \code{boot = TRUE}.
+#'
+#' @return A data frame with one row per window and columns:
+#'   \describe{
+#'     \item{range}{Genomic coordinates of the window (e.g., "1:100").}
+#'     \item{abba}{Number of ABBA sites in the window.}
+#'     \item{baba}{Number of BABA sites in the window.}
+#'     \item{d}{D-statistic for the window.}
+#'     \item{Z}{Z-score (only if \code{boot = TRUE}).}
+#'     \item{pval}{P-value (only if \code{boot = TRUE}).}
+#'   }
+#'
+#' @details
+#' D is calculated as (ABBA - BABA) / (ABBA + BABA) within each window.
+#' Windows with no informative sites return D = 0.  When bootstrapping,
+#' sites within each window are resampled with replacement to generate
+#' a null distribution.
+#'
+#' @examples
+#' \dontrun{
+#' # Calculate D in 500-bp windows sliding every 250 bp
+#' results <- WinCalcD("my_alignment.fasta",
+#'                     win.size = 500, step.size = 250)
+#'
+#' # Plot D across the genome
+#' plot(1:nrow(results), as.numeric(results$d), type = "l",
+#'      xlab = "Window", ylab = "D-statistic")
+#' abline(h = 0, lty = 2, col = "red")
+#' }
+#'
+#' @importFrom seqinr read.alignment
+#' @export
+WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
+                     step.size = 50, boot = FALSE, replicate = 1000) {
+
+  # ---- Read and parse the alignment ----
+  alignment <- read.alignment(alignment, format = "fasta")
+  alignment.matrix <- matrix(, length(alignment$nam),
+                             nchar(alignment$seq[[1]]))
+  for (i in 1:length(alignment$nam)) {
+    alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))
   }
   full.align <- alignment.matrix
+
+  # ---- Set up sliding window positions ----
   total <- ncol(full.align)
   spots <- seq(from = 1, to = (total - win.size), by = step.size)
-  results.matrix <- as.data.frame(matrix(,1,6))
+
+  # Prepare results container
+  results.matrix <- as.data.frame(matrix(, 1, 6))
   colnames(results.matrix) <- c("range", "abba", "baba", "d", "Z", "pval")
-  for(q in 1:length(spots)){
-    alignment.matrix <- full.align[,spots[q]:(spots[q] + win.size - 1)]
+
+  # ---- Loop through each window ----
+  for (q in 1:length(spots)) {
+    # Extract the current window from the full alignment
+    alignment.matrix <- full.align[, spots[q]:(spots[q] + win.size - 1)]
     starting <- spots[q]
     ending <- spots[q] + win.size - 1
-    abba <- 0                                                                         #  set up my variables
-    baba <- 0                                                                         #  set up my variables
-    for(i in 1:ncol(alignment.matrix)){                                               #  run through all sites
-      if(length(unique(alignment.matrix[, i])) == 2){                                 #  unique(c(p1,p2,p3,o))==2 aka biallelic
-        if(alignment.matrix[1, i] != alignment.matrix[2, i]){                         #  p1 != p2   aka different resolutions in p1 and p2
-          if(alignment.matrix[4, i] != alignment.matrix[3, i]){                       #  o != p3    durand says "less likely pattern due to seq. errors
-            if(alignment.matrix[3, i] == alignment.matrix[1, i]) {baba <- baba + 1}   #  add to the count of baba sites
-            if(alignment.matrix[2, i] == alignment.matrix[3, i]) {abba <- abba + 1}   #  add to the count of abba sites
-          } 
+
+    # Count ABBA and BABA patterns in this window
+    abba <- 0
+    baba <- 0
+    for (i in 1:ncol(alignment.matrix)) {
+      # Only biallelic sites
+      if (length(unique(alignment.matrix[, i])) == 2) {
+        if (alignment.matrix[1, i] != alignment.matrix[2, i]) {
+          if (alignment.matrix[4, i] != alignment.matrix[3, i]) {
+            if (alignment.matrix[3, i] == alignment.matrix[1, i]) baba <- baba + 1
+            if (alignment.matrix[2, i] == alignment.matrix[3, i]) abba <- abba + 1
+          }
         }
       }
     }
-    d <- (abba - baba) / (abba + baba)   #what its all about 
-    if(is.nan(d)) d <- 0   # if there are no ABBA BABA sites should interpret as zero
-  ## THIS SECTION WILL CALCULATE THE P-VAL BASED ON BOOTSTRAPPING
-  ## SITES ARE SAMPLED WITH REPLACEMENT TO MAKE A NEW DATASET OF
-  ## OF EQUAL SIZE TO THE ORIGINAL DATASET THIS ALLOWS US TO CALCULATE
-  ## THE STANDARD DEVIATION AND THUS A Z SCORE.
-    if(boot==T){
-      sim.d<-vector()
+    d <- (abba - baba) / (abba + baba)
+    if (is.nan(d)) d <- 0  # no informative sites -> D = 0
+
+    # ---- Bootstrap within this window ----
+    if (boot == TRUE) {
+      sim.d <- vector()
       foo <- ncol(alignment.matrix)
-      sim.matrix<-matrix(,4,foo)
-      for(k in 1:replicate){      
-        sim.matrix[1:4,1:foo] <- alignment.matrix[1:4, sample(1:foo, replace = T)]
-        t.abba <- t.baba <- 0                                                                         #  set up my variables
-        for(i in 1:ncol(sim.matrix)){                                               #  run through all sites
-          if(length(unique(sim.matrix[, i])) == 2){                                 #  unique(c(p1,p2,p3,o))==2 aka biallelic
-            if(sim.matrix[1, i] != sim.matrix[2, i]){                               #  p1 != p2   aka different resolutions in p1 and p2
-              if(sim.matrix[4, i] != sim.matrix[3, i]){                             #  o != p3    durand says "less likely pattern due to seq. errors
-                if(sim.matrix[3, i] == sim.matrix[1, i]) {t.baba <- t.baba + 1}     #  add to the count of baba sites
-                if(sim.matrix[2, i] == sim.matrix[3, i]) {t.abba <- t.abba + 1}     #  add to the count of abba sites
-              } 
+      sim.matrix <- matrix(, 4, foo)
+      for (k in 1:replicate) {
+        sim.matrix[1:4, 1:foo] <- alignment.matrix[1:4, sample(1:foo, replace = TRUE)]
+        t.abba <- 0
+        t.baba <- 0
+        for (i in 1:ncol(sim.matrix)) {
+          if (length(unique(sim.matrix[, i])) == 2) {
+            if (sim.matrix[1, i] != sim.matrix[2, i]) {
+              if (sim.matrix[4, i] != sim.matrix[3, i]) {
+                if (sim.matrix[3, i] == sim.matrix[1, i]) t.baba <- t.baba + 1
+                if (sim.matrix[2, i] == sim.matrix[3, i]) t.abba <- t.abba + 1
+              }
             }
           }
         }
-        sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)   #what its all about   
+        sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)
       }
       sim.d[is.nan(sim.d)] <- 0
-      z <- abs(d/sd(sim.d, na.rm = T))
+      z <- abs(d / sd(sim.d, na.rm = TRUE))
       z[is.nan(z)] <- 0
       new.pval <- 2 * (1 - pnorm(z))
-      ## NOW WE MAKE THE OUTPUTS
+
       cat("\nSites in alignment =", ncol(alignment.matrix))
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)
       cat("\n\nD raw statistic / Z-score = ", d, " / ", z)
       cat("\n\nResults from ", replicate, "bootstraps")
-      cat("\nSD D statistic =", sd(sim.d, na.rm = F))
-      cat("\nP-value (that D=0) = ",new.pval) #after Eaton and Ree 2013 
-      results.matrix[q, 1:6] <- c(paste(starting,":",ending,sep=""), 
-                                  abba, baba, d, z, new.pval)
-      
+      cat("\nSD D statistic =", sd(sim.d, na.rm = FALSE))
+      cat("\nP-value (that D=0) = ", new.pval)
+      results.matrix[q, 1:6] <- c(paste(starting, ":", ending, sep = ""),
+                                   abba, baba, d, z, new.pval)
     }
-    if(boot==F){
+
+    # ---- No bootstrap: just report raw D ----
+    if (boot == FALSE) {
       cat("\nSites in alignment =", ncol(alignment.matrix))
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)
       cat("\n\nD raw statistic = ", d)
-      results.matrix[q, 1:4] <- c(paste(starting,":",ending,sep=""), 
-                                  abba, baba, d)
+      results.matrix[q, 1:4] <- c(paste(starting, ":", ending, sep = ""),
+                                   abba, baba, d)
     }
   }
+
   return(results.matrix)
 }
