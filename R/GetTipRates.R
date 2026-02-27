@@ -104,26 +104,19 @@ GetTipRates <- function(tree = NULL,
   # If no explicit tip states given, derive them from the probability matrix
   # (each species gets the state where it has probability = 1)
   if (is.null(tip.states) && !is.null(p.mat)) {
-    tip.states <- c()
-    for (i in 1:nrow(p.mat)) {
-      tip.states[i] <- which(p.mat[i, ] == 1)
-    }
+    # Vectorized: find column index of maximum per row
+    tip.states <- apply(p.mat, 1, which.max)
     names(tip.states) <- row.names(p.mat)
   }
 
   # ---- Reorder data to match tree tip order ----
-  hit <- c()
-  for (j in 1:length(tree$tip.label)) {
-    hit[j] <- which(tree$tip.label[j] == names(tip.states))
-  }
+  # Vectorized matching using match() instead of a for-loop
+  hit <- match(tree$tip.label, names(tip.states))
   tip.states <- tip.states[hit]
 
   # Verify the reordering worked
   print("Checking the order of tree tip labels and provided data.")
-  order <- vapply(1:length(tree$tip.label), function(i) {
-    tree$tip.label[i] == names(tip.states)[i]
-  }, logical(1))
-  if (sum(order) == length(tree$tip.label)) {
+  if (all(tree$tip.label == names(tip.states))) {
     print("Tree tip labels and provided data are in the correct order.")
   } else {
     print("Tree tip labels and provided data are not in the correct order.")
@@ -155,36 +148,24 @@ GetTipRates <- function(tree = NULL,
 
   # ---- Get parent node states ----
   # For each internal node, pick the most likely state (highest posterior)
-  est <- c()
-  for (i in 1:nrow(recon$ancestral_likelihoods)) {
-    est[i] <- which.max(as.vector(recon$ancestral_likelihoods[i, ]))
-    names(est) <- seq(from = 1 + length(tree$tip.label),
-                      to = length(tree$tip.label) + length(est))
-  }
+  # Vectorized: apply which.max across all rows at once
+  est <- apply(recon$ancestral_likelihoods, 1, which.max)
+  n_tips <- length(tree$tip.label)
+  names(est) <- seq(from = n_tips + 1, to = n_tips + length(est))
 
   # Map tip labels to their node numbers
-  tips <- tree$tip.label
-  nodes <- seq_along(tree$tip.label)
+  nodes <- seq_len(n_tips)
   names(nodes) <- names(tip.states)
 
-  # Get the branch length leading to each tip
-  edge.lengths <- setNames(
-    tree$edge.length[sapply(nodes, function(x, y) which(y == x), y = tree$edge[, 2])],
-    names(nodes)
-  )
+  # Get the branch length leading to each tip (vectorized with match)
+  edge_row <- match(nodes, tree$edge[, 2])
+  edge.lengths <- setNames(tree$edge.length[edge_row], names(nodes))
 
-  # Find the parent node of each tip
-  nodepulls <- c()
-  for (i in 1:length(tree$tip.label)) {
-    nodepulls[i] <- getParent(tree, nodes[i])
-  }
+  # Find the parent node of each tip (vectorized from edge matrix)
+  nodepulls <- tree$edge[edge_row, 1]
 
-  # Look up the state at each parent node
-  node.states <- c()
-  for (i in 1:length(nodepulls)) {
-    node.state.idx <- which(names(est) == nodepulls[i])
-    node.states[i] <- as.numeric(states[est[node.state.idx]])
-  }
+  # Look up the state at each parent node (vectorized with named indexing)
+  node.states <- as.numeric(states[est[as.character(nodepulls)]])
 
   # ---- Calculate tip rates ----
   # Rate = |tip_state - parent_state| / branch_length

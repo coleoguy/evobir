@@ -70,16 +70,15 @@ SlidingWindow <- function(FUN, data, window, step, strict = FALSE) {
     }
   }
 
-  # ---- Vector sliding window ----
+  # ---- Vector sliding window (vectorized with vapply) ----
   if (is.vector(data)) {
     total <- length(data)
     # Calculate the starting positions for each window
     spots <- seq(from = 1, to = (total - window + 1), by = step)
-    result <- vector(length = length(spots))
-    for (i in 1:length(spots)) {
-      # Apply the function to the current window slice
-      result[i] <- match.fun(FUN)(data[spots[i]:(spots[i] + window - 1)])
-    }
+    # Resolve function once outside the loop to avoid repeated lookup
+    fun <- match.fun(FUN)
+    result <- vapply(spots, function(s) fun(data[s:(s + window - 1)]),
+                     numeric(1))
   }
 
   # ---- Matrix sliding window ----
@@ -88,13 +87,14 @@ SlidingWindow <- function(FUN, data, window, step, strict = FALSE) {
     spots.x <- seq(from = 1, to = (total.x - window + 1), by = step)
     total.y <- nrow(data)
     spots.y <- seq(from = 1, to = (total.y - window + 1), by = step)
+    # Resolve function once outside the loop
+    fun <- match.fun(FUN)
     result <- matrix(, length(spots.y), length(spots.x))
-    for (i in 1:length(spots.y)) {
-      for (j in 1:length(spots.x)) {
-        # Apply the function to a 2D window submatrix
-        result[i, j] <- match.fun(FUN)(
-          data[spots.y[i]:(spots.y[i] + window - 1),
-               spots.x[j]:(spots.x[j] + window - 1)])
+    for (i in seq_along(spots.y)) {
+      row_range <- spots.y[i]:(spots.y[i] + window - 1)
+      for (j in seq_along(spots.x)) {
+        result[i, j] <- fun(data[row_range,
+                                  spots.x[j]:(spots.x[j] + window - 1)])
       }
     }
   }

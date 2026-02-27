@@ -55,12 +55,8 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
 
   # ---- Read and parse the alignment ----
   alignment <- read.alignment(alignment, format = "fasta")
-  alignment.matrix <- matrix(, length(alignment$nam),
-                             nchar(alignment$seq[[1]]))
-  for (i in 1:length(alignment$nam)) {
-    alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))
-  }
-  full.align <- alignment.matrix
+  # Vectorized parsing: split all sequences at once, bind into matrix
+  full.align <- do.call(rbind, strsplit(unlist(alignment$seq), ""))
 
   # ---- Set up sliding window positions ----
   total <- ncol(full.align)
@@ -77,42 +73,37 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
     starting <- spots[q]
     ending <- spots[q] + win.size - 1
 
-    # Count ABBA and BABA patterns in this window
-    abba <- 0
-    baba <- 0
-    for (i in 1:ncol(alignment.matrix)) {
-      # Only biallelic sites
-      if (length(unique(alignment.matrix[, i])) == 2) {
-        if (alignment.matrix[1, i] != alignment.matrix[2, i]) {
-          if (alignment.matrix[4, i] != alignment.matrix[3, i]) {
-            if (alignment.matrix[3, i] == alignment.matrix[1, i]) baba <- baba + 1
-            if (alignment.matrix[2, i] == alignment.matrix[3, i]) abba <- abba + 1
-          }
-        }
-      }
-    }
+    # Count ABBA and BABA patterns in this window (vectorized)
+    p1 <- alignment.matrix[1, ]
+    p2 <- alignment.matrix[2, ]
+    p3 <- alignment.matrix[3, ]
+    o  <- alignment.matrix[4, ]
+
+    biallelic <- vapply(seq_len(ncol(alignment.matrix)), function(i) {
+      length(unique(alignment.matrix[, i])) == 2L
+    }, logical(1))
+    informative <- biallelic & (p1 != p2) & (o != p3)
+    abba <- sum(informative & (p2 == p3))
+    baba <- sum(informative & (p3 == p1))
+
     d <- (abba - baba) / (abba + baba)
     if (is.nan(d)) d <- 0  # no informative sites -> D = 0
 
     # ---- Bootstrap within this window ----
     if (boot == TRUE) {
-      sim.d <- vector()
+      sim.d <- numeric(replicate)  # pre-allocate for speed
       foo <- ncol(alignment.matrix)
-      sim.matrix <- matrix(, 4, foo)
       for (k in 1:replicate) {
-        sim.matrix[1:4, 1:foo] <- alignment.matrix[1:4, sample(1:foo, replace = TRUE)]
-        t.abba <- 0
-        t.baba <- 0
-        for (i in 1:ncol(sim.matrix)) {
-          if (length(unique(sim.matrix[, i])) == 2) {
-            if (sim.matrix[1, i] != sim.matrix[2, i]) {
-              if (sim.matrix[4, i] != sim.matrix[3, i]) {
-                if (sim.matrix[3, i] == sim.matrix[1, i]) t.baba <- t.baba + 1
-                if (sim.matrix[2, i] == sim.matrix[3, i]) t.abba <- t.abba + 1
-              }
-            }
-          }
-        }
+        sim.matrix <- alignment.matrix[1:4, sample.int(foo, foo, replace = TRUE)]
+        # Vectorized ABBA/BABA on bootstrap replicate
+        sp1 <- sim.matrix[1, ]; sp2 <- sim.matrix[2, ]
+        sp3 <- sim.matrix[3, ]; so  <- sim.matrix[4, ]
+        bi <- vapply(seq_len(foo), function(i) {
+          length(unique(sim.matrix[, i])) == 2L
+        }, logical(1))
+        inf_sites <- bi & (sp1 != sp2) & (so != sp3)
+        t.abba <- sum(inf_sites & (sp2 == sp3))
+        t.baba <- sum(inf_sites & (sp3 == sp1))
         sim.d[k] <- (t.abba - t.baba) / (t.abba + t.baba)
       }
       sim.d[is.nan(sim.d)] <- 0

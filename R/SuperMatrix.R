@@ -79,19 +79,13 @@ SuperMatrix <- function(missing = "-",
   }
 
   # ---- Collect all unique taxon names across all alignments ----
-  taxa <- vector()
-  for (i in 1:length(DNA)) {
-    taxa <- c(taxa,
-              row.names(DNA[[i]])[!row.names(DNA[[i]]) %in% taxa])
-  }
+  # Vectorized: unlist all rownames, then take unique (preserves first-seen order)
+  taxa <- unique(unlist(lapply(DNA, rownames)))
 
   # ---- Concatenation mode ----
   if (concatenate == TRUE) {
     # Calculate total alignment length (sum of all gene lengths)
-    total.length <- 0
-    for (i in 1:length(DNA)) {
-      total.length <- total.length + ncol(DNA[[i]])
-    }
+    total.length <- sum(vapply(DNA, ncol, integer(1)))
 
     # Create an empty matrix filled with the missing character
     seqmatrix <- matrix(as.character(missing), length(taxa), total.length)
@@ -107,11 +101,10 @@ SuperMatrix <- function(missing = "-",
     for (i in 1:length(DNA)) {
       print(paste("Processing alignment", i))
       gene <- DNA[[i]]
-      for (j in 1:nrow(gene)) {
-        # Find where this taxon goes in the supermatrix
-        c.row <- which(rownames(seqmatrix) == rownames(gene)[j])
-        seqmatrix[c.row, (c.col + 1):(c.col + ncol(gene))] <- gene[j, ]
-      }
+      # Vectorized: match all taxon names at once instead of one-by-one
+      c.rows <- match(rownames(gene), rownames(seqmatrix))
+      col_range <- (c.col + 1):(c.col + ncol(gene))
+      seqmatrix[c.rows, col_range] <- gene
       partitions[i, 1:3] <- c(file.names[i], c.col + 1, c.col + ncol(gene))
       c.col <- c.col + ncol(gene)
     }
@@ -139,10 +132,9 @@ SuperMatrix <- function(missing = "-",
       # Create a taxon-complete matrix for this gene
       seqmatrix <- matrix(as.character(missing), length(taxa), ncol(DNA[[i]]))
       rownames(seqmatrix) <- taxa
-      for (j in 1:nrow(DNA[[i]])) {
-        hit <- which(row.names(DNA[[i]])[j] == row.names(seqmatrix))
-        seqmatrix[hit, ] <- DNA[[i]][j, ]
-      }
+      # Vectorized: match all taxon names at once
+      hits <- match(rownames(DNA[[i]]), rownames(seqmatrix))
+      seqmatrix[hits, ] <- DNA[[i]]
       results[[i]] <- seqmatrix
       if (save == TRUE) {
         write.dna(seqmatrix,

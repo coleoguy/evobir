@@ -52,31 +52,29 @@ FuzzyMatch <- function(tree, data, max.dist) {
   }
 
   tree.names <- tree$tip.label
-  close.taxa <- data.frame()
-  counter <- 1
   data.names <- unique(data)
 
-  # Compare each name in the data against all tree tip labels
-  for (i in 1:length(data.names)) {
-    # adist() computes Levenshtein distance between strings
-    name.dist <- min(adist(data.names[i], as.character(tree.names)))
-    # Keep it if it's close but NOT an exact match (distance > 0)
-    if (name.dist <= max.dist & name.dist > 0) {
-      best.match <- which.min(adist(data.names[i], as.character(tree.names)))
-      close.taxa[counter, 1] <- data.names[i]
-      close.taxa[counter, 2] <- tree.names[best.match]
-      close.taxa[counter, 3] <- name.dist
-      counter <- counter + 1
-    }
-  }
+  # Compute full distance matrix once (rows = data names, cols = tree tips).
+  # This avoids calling adist() twice per name inside a loop.
+  dist_mat <- adist(data.names, as.character(tree.names))
 
-  # Report how many close matches were found
-  if (counter == 1) {
-    cat("Found", counter - 1, "names that were close but imperfect matches\n")
-  }
-  if (counter > 1) {
-    cat("Found", counter - 1, "names that were close but imperfect matches\n")
-    colnames(close.taxa) <- c("name.in.data", "name.in.tree", "differences")
+  # For each data name, find the closest tree tip and its distance
+  min_dists <- apply(dist_mat, 1, min)
+  best_idx  <- apply(dist_mat, 1, which.min)
+
+  # Keep names that are close but NOT exact matches (distance > 0)
+  close_idx <- which(min_dists <= max.dist & min_dists > 0)
+
+  if (length(close_idx) == 0) {
+    cat("Found 0 names that were close but imperfect matches\n")
+  } else {
+    close.taxa <- data.frame(
+      name.in.data = data.names[close_idx],
+      name.in.tree = tree.names[best_idx[close_idx]],
+      differences  = min_dists[close_idx],
+      stringsAsFactors = FALSE
+    )
+    cat("Found", nrow(close.taxa), "names that were close but imperfect matches\n")
     return(close.taxa)
   }
 }

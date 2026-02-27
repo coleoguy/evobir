@@ -96,26 +96,39 @@ CalcD <- function(alignment = "alignment.fasta",
                   replicate = 1000,
                   align.format = 'fasta') {
 
-  # ---- Inner function: core D calculation ----
-  # Takes a 4-row alignment matrix and counts ABBA/BABA patterns
+  # ---- Inner function: core D calculation (vectorized) ----
+  # Takes a 4-row alignment matrix and counts ABBA/BABA patterns.
+  # All comparisons are done column-wise with no R-level for-loop.
   d.calc <- function(alignment) {
-    abba <- 0
-    baba <- 0
-    for (i in 1:ncol(alignment)) {
-      # Only look at biallelic sites (exactly 2 alleles across all 4 taxa)
-      if (length(unique(alignment[, i])) == 2) {
-        # P1 and P2 must differ at this site
-        if (alignment[1, i] != alignment[2, i]) {
-          # Outgroup must differ from P3 (filters sequencing errors)
-          if (alignment[4, i] != alignment[3, i]) {
-            # BABA: P3 matches P1 (not P2)
-            if (alignment[3, i] == alignment[1, i]) baba <- baba + 1
-            # ABBA: P3 matches P2 (not P1)
-            if (alignment[2, i] == alignment[3, i]) abba <- abba + 1
-          }
-        }
-      }
-    }
+    # Extract each taxon's row as a vector for fast element-wise comparison
+    p1 <- alignment[1, ]
+    p2 <- alignment[2, ]
+    p3 <- alignment[3, ]
+    o  <- alignment[4, ]
+
+    # Biallelic filter: exactly 2 unique alleles at the site.
+    # A site is biallelic when not all four are the same AND at most
+    # two distinct values exist.  Fastest check: all pairwise combos.
+    n_alleles <- (p1 != p2) | (p1 != p3) | (p1 != o)   # at least 2
+    too_many  <- (p1 != p2) & (p1 != p3) & (p2 != p3)  # proxy for 3+
+    # Refine: sites where 3+ alleles exist among P1,P2,P3 or outgroup
+    # differs from all three ingroup.  Full exact check:
+    biallelic <- n_alleles & !( (p1 != p2) & (p1 != p3) & (p2 != p3) &
+                                 !((o == p1) | (o == p2) | (o == p3)) )
+    # Simpler exact method: count unique alleles per column
+    biallelic <- vapply(seq_len(ncol(alignment)), function(i) {
+      length(unique(alignment[, i])) == 2L
+    }, logical(1))
+
+    # Informative sites: biallelic, P1 != P2, and outgroup != P3
+    informative <- biallelic & (p1 != p2) & (o != p3)
+
+    # ABBA: P3 matches P2 (not P1) at informative sites
+    abba <- sum(informative & (p2 == p3))
+
+    # BABA: P3 matches P1 (not P2) at informative sites
+    baba <- sum(informative & (p3 == p1))
+
     d <- (abba - baba) / (abba + baba)
     return(list(d, abba, baba))
   }
@@ -123,11 +136,8 @@ CalcD <- function(alignment = "alignment.fasta",
   # ---- Read and parse the alignment ----
   alignment <- read.alignment(alignment, format = align.format,
                               forceToLower = TRUE)
-  alignment.matrix <- matrix(, length(alignment$nam),
-                             nchar(alignment$seq[[1]]))
-  for (i in 1:length(alignment$nam)) {
-    alignment.matrix[i, ] <- unlist(strsplit(alignment$seq[[i]], ""))
-  }
+  # Vectorized parsing: split all sequences at once, bind into matrix
+  alignment.matrix <- do.call(rbind, strsplit(unlist(alignment$seq), ""))
 
   # ---- Handle ambiguous bases ----
   # IUPAC ambiguity codes: R=A/G, Y=C/T, S=G/C, W=A/T, K=G/T, M=A/C
@@ -173,13 +183,12 @@ CalcD <- function(alignment = "alignment.fasta",
   # Resample columns (sites) WITH replacement to make new datasets
   # of equal size, then calculate D for each replicate
   if (sig.test == "B") {
-    sim.d <- vector()
+    sim.d <- numeric(replicate)  # pre-allocate for speed
     foo <- ncol(alignment.matrix)
-    sim.matrix <- matrix(, 4, foo)
     cat("\nperforming bootstrap")
     for (k in 1:replicate) {
       if (k %% 100 == 0) cat(".")
-      sim.matrix[1:4, 1:foo] <- alignment.matrix[1:4, sample(1:foo, replace = TRUE)]
+      sim.matrix <- alignment.matrix[1:4, sample.int(foo, foo, replace = TRUE)]
       sim.d[k] <- d.calc(sim.matrix)[[1]]
     }
     sim.d[is.nan(sim.d)] <- 0
@@ -219,14 +228,13 @@ CalcD <- function(alignment = "alignment.fasta",
     drop.pos <- seq.int(from = 1, to = (max.rep - 1), length.out = replicate)
     replicate2 <- replicate
 
-    sim.d <- vector()
+    sim.d <- numeric(replicate2)  # pre-allocate for speed
     foo <- ncol(alignment.matrix)
-    sim.matrix <- matrix(, 4, foo - block.size)
     cat("\nperforming jackknife")
     for (k in 1:replicate2) {
       if (k / 2 == round(k / 2)) cat(".")
-      sim.matrix[1:4, 1:(foo - block.size - 1)] <-
-        alignment.matrix[1:4, -drop.pos[k]:-(drop.pos[k] + block.size)]
+      drop_range <- drop.pos[k]:(drop.pos[k] + block.size)
+      sim.matrix <- alignment.matrix[1:4, -drop_range]
       sim.d[k] <- d.calc(sim.matrix)[[1]]
     }
     sim.d[is.nan(sim.d)] <- 0
@@ -324,31 +332,26 @@ CalcPopD <- function(alignment = "alignment.fasta",
   # The first column will hold population names, the rest hold bases
   alignment <- read.alignment(alignment, format = align.format,
                               forceToLower = TRUE)
-  alignment.matrix <- matrix(, length(alignment$nam),
-                             nchar(alignment$seq[[1]]) + 1)
-  for (i in 1:length(alignment$nam)) {
-    alignment.matrix[i, 2:ncol(alignment.matrix)] <-
-      unlist(strsplit(alignment$seq[[i]], ""))
-  }
-  # Store population names in column 1
-  alignment.matrix[, 1] <- alignment$nam
+  # Vectorized parsing: split all sequences at once, bind into matrix
+  seq.matrix <- do.call(rbind, strsplit(unlist(alignment$seq), ""))
+  # Prepend population names as column 1
+  alignment.matrix <- cbind(unlist(alignment$nam), seq.matrix)
 
   # ---- Handle ambiguous bases ----
   if (ambig == "D") {
     target <- c("a", "c", "g", "t")
-    keep <- TRUE
-    for (i in 2:ncol(alignment.matrix)) {
-      keep[i] <- all(alignment.matrix[, i] %in% target)
-    }
+    # Vectorized column filtering (skip column 1 = names)
+    keep <- c(TRUE, vapply(2:ncol(alignment.matrix), function(i) {
+      all(alignment.matrix[, i] %in% target)
+    }, logical(1)))
     alignment.matrix <- alignment.matrix[, keep]
   }
 
   if (ambig == "R") {
     target <- c("a", "c", "g", "t", "r", "y", "s", "w", "k", "m")
-    keep <- TRUE
-    for (i in 2:ncol(alignment.matrix)) {
-      keep[i] <- all(alignment.matrix[, i] %in% target)
-    }
+    keep <- c(TRUE, vapply(2:ncol(alignment.matrix), function(i) {
+      all(alignment.matrix[, i] %in% target)
+    }, logical(1)))
     alignment.matrix <- alignment.matrix[, keep]
 
     resolver <- function(x) {
@@ -428,13 +431,13 @@ CalcPopD <- function(alignment = "alignment.fasta",
 
   # ---- Bootstrap ----
   if (sig.test == "B") {
-    sim.d <- vector()
+    sim.d <- numeric(replicate)  # pre-allocate for speed
     foo <- ncol(alignment.matrix)
     cat("\nperforming bootstrap")
     for (k in 1:replicate) {
       if (k %% 100 == 0) cat(".")
       # Resample columns (keeping column 1 = names)
-      sim.matrix <- alignment.matrix[, c(1, sample(2:foo, replace = TRUE))]
+      sim.matrix <- alignment.matrix[, c(1, sample.int(foo - 1, replace = TRUE) + 1L)]
       sim.d[k] <- dpop.calc(sim.matrix)[[1]]
     }
     sim.d[is.nan(sim.d)] <- 0
@@ -467,12 +470,13 @@ CalcPopD <- function(alignment = "alignment.fasta",
     drop.pos <- seq.int(from = 2, to = (max.rep - 1), length.out = replicate)
     replicate2 <- replicate
 
-    sim.d <- vector()
+    sim.d <- numeric(replicate2)  # pre-allocate for speed
     foo <- ncol(alignment.matrix)
     cat("\nperforming jackknife")
     for (k in 1:replicate2) {
       if (k / 2 == round(k / 2)) cat(".")
-      sim.matrix <- alignment.matrix[, -drop.pos[k]:-(drop.pos[k] + block.size)]
+      drop_range <- drop.pos[k]:(drop.pos[k] + block.size)
+      sim.matrix <- alignment.matrix[, -drop_range]
       sim.d[k] <- dpop.calc(sim.matrix)[[1]]
     }
     sim.d[is.nan(sim.d)] <- 0
