@@ -17,6 +17,10 @@ R package for comparative analyses and teaching evolutionary biology. Maintained
   - Removed `PropSA` S3 class and `print.PropSA` method
 - Files updated: NAMESPACE, vignette, tests, man pages (old .Rd files deleted, new pSAF.Rd generated via roxygen2)
 
+### 2026-03-20: Added missing functions to vignette
+- Added vignette sections for: AncCondFast, GetTipRates, countTrees, WinCalcD, ReOrderAlignment
+- Vignette now covers all 18 exported functions
+
 ## Package Structure
 - Source: `R/` directory
 - Tests: `tests/testthat/`

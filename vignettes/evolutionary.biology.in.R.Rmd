@@ -44,6 +44,45 @@ The four steps in the ancestral condition test. A) Ancestral states are estimate
 
 &nbsp;
 
+## AncCondFast
+
+A more rigorous version of `AncCond` that builds its null distribution using parametric bootstrapping instead of simple node resampling. Rather than shuffling real node values, this function simulates entire neutral evolutionary histories on the tree via `sim.history`, puts each through the same stochastic-mapping pipeline, and compares the real Grand Mean to the distribution of neutral Grand Means.
+
+```{r, eval=FALSE}
+library(ape)
+library(phytools)
+tree <- rcoal(30)
+data <- data.frame(
+  species = tree$tip.label,
+  body_size = rnorm(30, 10, 2),
+  has_horn = sample(1:2, 30, replace = TRUE)
+)
+# Run parametric bootstrap with 50 null simulations, 50 maps each
+result <- AncCondFast(tree, data, n_iter = 50, n_maps = 50)
+hist(result$null_dist, main = "Null Distribution")
+abline(v = result$obs_stat, col = "red", lwd = 2)
+```
+
+&nbsp;
+
+## GetTipRates
+
+Estimates how fast a discrete character has been evolving at each tip of a phylogenetic tree. The rate for a tip is calculated as the absolute difference between the tip state and the reconstructed parent state divided by the branch length connecting them.
+
+```{r, eval=FALSE}
+library(ape)
+library(castor)
+tree <- rcoal(10)
+Q <- matrix(c(-0.2, 0.1, 0.1,
+               0.1, -0.2, 0.1,
+               0.1, 0.1, -0.2), 3, 3)
+colnames(Q) <- rownames(Q) <- c("1", "2", "3")
+tip.states <- setNames(sample(1:3, 10, replace = TRUE), tree$tip.label)
+rates <- GetTipRates(tree, Q, tip.states)
+```
+
+&nbsp;
+
 
 
 &nbsp;
@@ -76,6 +115,16 @@ This function takes as its input a large collection of trees from a program like
 
 
 &nbsp;
+
+## countTrees
+
+Classifies each tree in a collection against a set of reference topologies and counts how many trees match each reference. This is useful after a Bayesian phylogenetic analysis when you want to know what fraction of posterior trees support each possible branching arrangement.
+
+```{r, eval=FALSE}
+result <- countTrees("posterior_trees.nwk", "candidate_topologies.nwk")
+result[[1]]  # counts per reference topology
+result[[2]]  # which topology each individual tree matched
+```
 
 
 &nbsp;
@@ -154,6 +203,18 @@ CalcPopD(alignment = system.file("3.fasta", package = "evobiR"), sig.test = "N")
 
 ```
 
+The `WinCalcD` function is identical to `CalcD` but performs testing in sliding windows along the alignment, letting you see how introgression signal varies across the genome.
+
+```{r, eval=FALSE}
+results <- WinCalcD("my_alignment.fasta",
+                    win.size = 500, step.size = 250)
+plot(1:nrow(results), as.numeric(results$d), type = "l",
+     xlab = "Window", ylab = "D-statistic")
+abline(h = 0, lty = 2, col = "red")
+```
+
+&nbsp;
+
 ## getNe
 
 Calculate the variance effective population size due to unequal sex ratio. Formulas are available for both autosomal loci and X chromosome loci.
@@ -185,6 +246,19 @@ pSAF(n_auto = 13, n_x = 1, n_y = 1, mu = 0.4, weighted = FALSE)
 _______
 # Utility/Misc. Functions
 
+## ReOrderAlignment
+
+Reads a FASTA alignment and writes a new file with sequences reordered by their starting position (where the first non-gap character appears). This is helpful when sequences cover different regions of a gene and you want to visualize the alignment more clearly. Optionally, reference sequences can be pinned to the top.
+
+```{r, eval=FALSE}
+ReOrderAlignment("my_alignment.fasta", "reordered.fasta")
+
+# Pin a reference sequence to the top
+ReOrderAlignment("my_alignment.fasta", "reordered.fasta",
+                 ref = "reference_seq")
+```
+
+&nbsp;
 
 ## Sliding window
 
