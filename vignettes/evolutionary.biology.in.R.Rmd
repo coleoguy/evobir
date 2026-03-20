@@ -166,14 +166,17 @@ getNe(males = 100, females = 200)
 getNe(males = 100, females = 200, locus = "X")
 ```
 
-## Prop_SA
+## pSAF
 
-This function calculates the expected proportion of different classes of chromosomal fusions (sex chromosome-autosome, autosome-autosome, and sex chromosome-sex chromosome) given a sex chromosome system and diploid autosome number.
+This function computes the probability that a random chromosomal fusion joins a sex chromosome to an autosome. Two null models are available: an occurrence model (Anderson et al. 2020) and a fixation-weighted model that accounts for the different effective copy numbers of autosomes, X/Z, and Y/W chromosomes.
 
 ```{r}
-# Calculate fusion proportions for an XY system
-result <- Prop_SA(Da = 26, scs = "XY", mud = 0.4)
-result
+# Fixation-weighted probability of SA fusion for an XY system
+# with 13 autosome pairs (Da = 26)
+pSAF(n_auto = 13, n_x = 1, n_y = 1, mu = 0.4)
+
+# Occurrence probability only
+pSAF(n_auto = 13, n_x = 1, n_y = 1, mu = 0.4, weighted = FALSE)
 ```
 
 
