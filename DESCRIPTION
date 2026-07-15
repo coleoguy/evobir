@@ -3,7 +3,7 @@ Type: Package
 Title: Evolutionary Biology in R
 Version: 2.2
 Date: 2025-02-20
-Author: Michelle M. Jonika, Maximos Chin, Nathan Anderson, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
+Author: Michelle M. Jonika, Maximos Chin, Nathan Anderson, Meghann McConnell, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: https://github.com/coleoguy/evobir
 BugReports: https://github.com/coleoguy/evobir/issues
