@@ -2,7 +2,6 @@
 
 S3method(base::plot,phyloscaled)
 export(AncCond)
-export(AncCondFast)
 export(CalcD)
 export(CalcPopD)
 export(FuzzyMatch)
