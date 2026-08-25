@@ -5,5 +5,7 @@
 ^README\.md$
 ^README\.html$
 ^LICENSE\.md$
+^LICENSE$
+^context\.md$
 ^doc$
 ^Meta$

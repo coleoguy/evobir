@@ -88,6 +88,9 @@ fix.simmap <- function(hists, tips, transition.matrix) {
       next
     }
 
+    # Reset the working table so state never leaks between simulations
+    branches <- NULL
+
     # ---- Catalog tip states from the current simulation ----
     tip.states <- c()
     for (j in 1:length(hists[[i]]$tip.label)) {
@@ -120,22 +123,33 @@ fix.simmap <- function(hists, tips, transition.matrix) {
                                   ncol = 2)
       fail.tips.start <- fail.tips.numbers[, 1]
 
-      # Get the state at the start of each failed tip branch
-      fail.tips.leading.edge <- c()
-      for (j in 1:length(fail.tips.start)) {
-        fail.tips.leading.edge <- c(fail.tips.leading.edge,
-                                    which(hists[[i]]$edge[, 2] ==
-                                            fail.tips.start[j]))
+      # Get the state at the start of each failed tip branch.  Handle
+      # parents that are the root (which have no leading edge) so that
+      # names stay aligned with start nodes.
+      root.node <- length(hists[[i]]$tip.label) + 1
+      unique.starts <- unique(fail.tips.start)
+      fail.tips.start.states <- character(length(unique.starts))
+      for (j in 1:length(unique.starts)) {
+        if (unique.starts[j] != root.node) {
+          leading.edge <- which(hists[[i]]$edge[, 2] == unique.starts[j])
+          leading.map <- hists[[i]]$maps[[leading.edge]]
+          fail.tips.start.states[j] <- names(leading.map)[length(leading.map)]
+        } else {
+          # Root case: use the first state of a non-failed edge
+          # descending from the root
+          root.edges <- which(hists[[i]]$edge[, 1] == root.node)
+          state.found <- NA_character_
+          for (re in root.edges) {
+            nm <- names(hists[[i]]$maps[[re]])[1]
+            if (nm != "fail") {
+              state.found <- nm
+              break
+            }
+          }
+          fail.tips.start.states[j] <- state.found
+        }
       }
-      fail.tips.leading.edge <- unique(fail.tips.leading.edge)
-      fail.tips.leading.maps <- hists[[i]]$maps[fail.tips.leading.edge]
-      fail.tips.start.states <- c()
-
-      for (j in 1:length(fail.tips.leading.maps)) {
-        fail.tips.start.states[j] <- names(fail.tips.leading.maps[[j]])[
-          length(fail.tips.leading.maps[[j]])]
-      }
-      names(fail.tips.start.states) <- unique(fail.tips.start)
+      names(fail.tips.start.states) <- unique.starts
 
       # Get the desired end state from the tip data
       fail.tips.end.states <- fail.taxa[, 2]
@@ -200,7 +214,7 @@ fix.simmap <- function(hists, tips, transition.matrix) {
       branches.internal <- cbind(fail.internal.numbers,
                                  hists[[i]]$edge.length[fail.internal.edges])
 
-      if (exists("branches") && ncol(branches) == 3) {
+      if (!is.null(branches) && ncol(branches) == 3) {
         branches <- rbind(branches, branches.internal)
       } else {
         branches <- branches.internal
@@ -292,9 +306,18 @@ fix.simmap <- function(hists, tips, transition.matrix) {
     branches <- as.matrix(branches)
 
     # ---- Find valid paths and repair maps ----
-    # Build a graph from the transition matrix to find shortest paths
-    graph.paths <- graph_from_data_frame(
-      which(transition.matrix != 0, arr.ind = TRUE))
+    # Build a graph from the transition matrix to find shortest paths.
+    # Vertices must be named by STATE LABEL (dimnames), not by matrix
+    # row/column index, so that states such as "0"/"1" resolve
+    allowed <- which(transition.matrix != 0, arr.ind = TRUE)
+    if (!is.null(dimnames(transition.matrix))) {
+      graph.edges <- data.frame(
+        from = rownames(transition.matrix)[allowed[, 1]],
+        to = colnames(transition.matrix)[allowed[, 2]])
+    } else {
+      graph.edges <- allowed
+    }
+    graph.paths <- graph_from_data_frame(graph.edges)
 
     for (j in 1:nrow(branches)) {
       # Find the shortest valid path between start and end states
@@ -333,7 +356,8 @@ fix.simmap <- function(hists, tips, transition.matrix) {
                                trailing.multiple):length(found.path)]
 
         # Handle sibling failures sharing the same leading edge
-        if (sum(as.numeric(branches[, 6]) == branches[j, 6], na.rm = TRUE) >= 1) {
+        # (>= 2 because branches[j, ] always matches itself)
+        if (sum(as.numeric(branches[, 6]) == branches[j, 6], na.rm = TRUE) >= 2) {
           repeat.index <- which(branches[, 6] == branches[j, 6] &
                                   branches[, 5] != branches[j, 5])
           branches[repeat.index, 4] <- NA

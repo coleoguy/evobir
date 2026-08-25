@@ -1,8 +1,8 @@
 Package: evobiR
 Type: Package
 Title: Evolutionary Biology in R
-Version: 2.2
-Date: 2025-02-20
+Version: 2.2.1
+Date: 2026-08-21
 Author: Michelle M. Jonika, Maximos Chin, Nathan Anderson, Meghann McConnell, Richard H. Adams, Jeffery P. Demuth, and Heath Blackmon
 Maintainer: Heath Blackmon <coleoguy@gmail.com>
 URL: https://github.com/coleoguy/evobir
@@ -19,7 +19,7 @@ Imports:
      RColorBrewer,
      expm,
      igraph
-Suggests: knitr, testthat (>= 3.0.0)
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 RoxygenNote: 7.3.3

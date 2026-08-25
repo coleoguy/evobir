@@ -60,11 +60,20 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
 
   # ---- Set up sliding window positions ----
   total <- ncol(full.align)
-  spots <- seq(from = 1, to = (total - win.size), by = step.size)
+  # +1 so the final full window ending exactly at the last site is kept
+  spots <- seq(from = 1, to = (total - win.size + 1), by = step.size)
 
-  # Prepare results container
-  results.matrix <- as.data.frame(matrix(, 1, 6))
-  colnames(results.matrix) <- c("range", "abba", "baba", "d", "Z", "pval")
+  # Prepare results container: typed columns so numeric results stay
+  # numeric (a single mixed-type vector per row would coerce everything
+  # to character)
+  n.win <- length(spots)
+  results.matrix <- data.frame(range = character(n.win),
+                               abba = numeric(n.win),
+                               baba = numeric(n.win),
+                               d = numeric(n.win),
+                               Z = rep(NA_real_, n.win),
+                               pval = rep(NA_real_, n.win),
+                               stringsAsFactors = FALSE)
 
   # ---- Loop through each window ----
   for (q in 1:length(spots)) {
@@ -79,9 +88,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
     p3 <- alignment.matrix[3, ]
     o  <- alignment.matrix[4, ]
 
-    biallelic <- vapply(seq_len(ncol(alignment.matrix)), function(i) {
-      length(unique(alignment.matrix[, i])) == 2L
-    }, logical(1))
+    biallelic <- .biallelic4(p1, p2, p3, o)
     informative <- biallelic & (p1 != p2) & (o != p3)
     abba <- sum(informative & (p2 == p3))
     baba <- sum(informative & (p3 == p1))
@@ -98,9 +105,7 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
         # Vectorized ABBA/BABA on bootstrap replicate
         sp1 <- sim.matrix[1, ]; sp2 <- sim.matrix[2, ]
         sp3 <- sim.matrix[3, ]; so  <- sim.matrix[4, ]
-        bi <- vapply(seq_len(foo), function(i) {
-          length(unique(sim.matrix[, i])) == 2L
-        }, logical(1))
+        bi <- .biallelic4(sp1, sp2, sp3, so)
         inf_sites <- bi & (sp1 != sp2) & (so != sp3)
         t.abba <- sum(inf_sites & (sp2 == sp3))
         t.baba <- sum(inf_sites & (sp3 == sp1))
@@ -118,8 +123,12 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
       cat("\n\nResults from ", replicate, "bootstraps")
       cat("\nSD D statistic =", sd(sim.d, na.rm = FALSE))
       cat("\nP-value (that D=0) = ", new.pval)
-      results.matrix[q, 1:6] <- c(paste(starting, ":", ending, sep = ""),
-                                   abba, baba, d, z, new.pval)
+      results.matrix$range[q] <- paste(starting, ":", ending, sep = "")
+      results.matrix$abba[q] <- abba
+      results.matrix$baba[q] <- baba
+      results.matrix$d[q] <- d
+      results.matrix$Z[q] <- z
+      results.matrix$pval[q] <- new.pval
     }
 
     # ---- No bootstrap: just report raw D ----
@@ -128,8 +137,10 @@ WinCalcD <- function(alignment = "alignment.fasta", win.size = 100,
       cat("\nNumber of sites with ABBA pattern =", abba)
       cat("\nNumber of sites with BABA pattern =", baba)
       cat("\n\nD raw statistic = ", d)
-      results.matrix[q, 1:4] <- c(paste(starting, ":", ending, sep = ""),
-                                   abba, baba, d)
+      results.matrix$range[q] <- paste(starting, ":", ending, sep = "")
+      results.matrix$abba[q] <- abba
+      results.matrix$baba[q] <- baba
+      results.matrix$d[q] <- d
     }
   }
 

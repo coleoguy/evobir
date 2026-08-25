@@ -9,10 +9,29 @@
 #' @return The most common value in \code{x}.  If there is a tie, the first
 #'   value (in order of appearance) wins.
 #'
-#' @keywords internal
+#' @examples
+#' Mode(c(1, 2, 2, 3))
+#'
+#' @export
 Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
+}
+
+
+# Vectorized biallelic test for a 4-row alignment: returns TRUE for
+# sites (columns) with exactly 2 distinct alleles.  Counts unique
+# alleles by noting that each row adds a new allele only if it differs
+# from all preceding rows.  Exact equivalent of
+# length(unique(column)) == 2, ~20x faster.
+#
+# @keywords internal
+.biallelic4 <- function(p1, p2, p3, o) {
+  n_unique <- 1L +
+    (p2 != p1) +
+    ((p3 != p1) & (p3 != p2)) +
+    ((o != p1) & (o != p2) & (o != p3))
+  n_unique == 2L
 }
 
 
@@ -107,18 +126,9 @@ CalcD <- function(alignment = "alignment.fasta",
     o  <- alignment[4, ]
 
     # Biallelic filter: exactly 2 unique alleles at the site.
-    # A site is biallelic when not all four are the same AND at most
-    # two distinct values exist.  Fastest check: all pairwise combos.
-    n_alleles <- (p1 != p2) | (p1 != p3) | (p1 != o)   # at least 2
-    too_many  <- (p1 != p2) & (p1 != p3) & (p2 != p3)  # proxy for 3+
-    # Refine: sites where 3+ alleles exist among P1,P2,P3 or outgroup
-    # differs from all three ingroup.  Full exact check:
-    biallelic <- n_alleles & !( (p1 != p2) & (p1 != p3) & (p2 != p3) &
-                                 !((o == p1) | (o == p2) | (o == p3)) )
-    # Simpler exact method: count unique alleles per column
-    biallelic <- vapply(seq_len(ncol(alignment)), function(i) {
-      length(unique(alignment[, i])) == 2L
-    }, logical(1))
+    # Exact vectorized unique-allele count for 4 rows: each row adds a
+    # new allele only if it differs from all preceding rows.
+    biallelic <- .biallelic4(p1, p2, p3, o)
 
     # Informative sites: biallelic, P1 != P2, and outgroup != P3
     informative <- biallelic & (p1 != p2) & (o != p3)
@@ -224,8 +234,10 @@ CalcD <- function(alignment = "alignment.fasta",
                  "sites", replicate, "replicates\nare not possible"))
     }
 
-    # Evenly space the drop positions across the alignment
-    drop.pos <- seq.int(from = 1, to = (max.rep - 1), length.out = replicate)
+    # Evenly space the drop positions across the alignment; round to
+    # whole-number site indices
+    drop.pos <- round(seq.int(from = 1, to = max.rep + 1,
+                              length.out = replicate))
     replicate2 <- replicate
 
     sim.d <- numeric(replicate2)  # pre-allocate for speed
@@ -233,7 +245,8 @@ CalcD <- function(alignment = "alignment.fasta",
     cat("\nperforming jackknife")
     for (k in 1:replicate2) {
       if (k / 2 == round(k / 2)) cat(".")
-      drop_range <- drop.pos[k]:(drop.pos[k] + block.size)
+      # drop exactly block.size contiguous sites
+      drop_range <- drop.pos[k]:(drop.pos[k] + block.size - 1)
       sim.matrix <- alignment.matrix[1:4, -drop_range]
       sim.d[k] <- d.calc(sim.matrix)[[1]]
     }
@@ -379,37 +392,42 @@ CalcPopD <- function(alignment = "alignment.fasta",
     useful <- 0      # sites with ABBA/BABA signal
     segregating <- 0 # useful sites still polymorphic in >= 1 population
 
+    # Hoist group row indices: these are constant across all sites, so
+    # compute them once instead of ~10 times per site
+    g1 <- which(alignment.matrix[, 1] == groups[1])
+    g2 <- which(alignment.matrix[, 1] == groups[2])
+    g3 <- which(alignment.matrix[, 1] == groups[3])
+    g4 <- which(alignment.matrix[, 1] == groups[4])
+    g12 <- c(g1, g2)
+
     for (i in 2:ncol(alignment.matrix)) {
       seg.pos <- FALSE
+      site <- alignment.matrix[, i]
 
       # Only biallelic sites
-      if (length(unique(alignment.matrix[, i])) == 2) {
+      if (length(unique(site)) == 2) {
         # "A" = most common allele in outgroup, "B" = the other
-        A <- Mode(alignment.matrix[alignment.matrix[, 1] == groups[4], i])
-        B <- unique(alignment.matrix[, i])[unique(alignment.matrix[, i]) != A]
+        A <- Mode(site[g4])
+        B <- unique(site)[unique(site) != A]
 
         # P3 must carry allele B
-        if (B %in% unique(alignment.matrix[alignment.matrix[, 1] == groups[3], i])) {
+        if (B %in% site[g3]) {
           # P1 and P2 must differ
-          if (length(unique(alignment.matrix[alignment.matrix[, 1] %in% groups[1:2], i])) == 2) {
+          if (length(unique(site[g12])) == 2) {
             useful <- useful + 1
 
             # Check if site is still segregating within any population
-            if (length(unique(alignment.matrix[alignment.matrix[, 1] == groups[1], i])) == 2) seg.pos <- TRUE
-            if (length(unique(alignment.matrix[alignment.matrix[, 1] == groups[2], i])) == 2) seg.pos <- TRUE
-            if (length(unique(alignment.matrix[alignment.matrix[, 1] == groups[3], i])) == 2) seg.pos <- TRUE
-            if (length(unique(alignment.matrix[alignment.matrix[, 1] == groups[4], i])) == 2) seg.pos <- TRUE
+            if (length(unique(site[g1])) == 2) seg.pos <- TRUE
+            if (length(unique(site[g2])) == 2) seg.pos <- TRUE
+            if (length(unique(site[g3])) == 2) seg.pos <- TRUE
+            if (length(unique(site[g4])) == 2) seg.pos <- TRUE
             if (seg.pos) segregating <- segregating + 1
 
             # Calculate allele frequencies (proportion of allele B)
-            p1 <- 1 - (sum(alignment.matrix[alignment.matrix[, 1] == groups[1], i] == A) /
-                          length(alignment.matrix[alignment.matrix[, 1] == groups[1], i]))
-            p2 <- 1 - (sum(alignment.matrix[alignment.matrix[, 1] == groups[2], i] == A) /
-                          length(alignment.matrix[alignment.matrix[, 1] == groups[2], i]))
-            p3 <- 1 - (sum(alignment.matrix[alignment.matrix[, 1] == groups[3], i] == A) /
-                          length(alignment.matrix[alignment.matrix[, 1] == groups[3], i]))
-            p4 <- 1 - (sum(alignment.matrix[alignment.matrix[, 1] == groups[4], i] == A) /
-                          length(alignment.matrix[alignment.matrix[, 1] == groups[4], i]))
+            p1 <- 1 - (sum(site[g1] == A) / length(g1))
+            p2 <- 1 - (sum(site[g2] == A) / length(g2))
+            p3 <- 1 - (sum(site[g3] == A) / length(g3))
+            p4 <- 1 - (sum(site[g4] == A) / length(g4))
 
             # Durand et al. Equation 2: frequency-based ABBA-BABA
             numerator <- ((1 - p1) * p2 * p3 * (1 - p4)) -
@@ -467,7 +485,10 @@ CalcPopD <- function(alignment = "alignment.fasta",
                  "and an alignment of", ncol(alignment.matrix),
                  "sites", replicate, "replicates\nare not possible"))
     }
-    drop.pos <- seq.int(from = 2, to = (max.rep - 1), length.out = replicate)
+    # Whole-number site indices; column 1 holds population names, so
+    # sites start at column 2
+    drop.pos <- round(seq.int(from = 2, to = max.rep + 1,
+                              length.out = replicate))
     replicate2 <- replicate
 
     sim.d <- numeric(replicate2)  # pre-allocate for speed
@@ -475,7 +496,8 @@ CalcPopD <- function(alignment = "alignment.fasta",
     cat("\nperforming jackknife")
     for (k in 1:replicate2) {
       if (k / 2 == round(k / 2)) cat(".")
-      drop_range <- drop.pos[k]:(drop.pos[k] + block.size)
+      # drop exactly block.size contiguous sites
+      drop_range <- drop.pos[k]:(drop.pos[k] + block.size - 1)
       sim.matrix <- alignment.matrix[, -drop_range]
       sim.d[k] <- dpop.calc(sim.matrix)[[1]]
     }

@@ -110,16 +110,20 @@ GetTipRates <- function(tree = NULL,
   }
 
   # ---- Reorder data to match tree tip order ----
+  # Every tip label must have a matching entry in tip.states
+  missing.tips <- setdiff(tree$tip.label, names(tip.states))
+  if (length(missing.tips) > 0) {
+    stop("\n Tip states are missing for the following tips: ",
+         paste(missing.tips, collapse = ", "))
+  }
+
   # Vectorized matching using match() instead of a for-loop
   hit <- match(tree$tip.label, names(tip.states))
   tip.states <- tip.states[hit]
 
   # Verify the reordering worked
-  print("Checking the order of tree tip labels and provided data.")
-  if (all(tree$tip.label == names(tip.states))) {
-    print("Tree tip labels and provided data are in the correct order.")
-  } else {
-    print("Tree tip labels and provided data are not in the correct order.")
+  if (!all(tree$tip.label == names(tip.states))) {
+    stop("\n Tree tip labels and provided data could not be aligned.")
   }
 
   # ---- Ancestral state reconstruction ----

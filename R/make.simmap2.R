@@ -85,10 +85,12 @@ make.simmap2 <- function(tree, x, model = "SYM", nsim = 1,
                           rejint = 1000000, ...) {
 
   # ---- Handle multiPhylo input ----
-  # If given multiple trees, apply make.simmap to each one
+  # If given multiple trees, apply make.simmap2 to each one so that
+  # rejmax/rejint/monitor are honored for every tree
   if (inherits(tree, "multiPhylo")) {
     ff <- function(yy, x, model, nsim, ...) {
-      zz <- make.simmap(yy, x, model, nsim, ...)
+      zz <- make.simmap2(yy, x, model, nsim, monitor = monitor,
+                         rejmax = rejmax, rejint = rejint, ...)
       if (nsim > 1) class(zz) <- NULL
       return(zz)
     }
@@ -210,6 +212,11 @@ make.simmap2 <- function(tree, x, model = "SYM", nsim = 1,
     else if (is.matrix(Q)) {
       XX <- getPars(bt, xx, model, Q = Q, tree, tol, m,
                     pi = pi, args = list(...))
+      # state-name indexing downstream requires dimnames on Q; if the
+      # user's matrix has none, assume states in the same order as the
+      # (sorted) data columns
+      if (is.null(dimnames(Q)))
+        dimnames(Q) <- list(colnames(XX$L), colnames(XX$L))
       L <- XX$L
       logL <- XX$loglik
       pi <- XX$pi
@@ -287,7 +294,10 @@ smap2 <- function(tree, x, N, m, root, L, Q, pi, logL,
 
   for (j in 1:nrow(tree$edge)) {
     # Draw end state conditioned on start state and data at descendant
-    p <- EXPM(Q * tree$edge.length[j])[as.numeric(NN[j, 1]), ] *
+    # NOTE: index by state NAME (character), never by as.numeric(state
+    # label) -- labels like "0"/"1" or chromosome numbers are not row
+    # numbers of Q
+    p <- EXPM(Q * tree$edge.length[j])[NN[j, 1], ] *
       L[as.character(tree$edge[j, 2]), ]
     NN[j, 2] <- rstate(p / sum(p))
     NN[which(tree$edge[, 1] == tree$edge[j, 2]), 1] <- NN[j, 2]
@@ -298,8 +308,8 @@ smap2 <- function(tree, x, N, m, root, L, Q, pi, logL,
     accept <- FALSE
     counter <- 0
     while (!accept) {
-      map <- sch(as.numeric(NN[j, 1]), tree$edge.length[j], Q)
-      if (counter == rejmax) {
+      map <- sch(NN[j, 1], tree$edge.length[j], Q)
+      if (!is.null(rejmax) && counter == rejmax) {
         # Give up on this branch -- mark as failed
         if (monitor == TRUE) {
           print(paste("sim", sim, ": branch", j, "of", nrow(tree$edge),
@@ -543,7 +553,8 @@ sch <- function(start, t, Q) {
   tol <- t * 1e-12
   dt <- setNames(0, start)
   while (sum(dt) < (t - tol)) {
-    s <- as.numeric(names(dt)[length(dt)])
+    # index Q by state NAME so arbitrary state labels work
+    s <- names(dt)[length(dt)]
     # Draw waiting time from exponential distribution
     dt[length(dt)] <- if (-Q[s, s] > 0) rexp(n = 1, rate = -Q[s, s]) else t - sum(dt)
     if (sum(dt) < (t - tol)) {

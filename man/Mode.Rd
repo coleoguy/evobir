@@ -18,4 +18,6 @@ Returns the most frequently occurring value in a vector.  R does not have
 a built-in mode function for data (its \code{mode()} returns storage type),
 so this simple helper fills that gap.
 }
-\keyword{internal}
+\examples{
+Mode(c(1, 2, 2, 3))
+}

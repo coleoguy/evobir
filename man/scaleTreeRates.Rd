@@ -55,7 +55,7 @@ Passed to \code{\link[phytools]{fitMk}}.  Default is
 \code{"fitzjohn"}.}
 }
 \value{
-A tree of class \code{c("phylo", "phyloscaled")} with an
+A tree of class \code{c("phyloscaled", "phylo")} with an
   additional \code{$scalar} element: a numeric vector (one value
   per edge) of rate multipliers.  Plot with
   \code{\link{plot.phyloscaled}}.

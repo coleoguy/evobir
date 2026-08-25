@@ -39,7 +39,7 @@
 #'   Passed to \code{\link[phytools]{fitMk}}.  Default is
 #'   \code{"fitzjohn"}.
 #'
-#' @return A tree of class \code{c("phylo", "phyloscaled")} with an
+#' @return A tree of class \code{c("phyloscaled", "phylo")} with an
 #'   additional \code{$scalar} element: a numeric vector (one value
 #'   per edge) of rate multipliers.  Plot with
 #'   \code{\link{plot.phyloscaled}}.
@@ -284,7 +284,26 @@ scaleTreeRates <- function(tree, tip.states, model, fixedQ = NULL,
     Q
   }
 
+  # Memoization cache for matrix exponentials.  During the main
+  # edge-scaling loop Q is fixed, so the product Q * t (and hence the
+  # cache key) is determined by the scaled edge length; the vast
+  # majority of EXPM calls are repeats of previously seen edge lengths.
+  # The cache is only enabled once Q is fixed (see below) so it is
+  # never polluted during the initial rate estimation, where Q varies.
+  expm.cache <- new.env(hash = TRUE, parent = emptyenv())
+  use.expm.cache <- FALSE
+
   EXPM <- function(x, ...) {
+    if (use.expm.cache) {
+      key <- paste(x, collapse = " ")
+      e_x <- expm.cache[[key]]
+      if (is.null(e_x)) {
+        e_x <- if (isSymmetric(x)) matexpo(x) else expm(x, ...)
+        expm.cache[[key]] <- e_x
+      }
+      dimnames(e_x) <- dimnames(x)
+      return(e_x)
+    }
     e_x <- if (isSymmetric(x)) matexpo(x) else expm(x, ...)
     dimnames(e_x) <- dimnames(x)
     e_x
@@ -326,6 +345,10 @@ scaleTreeRates <- function(tree, tip.states, model, fixedQ = NULL,
     }
     diag(Q) <- -rowSums(Q)
   }
+
+  # Q is now fixed for the remainder of the search: turn on the
+  # matrix-exponential cache (keyed on Q * scaled edge length)
+  use.expm.cache <- TRUE
 
   # ---- Define the scalar bins to test ----
   # Creates a symmetric set of bins around 1
@@ -403,14 +426,16 @@ scaleTreeRates <- function(tree, tip.states, model, fixedQ = NULL,
                                 fixedQ = Q)$logLik
     }
     max.final.lik <- max(final.liks)
-    max.index <- which(final.liks == max(final.liks))
+    max.index <- which.max(final.liks)
     final.start <- bins[max.index]
     final.tree <- trees[[max.index]]
     print(paste0("the best starting scalar is ", final.start,
                  ", associated logLik is ", max.final.lik))
   }
 
-  class(final.tree) <- c("phylo", "phyloscaled")
+  # "phyloscaled" must come FIRST so that plot() dispatches to
+  # plot.phyloscaled rather than ape::plot.phylo
+  class(final.tree) <- c("phyloscaled", "phylo")
   print(paste0("returning tree with scalar"))
   return(final.tree)
 }

@@ -41,6 +41,9 @@
 #'
 #' @export
 getNe <- function(males, females, locus = "A") {
+  # Validate locus so unrecognized values fail informatively rather
+  # than with "object 'ne' not found"
+  locus <- match.arg(locus, c("A", "X"))
   if (locus == "A") {
     # Autosomal: classic formula from Wright (1931)
     ne <- (4 * males * females) / (males + females)

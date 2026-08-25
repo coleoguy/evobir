@@ -49,21 +49,34 @@
 SampleTrees <- function(trees, burnin, final.number, format, prefix) {
   # Read the full collection of trees from the NEXUS file
   trees <- read.nexus(trees)
-  original.number <- as.numeric(length(trees))
+  original.number <- length(trees)
 
-  # Remove the burn-in portion (first burnin*N trees)
-  post.burnin.trees <- trees[(burnin * original.number):original.number]
+  # Validate burnin
+  if (!is.numeric(burnin) || burnin < 0 || burnin >= 1) {
+    stop("burnin must be a proportion in [0, 1)")
+  }
+
+  # Remove the burn-in portion (first floor(burnin*N) trees are
+  # discarded; the sample is drawn from the remaining trees)
+  post.burnin.trees <- trees[(floor(burnin * original.number) + 1):original.number]
+
+  # Validate the requested sample size
+  if (final.number > length(post.burnin.trees)) {
+    stop("final.number (", final.number,
+         ") exceeds the number of post-burn-in trees (",
+         length(post.burnin.trees), ")")
+  }
 
   # Randomly sample the desired number of post-burn-in trees
   final.trees <- sample(post.burnin.trees, final.number)
 
   # Save in the requested format
   if (format == "new") {
-    write.tree(final.trees, file = paste(prefix, ".nwk"))
+    write.tree(final.trees, file = paste0(prefix, ".nwk"))
     print("Your trees were saved in the Newick format")
   }
   if (format == "nex") {
-    write.nexus(final.trees, file = paste(prefix, ".nex"))
+    write.nexus(final.trees, file = paste0(prefix, ".nex"))
     print("Your trees were saved in the Nexus format")
   }
 }

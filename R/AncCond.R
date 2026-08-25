@@ -10,7 +10,7 @@
 # ============================================================================
 
 
-# ── Internal: analytical 2-state transition probabilities ──────────────────
+# -- Internal: analytical 2-state transition probabilities ------------------
 # Returns 2x2 matrix P[from+1, to+1] = P(to | from, t)
 # States are 0-indexed but matrix is 1-indexed.
 .tp2 <- function(q01, q10, t) {
@@ -28,14 +28,14 @@
 }
 
 
-# ── Internal: pruning algorithm (postorder) with log-rescaling ─────────────
+# -- Internal: pruning algorithm (postorder) with log-rescaling -------------
 # tree must already be reorder(tree, "postorder").
 # y: named 0/1 vector at tips (length n.tips).
 # Returns a list with:
-#   cl    — matrix cl[node, state+1] of rescaled conditional likelihoods
+#   cl    -- matrix cl[node, state+1] of rescaled conditional likelihoods
 #           (proportional within each node, suitable for posterior sampling)
-#   logL  — log-likelihood at root under flat prior
-.pruning2 <- function(tree, y, q01, q10) {
+#   logL  -- log-likelihood at root under flat prior
+.pruning2 <- function(tree, y, q01, q10, P.edges = NULL) {
   n.tips  <- length(tree$tip.label)
   n.total <- n.tips + tree$Nnode
   root    <- n.tips + 1L
@@ -53,7 +53,9 @@
   for (k in seq_len(nrow(edges))) {
     pa <- edges[k, 1L]
     ch <- edges[k, 2L]
-    P  <- .tp2(q01, q10, el[k])
+    # use the precomputed per-edge transition matrix when supplied
+    # (rates and edge lengths are constant across null simulations)
+    P  <- if (is.null(P.edges)) .tp2(q01, q10, el[k]) else P.edges[[k]]
     # contribution of child to parent's conditional likelihood
     c0 <- P[1, 1] * cl[ch, 1] + P[1, 2] * cl[ch, 2]
     c1 <- P[2, 1] * cl[ch, 1] + P[2, 2] * cl[ch, 2]
@@ -75,7 +77,7 @@
 }
 
 
-# ── Internal: fit 2-state Mk model ────────────────────────────────────────
+# -- Internal: fit 2-state Mk model ----------------------------------------
 # Fits bidirectional (ARD) and unidirectional (q10=0) models, returns the
 # AIC-preferred fit.  ARD uses L-BFGS-B with a rate floor to prevent
 # degenerate solutions where one rate collapses to ~0.
@@ -125,10 +127,10 @@
 }
 
 
-# ── Internal: simulate discrete tip states (batch) ─────────────────────────
+# -- Internal: simulate discrete tip states (batch) -------------------------
 # Simulates n.sims independent discrete trait datasets under Mk(q01,q10).
 # tree must be in cladewise (preorder) order.
-# Returns n.tips × n.sims integer matrix of 0/1 tip states.
+# Returns n.tips x n.sims integer matrix of 0/1 tip states.
 .simMk2 <- function(tree, q01, q10, n.sims) {
   n.tips  <- length(tree$tip.label)
   n.total <- n.tips + tree$Nnode
@@ -162,22 +164,23 @@
 }
 
 
-# ── Internal: sample ancestral states + compute test statistics ────────────
+# -- Internal: sample ancestral states + compute test statistics ------------
 # Samples n.maps stochastic ancestral-state configurations via preorder
 # traversal, identifies transition edges in both directions, and returns
 # the mean interpolated continuous trait value at transition points,
 # averaged across maps.
 #
 # Returns a list with:
-#   T.01 — mean interpolated continuous value at 0→1 transitions
-#   T.10 — mean interpolated continuous value at 1→0 transitions
+#   T.01 -- mean interpolated continuous value at 0->1 transitions
+#   T.10 -- mean interpolated continuous value at 1->0 transitions
 #
 # tree must be in cladewise order.
 # anc.x: numeric vector indexed by node number (1:n.total), continuous trait
 #         values at tips and ML estimates at internal nodes.
 # clik:  rescaled conditional likelihood matrix from .pruning2()$cl
-#         (n.total × 2). Only ratios matter for sampling, so rescaling is fine.
-.anccond.T <- function(tree, anc.x, clik, q01, q10, n.maps) {
+#         (n.total x 2). Only ratios matter for sampling, so rescaling is fine.
+.anccond.T <- function(tree, anc.x, clik, q01, q10, n.maps,
+                       P.edges = NULL) {
   n.tips  <- length(tree$tip.label)
   n.total <- n.tips + tree$Nnode
   root    <- n.tips + 1L
@@ -185,19 +188,19 @@
   el      <- tree$edge.length
   n.edges <- nrow(edges)
 
-  # ── Sample root (vectorised across maps) ──
+  # -- Sample root (vectorised across maps) --
   rp <- clik[root, ] * 0.5
   rp <- rp / sum(rp)
   states <- matrix(NA_integer_, n.total, n.maps)
   states[root, ] <- rbinom(n.maps, 1L, rp[2])
 
-  # ── Preorder traversal: sample child states ──
+  # -- Preorder traversal: sample child states --
   p1g0 <- numeric(n.edges)
   p1g1 <- numeric(n.edges)
 
   for (k in seq_len(n.edges)) {
     ch <- edges[k, 2L]
-    P  <- .tp2(q01, q10, el[k])
+    P  <- if (is.null(P.edges)) .tp2(q01, q10, el[k]) else P.edges[[k]]
     d0 <- P[1, 1] * clik[ch, 1] + P[1, 2] * clik[ch, 2]
     d1 <- P[2, 1] * clik[ch, 1] + P[2, 2] * clik[ch, 2]
     p1g0[k] <- if (d0 > 0) P[1, 2] * clik[ch, 2] / d0 else 0.5
@@ -211,21 +214,21 @@
     states[ch, ] <- rbinom(n.maps, 1L, prob1)
   }
 
-  # ── Identify transitions on each edge × map ──
-  pa.st <- states[edges[, 1], , drop = FALSE]  # n.edges × n.maps
+  # -- Identify transitions on each edge x map --
+  pa.st <- states[edges[, 1], , drop = FALSE]  # n.edges x n.maps
   ch.st <- states[edges[, 2], , drop = FALSE]
   is.01 <- (pa.st == 0L) & (ch.st == 1L)       # logical matrix
   is.10 <- (pa.st == 1L) & (ch.st == 0L)
 
-  # ── Interpolated values at transition points ──
-  # For 0→1: transition position drawn from truncated Exp(q01)
-  # For 1→0: transition position drawn from truncated Exp(q10)
+  # -- Interpolated values at transition points --
+  # For 0->1: transition position drawn from truncated Exp(q01)
+  # For 1->0: transition position drawn from truncated Exp(q10)
   u.mat <- matrix(runif(n.edges * n.maps), n.edges, n.maps)
 
   x.pa <- anc.x[edges[, 1]]   # n.edges
   x.ch <- anc.x[edges[, 2]]
 
-  # 0→1 interpolation
+  # 0->1 interpolation
   if (q01 > 1e-15) {
     d.mat.01 <- -log(1 - u.mat * (1 - exp(-q01 * el))) / (q01 * el)
   } else {
@@ -234,7 +237,7 @@
   d.mat.01[d.mat.01 < 0] <- 0; d.mat.01[d.mat.01 > 1] <- 1
   interp.01 <- x.pa * (1 - d.mat.01) + x.ch * d.mat.01
 
-  # 1→0 interpolation
+  # 1->0 interpolation
   if (q10 > 1e-15) {
     d.mat.10 <- -log(1 - u.mat * (1 - exp(-q10 * el))) / (q10 * el)
   } else {
@@ -243,7 +246,7 @@
   d.mat.10[d.mat.10 < 0] <- 0; d.mat.10[d.mat.10 > 1] <- 1
   interp.10 <- x.pa * (1 - d.mat.10) + x.ch * d.mat.10
 
-  # ── Mean ancestral condition at transition points, per map ──
+  # -- Mean ancestral condition at transition points, per map --
   T.01 <- numeric(n.maps)
   T.10 <- numeric(n.maps)
   for (m in seq_len(n.maps)) {
@@ -257,7 +260,7 @@
 }
 
 
-# ── Internal: map pruned-tree ancestral estimates to full tree ─────────────
+# -- Internal: map pruned-tree ancestral estimates to full tree -------------
 .map.pruned <- function(full.tree, pruned.tree, pruned.anc, obs.x) {
   n.f <- length(full.tree$tip.label)
   n.total.f <- n.f + full.tree$Nnode
@@ -294,7 +297,7 @@
 
 
 # ============================================================================
-# AncCond — main function
+# AncCond -- main function
 # ============================================================================
 #' Ancestral Condition Test
 #'
@@ -302,38 +305,38 @@
 #' extreme ancestral values of a continuous trait.
 #'
 #' @param tree   a phylo object (ape)
-#' @param x      named numeric vector — continuous trait at tips
-#' @param y      named integer vector — binary discrete trait (0/1) at tips
+#' @param x      named numeric vector -- continuous trait at tips
+#' @param y      named integer vector -- binary discrete trait (0/1) at tips
 #' @param n.maps number of stochastic maps per test-statistic computation
 #' @param n.sims number of null simulations
 #' @param prune  if TRUE, estimate continuous trait using only state-0 lineages
 #' @param Q      optional 2x2 rate matrix (rows/cols labelled "0","1"). If
-#'               supplied, the Mk model is NOT fitted — the provided rates
+#'               supplied, the Mk model is NOT fitted -- the provided rates
 #'               are used directly for stochastic mapping and null simulation.
 #'               Useful when the user has a preferred model or wants to avoid
 #'               automatic model selection.
 #' @param hypothesis direction of the alternative hypothesis. One of:
-#'               "none"   — two-sided test (default): p = min(1, 2 * min(p.upper, p.lower))
-#'               "higher" — one-sided: transitions occur at HIGH continuous values (p = p.upper)
-#'               "lower"  — one-sided: transitions occur at LOW continuous values (p = p.lower)
+#'               "none"   -- two-sided test (default): p = min(1, 2 * min(p.upper, p.lower))
+#'               "higher" -- one-sided: transitions occur at HIGH continuous values (p = p.upper)
+#'               "lower"  -- one-sided: transitions occur at LOW continuous values (p = p.lower)
 #'
 #' @return A list of class "anccond" with elements:
-#'   T.obs.01   — observed mean continuous value at 0→1 transitions
-#'   T.obs.10   — observed mean continuous value at 1→0 transitions
-#'   p.01       — p-value for 0→1 transitions (adjusted per hypothesis)
-#'   p.10       — p-value for 1→0 transitions (adjusted per hypothesis)
-#'   p.combined — Bonferroni-corrected p-value across both transition
+#'   T.obs.01   -- observed mean continuous value at 0->1 transitions
+#'   T.obs.10   -- observed mean continuous value at 1->0 transitions
+#'   p.01       -- p-value for 0->1 transitions (adjusted per hypothesis)
+#'   p.10       -- p-value for 1->0 transitions (adjusted per hypothesis)
+#'   p.combined -- Bonferroni-corrected p-value across both transition
 #'                directions: min(1, 2 * min(p.01, p.10)). Use this when
 #'                interpreting both p.01 and p.10 as independent tests.
-#'   p.upper.01 — one-sided P(T_null >= T_obs) for 0→1
-#'   p.lower.01 — one-sided P(T_null <= T_obs) for 0→1
-#'   p.upper.10 — one-sided P(T_null >= T_obs) for 1→0
-#'   p.lower.10 — one-sided P(T_null <= T_obs) for 1→0
-#'   T.null.01  — null distribution for 0→1 (length n.sims)
-#'   T.null.10  — null distribution for 1→0 (length n.sims)
-#'   Q          — fitted rate matrix
-#'   model      — "ARD", "unidirectional", or "user-supplied"
-#'   hypothesis — hypothesis direction used
+#'   p.upper.01 -- one-sided P(T_null >= T_obs) for 0->1
+#'   p.lower.01 -- one-sided P(T_null <= T_obs) for 0->1
+#'   p.upper.10 -- one-sided P(T_null >= T_obs) for 1->0
+#'   p.lower.10 -- one-sided P(T_null <= T_obs) for 1->0
+#'   T.null.01  -- null distribution for 0->1 (length n.sims)
+#'   T.null.10  -- null distribution for 1->0 (length n.sims)
+#'   Q          -- fitted rate matrix
+#'   model      -- "ARD", "unidirectional", or "user-supplied"
+#'   hypothesis -- hypothesis direction used
 #'
 #' @examples
 #' \dontrun{
@@ -357,7 +360,7 @@ AncCond <- function(tree, x, y,
   n.tips  <- length(tree$tip.label)
   n.total <- n.tips + tree$Nnode
 
-  # ── Match data to tree ──
+  # -- Match data to tree --
   if (is.null(names(x)) || is.null(names(y)))
     stop("x and y must be named vectors matching tree$tip.label")
   x <- x[tree$tip.label]
@@ -367,7 +370,7 @@ AncCond <- function(tree, x, y,
   y <- as.integer(y)
   if (!all(y %in% 0:1)) stop("y must be binary (0 and 1)")
 
-  # ── Step 1: Continuous trait ancestral reconstruction ──
+  # -- Step 1: Continuous trait ancestral reconstruction --
   if (prune) {
     keep <- tree$tip.label[y == 0L]
     if (length(keep) < 3L) stop("Pruning leaves fewer than 3 tips in state 0")
@@ -381,7 +384,7 @@ AncCond <- function(tree, x, y,
     anc.x[(n.tips + 1):n.total] <- anc.est[as.character((n.tips + 1):n.total)]
   }
 
-  # ── Step 2: Mk rates (fit or user-supplied) ──
+  # -- Step 2: Mk rates (fit or user-supplied) --
   tree.po <- reorder(tree, "postorder")
   if (!is.null(Q)) {
     # user-supplied Q matrix: extract rates, skip model selection
@@ -398,7 +401,7 @@ AncCond <- function(tree, x, y,
     q10 <- mk$q10
   }
 
-  # ── Step 3–5: Empirical test statistics (both directions) ──
+  # -- Step 3-5: Empirical test statistics (both directions) --
   tree.pre <- reorder(tree, "cladewise")
   prun.obs <- .pruning2(tree.po, y, q01, q10)
   T.obs    <- .anccond.T(tree.pre, anc.x, prun.obs$cl, q01, q10, n.maps)
@@ -406,7 +409,7 @@ AncCond <- function(tree, x, y,
   T.obs.01 <- T.obs$T.01
   T.obs.10 <- T.obs$T.10
 
-  # ── Guard: no transitions in observed data ──
+  # -- Guard: no transitions in observed data --
   if (!is.finite(T.obs.01) && !is.finite(T.obs.10)) {
     warning("No transitions detected in stochastic maps of observed data; ",
             "returning NA p-values. Consider whether the binary trait has ",
@@ -428,20 +431,26 @@ AncCond <- function(tree, x, y,
     return(out)
   }
 
-  # ── Null distribution ──
+  # -- Null distribution --
   y.sims <- .simMk2(tree.pre, q01, q10, n.sims)
+
+  # Precompute per-edge transition matrices once: rates and edge
+  # lengths do not change across the n.sims null replicates
+  P.po  <- lapply(tree.po$edge.length,  function(t) .tp2(q01, q10, t))
+  P.pre <- lapply(tree.pre$edge.length, function(t) .tp2(q01, q10, t))
 
   T.null.01 <- numeric(n.sims)
   T.null.10 <- numeric(n.sims)
   for (b in seq_len(n.sims)) {
     y.b   <- y.sims[, b]
-    prun.b <- .pruning2(tree.po, y.b, q01, q10)
-    T.b   <- .anccond.T(tree.pre, anc.x, prun.b$cl, q01, q10, n.maps)
+    prun.b <- .pruning2(tree.po, y.b, q01, q10, P.edges = P.po)
+    T.b   <- .anccond.T(tree.pre, anc.x, prun.b$cl, q01, q10, n.maps,
+                        P.edges = P.pre)
     T.null.01[b] <- T.b$T.01
     T.null.10[b] <- T.b$T.10
   }
 
-  # ── p-values (with continuity correction) ──
+  # -- p-values (with continuity correction) --
   .pvals <- function(T.obs, T.null) {
     T.valid <- T.null[is.finite(T.null)]
     nv <- length(T.valid)
@@ -461,7 +470,7 @@ AncCond <- function(tree, x, y,
   pv.01 <- .pvals(T.obs.01, T.null.01)
   pv.10 <- .pvals(T.obs.10, T.null.10)
 
-  # ── Compute final p-values based on hypothesis direction ──
+  # -- Compute final p-values based on hypothesis direction --
   .final.p <- function(p.upper, p.lower, hypothesis) {
     switch(hypothesis,
       higher = p.upper,
@@ -502,7 +511,7 @@ AncCond <- function(tree, x, y,
 }
 
 
-# ── print method ───────────────────────────────────────────────────────────
+# -- print method -----------------------------------------------------------
 print.anccond <- function(x, ...) {
   hyp.label <- switch(x$hypothesis,
     none   = "two-sided (2 * min of one-sided p-values)",
@@ -510,7 +519,7 @@ print.anccond <- function(x, ...) {
     lower  = "one-sided (transitions at LOW values)"
   )
   cat("\nAncestral Condition Test\n")
-  cat("─────────────────────────────────────\n")
+  cat("-------------------------------------\n")
   cat("Mk model:    ", x$model, "\n")
   cat("  q01 =", formatC(x$Q[1,2], digits = 4, format = "f"), "\n")
   cat("  q10 =", formatC(x$Q[2,1], digits = 4, format = "f"), "\n")
@@ -518,12 +527,12 @@ print.anccond <- function(x, ...) {
   cat("Null sims:   ", x$n.sims, "\n")
   cat("Pruned:      ", x$prune, "\n")
   cat("Hypothesis:  ", hyp.label, "\n\n")
-  cat("0→1 transitions (gains):\n")
+  cat("0->1 transitions (gains):\n")
   cat("  T.obs =", formatC(x$T.obs.01, digits = 4, format = "f"), "\n")
   cat("  p     =", formatC(x$p.01, digits = 4, format = "f"), "\n")
   cat("  p (upper) =", formatC(x$p.upper.01, digits = 4, format = "f"),
       "  p (lower) =", formatC(x$p.lower.01, digits = 4, format = "f"), "\n\n")
-  cat("1→0 transitions (losses):\n")
+  cat("1->0 transitions (losses):\n")
   cat("  T.obs =", formatC(x$T.obs.10, digits = 4, format = "f"), "\n")
   cat("  p     =", formatC(x$p.10, digits = 4, format = "f"), "\n")
   cat("  p (upper) =", formatC(x$p.upper.10, digits = 4, format = "f"),
@@ -532,6 +541,6 @@ print.anccond <- function(x, ...) {
   cat("  p.combined =", formatC(x$p.combined, digits = 4, format = "f"), "\n")
   cat("  Note: use p.combined if interpreting both p.01\n")
   cat("  and p.10 as independent tests from the same data.\n")
-  cat("─────────────────────────────────────\n")
+  cat("-------------------------------------\n")
   invisible(x)
 }

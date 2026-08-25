@@ -63,6 +63,10 @@
 #' @export
 ResSel <- function(data, traits, percent = 10, identifier = 1,
                    model = "linear") {
+  # Only linear models are currently supported; error informatively
+  # rather than silently ignoring the argument
+  model <- match.arg(model, "linear")
+
   # Fit a linear model: trait2 ~ trait1
   lm.norm <- lm(data[, traits[2]] ~ data[, traits[1]])
 
@@ -72,18 +76,19 @@ ResSel <- function(data, traits, percent = 10, identifier = 1,
   # Identify individuals in the upper and lower tails
   # "high line" = individuals whose trait2 is higher than predicted
   # "low line" = individuals whose trait2 is lower than predicted
-  high <- data[foo > (nrow(data) - (nrow(data) * 0.01 * percent)), identifier]
-  low  <- data[foo < (nrow(data) * 0.01 * percent), identifier]
+  # Both tails select the same number of individuals (symmetric cutoffs)
+  n.sel <- nrow(data) * 0.01 * percent
+  high <- data[foo > (nrow(data) - n.sel), identifier]
+  low  <- data[foo <= n.sel, identifier]
 
   # ---- Visualization ----
   # Gray dots = all individuals, blue = high line, red = low line
-  plot(data[, traits[1]:traits[2]], pch = 19, cex = 0.5,
+  # Use traits directly (columns need not be adjacent or ascending)
+  plot(data[, traits], pch = 19, cex = 0.5,
        main = paste("Top and Bottom ", percent, "%", sep = ""), col = "gray")
-  points(data[foo > (nrow(data) - (nrow(data) * 0.01 * percent)),
-              traits[1]:traits[2]],
+  points(data[foo > (nrow(data) - n.sel), traits],
          col = "blue", pch = 19, cex = 1.1)
-  points(data[foo < (nrow(data) * 0.01 * percent),
-              traits[1]:traits[2]],
+  points(data[foo <= n.sel, traits],
          col = "red", pch = 19, cex = 1.1)
   abline(lm.norm, col = 'orange', lwd = 5)
 

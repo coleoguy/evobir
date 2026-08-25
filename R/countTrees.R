@@ -62,7 +62,11 @@ countTrees <- function(collection = NULL, ref = NULL, classes = TRUE,
   # Read tree collections
   trees <- read.tree(collection)
   types <- read.tree(ref)
-  class(types) <- "multiPhylo"
+  # Normalize single-tree files: read.tree returns a "phylo" object for
+  # one tree; wrap it so trees[[i]]/types[[i]] index whole trees rather
+  # than tree components
+  if (inherits(trees, "phylo")) trees <- c(trees)
+  if (inherits(types, "phylo")) types <- c(types)
   top.num <- length(types)
 
   # Storage for classifications

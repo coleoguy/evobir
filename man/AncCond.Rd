@@ -10,9 +10,9 @@ AncCond(tree,
         x, 
         y,
         n.maps = 100, 
-        n.sims = 500, 
+        n.sims = 1000, 
         prune = FALSE,
-        Q = c(0,2,1,0),
+        Q = NULL,
         hypothesis = "none")
 }
 \arguments{

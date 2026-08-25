@@ -45,7 +45,7 @@
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom viridis viridis
 #' @importFrom ape plot.phylo
-#' @exportS3Method base::plot phyloscaled
+#' @exportS3Method plot phyloscaled
 plot.phyloscaled <- function(x, method = "multiply", palette = "RdYlGn",
                              edge.width = 1, cex = 1,
                              show.tip.label = TRUE, ...) {

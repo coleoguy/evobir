@@ -66,7 +66,15 @@ SuperMatrix <- function(missing = "-",
   # ---- Find and read alignment files ----
   file.names <- list.files()
   if (input != "") {
-    file.names <- grep(input, file.names, value = TRUE)
+    # fixed = TRUE: treat input as a literal substring, not a regex
+    file.names <- grep(input, file.names, value = TRUE, fixed = TRUE)
+  }
+  # Never read this function's own output files (e.g., from a previous
+  # run in the same directory): the supermatrix, the partition CSV, and
+  # padded per-gene outputs all begin with the output prefix
+  file.names <- file.names[!startsWith(file.names, prefix)]
+  if (length(file.names) == 0) {
+    stop("no alignment files found matching input = \"", input, "\"")
   }
 
   # Read each alignment file into a list
