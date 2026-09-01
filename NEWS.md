@@ -1,5 +1,20 @@
 # evobiR 2.2.1
 
+## New features
+
+* `AncCond()` accepts missing data: `x` and `y` may each be observed on
+  any subset of tips, including disjoint subsets (previously any missing
+  value was an error). Tips without `y` are marginalised in the Mk
+  likelihood and the stochastic maps, and null simulations are masked to
+  the observed missingness pattern. Nodes without a direct continuous
+  estimate receive the Brownian-motion conditional expectation given the
+  `x`-bearing tips (branch-length interpolation along the pruned-tree
+  edge; attachment-point value for dataless subtrees). The result gains an
+  `n.obs` element. Note for `prune = TRUE`: nodes in state-1 subtrees now
+  take this conditional expectation instead of the previous fallback,
+  which used a `fastAnc` fit to all tips including the state-1 lineages
+  that `prune` is meant to exclude.
+
 ## Bug fixes
 
 * `make.simmap2()` now indexes the transition matrix by character state

@@ -6,6 +6,11 @@
 # by holding the continuous trait fixed and simulating discrete traits under
 # the fitted Mk model.
 #
+# Missing data: x and y may each be observed on any subset of tips (including
+# disjoint subsets). Tips lacking y are marginalised in the Mk likelihood and
+# in stochastic mapping; tips lacking x are given their BM conditional
+# expectation from the tips that do carry x (see .anc.subset).
+#
 # Dependencies: ape, phytools (for fastAnc only)
 # ============================================================================
 
@@ -30,7 +35,10 @@
 
 # -- Internal: pruning algorithm (postorder) with log-rescaling -------------
 # tree must already be reorder(tree, "postorder").
-# y: named 0/1 vector at tips (length n.tips).
+# y: 0/1 vector at tips in tree$tip.label order (length n.tips). NA marks an
+#    unobserved tip: its conditional likelihood is (1, 1), which marginalises
+#    the tip out (identical to the likelihood of the tree with that tip
+#    dropped).
 # Returns a list with:
 #   cl    -- matrix cl[node, state+1] of rescaled conditional likelihoods
 #           (proportional within each node, suitable for posterior sampling)
@@ -43,9 +51,10 @@
   el      <- tree$edge.length
 
   cl <- matrix(1, n.total, 2)
-  # tips: indicator at observed state
-  cl[1:n.tips, ] <- 0
-  for (i in seq_len(n.tips)) cl[i, y[i] + 1L] <- 1
+  # observed tips: indicator at observed state; NA tips stay (1, 1)
+  obs <- which(!is.na(y[seq_len(n.tips)]))
+  cl[obs, ] <- 0
+  cl[cbind(obs, y[obs] + 1L)] <- 1
 
   # log-scaling constant accumulated over internal nodes
   log.scale <- 0
@@ -260,38 +269,124 @@
 }
 
 
-# -- Internal: map pruned-tree ancestral estimates to full tree -------------
-.map.pruned <- function(full.tree, pruned.tree, pruned.anc, obs.x) {
-  n.f <- length(full.tree$tip.label)
-  n.total.f <- n.f + full.tree$Nnode
-  n.p <- length(pruned.tree$tip.label)
+# -- Internal: continuous-trait reconstruction from a subset of tips --------
+# x.obs: named numeric vector over the tips that carry continuous data (any
+#        subset of tree$tip.label, at least 3 tips).
+# Returns anc.x indexed by full-tree node number (1:n.total).
+#
+# The tree is pruned to the tips in x.obs and fastAnc gives the BM ML
+# estimate at every pruned-tree node; those are copied onto the matching
+# full-tree nodes (tips with data, and internal nodes that are MRCAs of
+# >= 2 data-bearing child clades). Every remaining full-tree node lies
+# either (a) on a pruned-tree edge A->B, with exactly one data-bearing child
+# clade, or (b) inside a subtree with no data. Under BM the conditional
+# expectation given the data is, for (a), the branch-length-weighted linear
+# interpolation between the A and B estimates (a Brownian bridge, because
+# conditional on x_A and x_B the node is independent of the rest of the
+# data), and for (b) the value at the point where the dataless subtree
+# attaches, since BM has no drift. Nodes above the pruned root inherit the
+# pruned-root estimate for the same reason. Because the test statistic is a
+# mean of x at transition points, plugging in these conditional expectations
+# is the natural treatment of unmeasured lineages.
+.anc.subset <- function(tree, x.obs) {
+  n.tips  <- length(tree$tip.label)
+  n.total <- n.tips + tree$Nnode
+  keep    <- tree$tip.label[tree$tip.label %in% names(x.obs)]
+  if (length(keep) < 3L)
+    stop("Fewer than 3 tips are available for continuous-trait reconstruction")
 
-  anc.x <- numeric(n.total.f)
-  anc.x[1:n.f] <- obs.x[full.tree$tip.label]
-  anc.x[(n.f + 1):n.total.f] <- NA_real_
+  anc.x <- rep(NA_real_, n.total)
+  anc.x[match(keep, tree$tip.label)] <- x.obs[keep]
 
-  # map each pruned-tree internal node to the corresponding full-tree node
-  for (nd in (n.p + 1):(n.p + pruned.tree$Nnode)) {
-    desc <- ape::extract.clade(pruned.tree, nd)$tip.label
-    if (length(desc) >= 2L) {
-      fnode <- ape::getMRCA(full.tree, desc)
+  # complete data: plain fastAnc on the full tree
+  if (length(keep) == n.tips) {
+    est <- phytools::fastAnc(tree, x.obs[tree$tip.label])
+    anc.x[(n.tips + 1):n.total] <- est[as.character((n.tips + 1):n.total)]
+    return(anc.x)
+  }
+
+  pruned <- ape::drop.tip(tree, setdiff(tree$tip.label, keep))
+  est    <- phytools::fastAnc(pruned, x.obs[pruned$tip.label])
+
+  # -- Match pruned internal nodes to full-tree nodes --
+  # Each internal node is keyed by the sorted set of "representative" data
+  # tips (the smallest data-tip index in each data-bearing child clade). The
+  # partition of a clade into child clades is unique to that node, so keys
+  # are unique within a tree and identical for the same clade in both trees.
+  .node.keys <- function(tr, tip.rank) {
+    nt  <- length(tr$tip.label)
+    ntot <- nt + tr$Nnode
+    tr.po <- reorder(tr, "postorder")
+    e   <- tr.po$edge
+    rt <- c(tip.rank, rep(NA_integer_, tr$Nnode))   # representative tip
+    n.meas <- c(as.integer(!is.na(tip.rank)), integer(tr$Nnode))
+    for (k in seq_len(nrow(e))) {
+      pa <- e[k, 1L]; ch <- e[k, 2L]
+      n.meas[pa] <- n.meas[pa] + n.meas[ch]
+      if (!is.na(rt[ch]) && (is.na(rt[pa]) || rt[ch] < rt[pa]))
+        rt[pa] <- rt[ch]
+    }
+    kids <- split(rt[e[, 2L]], factor(e[, 1L], levels = (nt + 1):ntot))
+    keys <- vapply(kids, function(r) {
+      r <- sort(r[!is.na(r)])
+      if (length(r) >= 2L) paste(r, collapse = "_") else NA_character_
+    }, character(1))
+    list(keys = keys, n.meas = n.meas)
+  }
+  tip.rank.full <- match(tree$tip.label, pruned$tip.label)      # NA if no x
+  tip.rank.prun <- seq_along(pruned$tip.label)
+  kf <- .node.keys(tree,   tip.rank.full)
+  kp <- .node.keys(pruned, tip.rank.prun)
+  n.meas <- kf$n.meas
+  hit <- match(kf$keys, kp$keys)          # pruned internal-node index, per full internal node
+  full.int <- (n.tips + 1):n.total
+  prun.int <- length(pruned$tip.label) + hit[!is.na(hit)]
+  anc.x[full.int[!is.na(hit)]] <- est[as.character(prun.int)]
+
+  is.pnode <- !is.na(anc.x)
+
+  # -- Nearest pruned-tree descendant (B) of every on-path node, postorder --
+  tree.po <- reorder(tree, "postorder")
+  e.po <- tree.po$edge; el.po <- tree.po$edge.length
+  B  <- ifelse(is.pnode, seq_len(n.total), 0L)
+  dB <- numeric(n.total)
+  for (k in seq_len(nrow(e.po))) {
+    pa <- e.po[k, 1L]; ch <- e.po[k, 2L]
+    if (!is.pnode[pa] && n.meas[ch] > 0L) {
+      B[pa]  <- B[ch]
+      dB[pa] <- dB[ch] + el.po[k]
+    }
+  }
+
+  # -- Fill remaining nodes in preorder --
+  tree.pre <- reorder(tree, "cladewise")
+  e.pre <- tree.pre$edge; el.pre <- tree.pre$edge.length
+  root <- n.tips + 1L
+  A  <- integer(n.total)   # nearest pruned-tree ancestor-or-self (0 = none)
+  dA <- numeric(n.total)
+  if (is.pnode[root]) {
+    A[root] <- root
+  } else {
+    anc.x[root] <- anc.x[B[root]]   # above the pruned root: no drift
+  }
+  for (k in seq_len(nrow(e.pre))) {
+    pa <- e.pre[k, 1L]; ch <- e.pre[k, 2L]
+    if (is.pnode[ch]) {
+      A[ch] <- ch
+    } else if (n.meas[ch] == 0L) {
+      anc.x[ch] <- anc.x[pa]        # dataless subtree: attachment value
     } else {
-      fnode <- full.tree$edge[
-        which(full.tree$edge[, 2] == match(desc, full.tree$tip.label)), 1]
-    }
-    nm <- as.character(nd)
-    if (nm %in% names(pruned.anc)) anc.x[fnode] <- pruned.anc[nm]
-  }
-
-  # fallback: any unmapped internal nodes get the full-tree estimate
-  na.nodes <- which(is.na(anc.x))
-  if (length(na.nodes) > 0L) {
-    full.anc <- phytools::fastAnc(full.tree, obs.x[full.tree$tip.label])
-    for (nd in na.nodes) {
-      nm <- as.character(nd)
-      if (nm %in% names(full.anc)) anc.x[nd] <- full.anc[nm]
+      A[ch]  <- A[pa]
+      dA[ch] <- dA[pa] + el.pre[k]
+      if (A[ch] == 0L) {
+        anc.x[ch] <- anc.x[B[ch]]
+      } else {
+        f <- dA[ch] / (dA[ch] + dB[ch])
+        anc.x[ch] <- (1 - f) * anc.x[A[ch]] + f * anc.x[B[ch]]
+      }
     }
   }
+  if (anyNA(anc.x)) stop("Internal error: unfilled nodes in .anc.subset")
   anc.x
 }
 
@@ -305,11 +400,16 @@
 #' extreme ancestral values of a continuous trait.
 #'
 #' @param tree   a phylo object (ape)
-#' @param x      named numeric vector -- continuous trait at tips
-#' @param y      named integer vector -- binary discrete trait (0/1) at tips
+#' @param x      named numeric vector -- continuous trait at tips. Tips may be
+#'               absent from x or NA; at least 3 tips must carry data.
+#' @param y      named integer vector -- binary discrete trait (0/1) at tips.
+#'               Tips may be absent from y or NA; both states must be present
+#'               among observed tips. x and y need not be observed on the same
+#'               tips.
 #' @param n.maps number of stochastic maps per test-statistic computation
 #' @param n.sims number of null simulations
-#' @param prune  if TRUE, estimate continuous trait using only state-0 lineages
+#' @param prune  if TRUE, estimate the continuous trait using only lineages
+#'               observed in state 0 (tips with unknown y are excluded)
 #' @param Q      optional 2x2 rate matrix (rows/cols labelled "0","1"). If
 #'               supplied, the Mk model is NOT fitted -- the provided rates
 #'               are used directly for stochastic mapping and null simulation.
@@ -319,6 +419,13 @@
 #'               "none"   -- two-sided test (default): p = min(1, 2 * min(p.upper, p.lower))
 #'               "higher" -- one-sided: transitions occur at HIGH continuous values (p = p.upper)
 #'               "lower"  -- one-sided: transitions occur at LOW continuous values (p = p.lower)
+#'
+#' @details Tips without y are marginalised out of the Mk likelihood and the
+#'   stochastic maps (their state is sampled from the posterior), and the
+#'   null simulations are masked to the same missingness pattern. Tips and
+#'   nodes without a direct continuous-trait estimate receive their Brownian
+#'   motion conditional expectation given the tips that carry x (linear
+#'   interpolation along the pruned-tree edge on which they sit).
 #'
 #' @return A list of class "anccond" with elements:
 #'   T.obs.01   -- observed mean continuous value at 0->1 transitions
@@ -337,6 +444,7 @@
 #'   Q          -- fitted rate matrix
 #'   model      -- "ARD", "unidirectional", or "user-supplied"
 #'   hypothesis -- hypothesis direction used
+#'   n.obs      -- named vector: tips in the tree, tips with x, tips with y
 #'
 #' @examples
 #' \dontrun{
@@ -347,6 +455,8 @@
 #'   res <- AncCond(tree, x, y, n.maps = 50, n.sims = 500)
 #'   res$p.upper.01   # 0->1 transitions at high values
 #'   res$p.upper.10   # 1->0 transitions at high values
+#'   # x and y measured on different species
+#'   res2 <- AncCond(tree, x[1:60], y[41:100], n.maps = 50, n.sims = 500)
 #' }
 AncCond <- function(tree, x, y,
                     n.maps     = 100,
@@ -360,29 +470,29 @@ AncCond <- function(tree, x, y,
   n.tips  <- length(tree$tip.label)
   n.total <- n.tips + tree$Nnode
 
-  # -- Match data to tree --
+  # -- Match data to tree (tips absent from x or y become NA) --
   if (is.null(names(x)) || is.null(names(y)))
     stop("x and y must be named vectors matching tree$tip.label")
-  x <- x[tree$tip.label]
-  y <- y[tree$tip.label]
-  if (any(is.na(x)) || any(is.na(y)))
-    stop("All tips must have non-missing values for x and y")
+  if (!any(names(x) %in% tree$tip.label) || !any(names(y) %in% tree$tip.label))
+    stop("names of x and y do not match tree$tip.label")
+  x <- as.numeric(x[tree$tip.label]); names(x) <- tree$tip.label
+  y <- y[tree$tip.label];             names(y) <- tree$tip.label
+  has.x <- !is.na(x)
+  has.y <- !is.na(y)
+  if (sum(has.x) < 3L) stop("At least 3 tips must have continuous trait data")
+  if (!all(y[has.y] %in% 0:1)) stop("y must be binary (0 and 1)")
   y <- as.integer(y)
-  if (!all(y %in% 0:1)) stop("y must be binary (0 and 1)")
+  if (length(unique(y[has.y])) < 2L)
+    stop("Both states of y must be observed in at least one tip")
+  n.obs <- c(tree = n.tips, x = sum(has.x), y = sum(has.y))
 
   # -- Step 1: Continuous trait ancestral reconstruction --
-  if (prune) {
-    keep <- tree$tip.label[y == 0L]
-    if (length(keep) < 3L) stop("Pruning leaves fewer than 3 tips in state 0")
-    pruned.tree <- ape::drop.tip(tree, setdiff(tree$tip.label, keep))
-    pruned.anc  <- phytools::fastAnc(pruned.tree, x[keep])
-    anc.x <- .map.pruned(tree, pruned.tree, pruned.anc, x)
-  } else {
-    anc.est <- phytools::fastAnc(tree, x)
-    anc.x <- numeric(n.total)
-    anc.x[1:n.tips] <- x
-    anc.x[(n.tips + 1):n.total] <- anc.est[as.character((n.tips + 1):n.total)]
-  }
+  # prune: use only lineages known to be in state 0; unknown-y tips are
+  # excluded as well because they may carry the derived state
+  keep <- if (prune) has.x & has.y & (y == 0L) else has.x
+  if (prune && sum(keep) < 3L)
+    stop("Pruning leaves fewer than 3 tips with x observed in state 0")
+  anc.x <- .anc.subset(tree, x[keep])
 
   # -- Step 2: Mk rates (fit or user-supplied) --
   tree.po <- reorder(tree, "postorder")
@@ -400,6 +510,8 @@ AncCond <- function(tree, x, y,
     q01 <- mk$q01
     q10 <- mk$q10
   }
+  Qmat <- matrix(c(-q01, q01, q10, -q10), 2, 2,
+                 dimnames = list(c("0","1"), c("0","1")))
 
   # -- Step 3-5: Empirical test statistics (both directions) --
   tree.pre <- reorder(tree, "cladewise")
@@ -414,8 +526,6 @@ AncCond <- function(tree, x, y,
     warning("No transitions detected in stochastic maps of observed data; ",
             "returning NA p-values. Consider whether the binary trait has ",
             "enough transitions for a meaningful test.")
-    Qmat <- matrix(c(-q01, q01, q10, -q10), 2, 2,
-                   dimnames = list(c("0","1"), c("0","1")))
     out <- list(
       T.obs.01   = NA_real_, T.obs.10   = NA_real_,
       p.01       = NA_real_, p.10       = NA_real_,
@@ -425,14 +535,17 @@ AncCond <- function(tree, x, y,
       T.null.01  = rep(NA_real_, n.sims),
       T.null.10  = rep(NA_real_, n.sims),
       Q = Qmat, model = mk$model, n.maps = n.maps, n.sims = n.sims,
-      prune = prune, hypothesis = hypothesis
+      prune = prune, hypothesis = hypothesis, n.obs = n.obs
     )
     class(out) <- "anccond"
     return(out)
   }
 
   # -- Null distribution --
+  # Simulate on every tip, then mask to the observed missingness pattern so
+  # the null carries the same information as the data
   y.sims <- .simMk2(tree.pre, q01, q10, n.sims)
+  y.sims[!has.y, ] <- NA_integer_
 
   # Precompute per-edge transition matrices once: rates and edge
   # lengths do not change across the n.sims null replicates
@@ -485,8 +598,6 @@ AncCond <- function(tree, x, y,
   p.combined <- min(1, 2 * min(p.01, p.10, na.rm = TRUE))
   if (!is.finite(p.combined)) p.combined <- NA_real_
 
-  Qmat <- matrix(c(-q01, q01, q10, -q10), 2, 2,
-                 dimnames = list(c("0","1"), c("0","1")))
   out <- list(
     T.obs.01   = T.obs.01,
     T.obs.10   = T.obs.10,
@@ -504,7 +615,8 @@ AncCond <- function(tree, x, y,
     n.maps     = n.maps,
     n.sims     = n.sims,
     prune      = prune,
-    hypothesis = hypothesis
+    hypothesis = hypothesis,
+    n.obs      = n.obs
   )
   class(out) <- "anccond"
   out
@@ -520,6 +632,9 @@ print.anccond <- function(x, ...) {
   )
   cat("\nAncestral Condition Test\n")
   cat("-------------------------------------\n")
+  if (!is.null(x$n.obs))
+    cat("Tips:        ", x$n.obs["tree"], " (x observed: ", x$n.obs["x"],
+        ", y observed: ", x$n.obs["y"], ")\n", sep = "")
   cat("Mk model:    ", x$model, "\n")
   cat("  q01 =", formatC(x$Q[1,2], digits = 4, format = "f"), "\n")
   cat("  q10 =", formatC(x$Q[2,1], digits = 4, format = "f"), "\n")
