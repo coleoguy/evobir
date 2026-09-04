@@ -51,6 +51,15 @@ seed <- read.csv(file.path(proj_dir, "data", "seed_pool.csv"),
 stopifnot(all(c("inst_key", "institution", "unitid", "openalex_query",
                 "dept_regex", "phd_program_regex", "ai_bio_verdict") %in% names(seed)))
 tamu_key <- "tamu"
+## BIOLAI_KEYS="tamu,purdue,ncstate" restricts every pull to a subset of the
+## seed pool. Used for the sleuthing pass (TAMU plus the seven finalists and
+## alternates) so the OpenAlex pull takes minutes, not hours.
+if (nzchar(Sys.getenv("BIOLAI_KEYS"))) {
+  keep <- trimws(strsplit(Sys.getenv("BIOLAI_KEYS"), ",")[[1]])
+  stopifnot(all(keep %in% seed$inst_key))
+  seed <- seed[seed$inst_key %in% keep, ]
+  message("seed pool restricted to: ", paste(seed$inst_key, collapse = ", "))
+}
 
 ## ---- helpers ---------------------------------------------------------------
 

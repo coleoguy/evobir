@@ -36,9 +36,19 @@ oa_filter_domain <- "primary_topic.domain.id:1"
 if (any(is.na(seed$openalex_id))) {
   for (i in which(is.na(seed$openalex_id))) {
     r <- get_json(sprintf("https://api.openalex.org/institutions/%s?mailto=%s", seed$ror[i], mailto))
-    if (!is.null(r)) seed$openalex_id[i] <- sub("https://openalex.org/", "", r$id)
+    if (is.null(r)) { warning("could not resolve ROR for ", seed$inst_key[i]); next }
+    ## The ROR ids were entered by hand; refuse to proceed if the resolved
+    ## name does not contain the first word of the institution name.
+    first_word <- strsplit(seed$institution[i], "[ -]")[[1]][1]
+    if (!grepl(first_word, r$display_name, ignore.case = TRUE))
+      stop("ROR ", seed$ror[i], " resolves to '", r$display_name, "', not ", seed$institution[i])
+    message(seed$inst_key[i], " -> ", r$display_name, " (", sub("https://openalex.org/", "", r$id), ")")
+    seed$openalex_id[i] <- sub("https://openalex.org/", "", r$id)
   }
-  write.csv(seed, file.path(proj_dir, "data", "seed_pool.csv"), row.names = FALSE)
+  ## Write ids back into the full roster file, not the subset.
+  full <- read.csv(file.path(proj_dir, "data", "seed_pool.csv"), stringsAsFactors = FALSE, na.strings = c("", "NA"))
+  full$openalex_id[match(seed$inst_key, full$inst_key)] <- seed$openalex_id
+  write.csv(full, file.path(proj_dir, "data", "seed_pool.csv"), row.names = FALSE)
 }
 
 pull_inst <- function(s) {
