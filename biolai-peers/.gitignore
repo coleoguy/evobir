@@ -1,0 +1,7 @@
+# Internal rosters, coordinator replies and hand counts are not public data.
+data/internal/*
+!data/internal/README.md
+!data/internal/*_template.csv
+# IPEDS zips are large and re-downloadable; the manifest records them.
+data/raw/ipeds_zip/
+figures/
