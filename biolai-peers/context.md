@@ -3,7 +3,12 @@
 ## Goal
 Pick 8 to 10 structural peers of TAMU Biology (Arts and Sciences), lock a 2019 to 2025 baseline, and run a department-year difference-in-differences (plus synthetic control) on PhDs, grant dollars, publications, trainee output, and undergrad PhD placement, re-pulled annually with the same scripts.
 
-## Status (2026-09-04)
+## Status (2026-09-04, evening)
+- Goal reframed by Heath: a sleuthing report naming the 4 to 5 departments most like TAMU Biology, not a statistical pipeline. Delivered: `report/TAMU_Biology_peer_departments.docx` (generator `report/make_report.py`, sources in `report/notes.md`).
+- Finalists: Purdue, NC State, LSU, Virginia Tech, Auburn; alternates Kansas State and Texas Tech. Evidence: PubMed affiliation counts 2021-25 with four MeSH subfield shares (research fingerprint), collegefactual CIP 26.0101 degree counts, department/catalog structure from search snippets.
+- Earlier pipeline work (below) remains valid for the quantitative follow-up.
+
+## Status (2026-09-04, earlier)
 - Pipeline written and offline-tested end to end on synthetic fixtures (scripts 01, 02, 05, 06, 07 executed; 03 and 04 parse-checked only, their API calls need an unblocked network). Base R plus jsonlite and curl.
 - Seed pool roster (`data/seed_pool.csv`, 25 candidates plus TAMU) filled with colleges, unit boundaries, IPEDS unitids, ROR ids, regexes for affiliation and ProQuest matching, contamination verdicts, coordinator contacts, and a `verification` column.
 - No quantitative data pulled yet: this session's egress policy blocked nces.ed.gov, api.openalex.org, api.nsf.gov, ncses.nsf.gov, and every .edu host. Web search budget ran out at 200 calls, so 9 of 25 contamination checks are UNKNOWN.
@@ -18,6 +23,7 @@ Pick 8 to 10 structural peers of TAMU Biology (Arts and Sciences), lock a 2019 t
 5. Contamination check still UNKNOWN for: okstate, missouri, lsu, auburn, msstate, oregonstate, cornell, minnesota, wisconsin. Six searches each (NRT, NRT AI, AI biology fellowship, data science biology scholars, HHMI, computational biology T32).
 
 ## Next actions
+0. Heath reviews the five finalists; confirm TAMU's own faculty and PhD-student counts in the report table (marked 'confirm').
 1. Run `Rscript R/01_ipeds.R` and `Rscript R/03_openalex_faculty.R` on a laptop; commit `data/raw/` and `data/derived/`.
 2. Finish the 9 UNKNOWN contamination checks; update `ai_bio_verdict` and `ai_bio_note` in `data/seed_pool.csv`.
 3. Hand-count faculty at the five calibration departments; fill `data/internal/faculty_handcount.csv`; re-run 03.
