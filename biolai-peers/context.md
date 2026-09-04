@@ -6,6 +6,7 @@ Pick 8 to 10 structural peers of TAMU Biology (Arts and Sciences), lock a 2019 t
 ## Status (2026-09-04, evening)
 - Goal reframed by Heath: a sleuthing report naming the 4 to 5 departments most like TAMU Biology, not a statistical pipeline. Delivered: `report/TAMU_Biology_peer_departments.docx` (generator `report/make_report.py`, sources in `report/notes.md`).
 - Finalists: Purdue, NC State, LSU, Virginia Tech, Auburn; alternates Kansas State and Texas Tech. Evidence: PubMed affiliation counts 2021-25 with four MeSH subfield shares (research fingerprint), collegefactual CIP 26.0101 degree counts, department/catalog structure from search snippets.
+- Directory-mining pass added department-site and Peterson's headcounts to the report; exact tenure-line rosters still need `Rscript R/08_directory_counts.R` run locally (all .edu hosts blocked here). Script written and unit-tested.
 - Earlier pipeline work (below) remains valid for the quantitative follow-up.
 
 ## Status (2026-09-04, earlier)

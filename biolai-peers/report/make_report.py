@@ -9,16 +9,16 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 # PubMed affiliation counts, publication years 2021-2025, queried 2026-09-04 via the
 # PubMed MCP (E-utilities). Columns: total, EEB, micro, neuro, plant (MeSH subsets).
 PM = {
- "tamu":     dict(total=866, eeb=139, micro=153, neuro=100, plant=19,  aff='"Department of Biology" AND "Texas A&M University" AND "College Station"'),
- "purdue":   dict(total=918, eeb=114, micro=165, neuro=74,  plant=28,  aff='"Department of Biological Sciences" AND "Purdue University" AND "West Lafayette"'),
- "ncstate":  dict(total=838, eeb=156, micro=78,  neuro=62,  plant=18,  aff='"Department of Biological Sciences" AND "North Carolina State University"'),
- "vt":       dict(total=778, eeb=186, micro=188, neuro=74,  plant=19,  aff='"Department of Biological Sciences" AND ("Virginia Tech" OR "Virginia Polytechnic")'),
+ "tamu":     dict(total=866, prev=659, eeb=139, micro=153, neuro=100, plant=19,  aff='"Department of Biology" AND "Texas A&M University" AND "College Station"'),
+ "purdue":   dict(total=918, prev=791, eeb=114, micro=165, neuro=74,  plant=28,  aff='"Department of Biological Sciences" AND "Purdue University" AND "West Lafayette"'),
+ "ncstate":  dict(total=838, prev=699, eeb=156, micro=78,  neuro=62,  plant=18,  aff='"Department of Biological Sciences" AND "North Carolina State University"'),
+ "vt":       dict(total=778, prev=647, eeb=186, micro=188, neuro=74,  plant=19,  aff='"Department of Biological Sciences" AND ("Virginia Tech" OR "Virginia Polytechnic")'),
  "colostate":dict(total=774, eeb=289, micro=70,  neuro=64,  plant=90,  aff='"Department of Biology" AND "Colorado State University" AND "Fort Collins"'),
- "lsu":      dict(total=630, eeb=171, micro=93,  neuro=43,  plant=35,  aff='"Department of Biological Sciences" AND "Louisiana State University" AND "Baton Rouge"'),
- "auburn":   dict(total=495, eeb=131, micro=55,  neuro=39,  plant=15,  aff='"Department of Biological Sciences" AND "Auburn University"'),
+ "lsu":      dict(total=630, prev=564, eeb=171, micro=93,  neuro=43,  plant=35,  aff='"Department of Biological Sciences" AND "Louisiana State University" AND "Baton Rouge"'),
+ "auburn":   dict(total=495, prev=439, eeb=131, micro=55,  neuro=39,  plant=15,  aff='"Department of Biological Sciences" AND "Auburn University"'),
  "wsu":      dict(total=497, eeb=147, micro=46,  neuro=28,  plant=67,  aff='"School of Biological Sciences" AND "Washington State University"'),
- "texastech":dict(total=451, eeb=125, micro=55,  neuro=27,  plant=31,  aff='"Department of Biological Sciences" AND "Texas Tech University" AND "Lubbock"'),
- "kstate":   dict(total=346, eeb=81,  micro=69,  neuro=13,  plant=25,  aff='"Division of Biology" AND "Kansas State University"'),
+ "texastech":dict(total=451, prev=276, eeb=125, micro=55,  neuro=27,  plant=31,  aff='"Department of Biological Sciences" AND "Texas Tech University" AND "Lubbock"'),
+ "kstate":   dict(total=346, prev=368, eeb=81,  micro=69,  neuro=13,  plant=25,  aff='"Division of Biology" AND "Kansas State University"'),
  "missouri": dict(total=310, eeb=43,  micro=17,  neuro=35,  plant=46,  aff='"Division of Biological Sciences" AND "University of Missouri"'),
  "florida":  dict(total=1431,eeb=487, micro=190, neuro=110, plant=127, aff='"Department of Biology" AND "University of Florida" AND "Gainesville"'),
  "pennstate":dict(total=1062, aff='"Department of Biology" AND "Pennsylvania State University" AND "University Park"'),
@@ -34,38 +34,38 @@ PM_TAMU_2016_2020 = 659
 D = {
  "tamu":      dict(name="Texas A&M, Department of Biology", college="Arts and Sciences", ag="Y", vet="Y", landgrant="Y",
                    micro="inside (BS + PhD in Microbiology)", neuro="inside (BS Neuroscience; TAMIN interdisciplinary PhD)",
-                   bs="742 (2020-21)", majors="2,000+ (5 majors; dept site 2025)", phd="31 PhDs 2021; ~128 grad students (Peterson's, dated)",
-                   fac="~45-50 T/TT plus ~30 instructional (own knowledge; confirm)",
+                   bs="742 (2020-21)", majors="2,000+ (5 majors; dept site 2025)", phd="128 grad students (Peterson's); 31 PhDs 2021 (IPEDS)",
+                   fac="\"over 40 faculty\" (dept site); Peterson's 35; plus instructional faculty (confirm from directory)",
                    boundary="Entomology, Biochem, ECCB, Rangeland in ag college; VIBS, BIMS in vet college",
                    note="Reference. 20,000+ students served per year; largest A&P program nationally; 30% enrollment growth in 5 yr (dept strategic plan draft, Mar 2026)."),
  "purdue":    dict(name="Purdue, Department of Biological Sciences", college="Science", ag="Y", vet="Y", landgrant="Y",
                    micro="inside (PhD research area)", neuro="inside (neurobiology area) + cross-dept institute",
-                   bs="242", majors="784 majors (2016 fact sheet); 10,480 students taught 2014-15", phd="25 PhDs 2022",
-                   fac="39 TT + 7 lecturers (2016 fact sheet; current likely 45-50)",
+                   bs="242", majors="784 majors (2016 fact sheet); 10,480 students taught 2014-15", phd="136 grad students, 128 PhD (2016 fact sheet); 25 PhDs 2022 (IPEDS)",
+                   fac="39 TT + 13 joint + 7 lecturers (2016 fact sheet; no newer sheet published)",
                    boundary="Entomology, Biochemistry, Botany & Plant Pathology, Forestry in College of Agriculture; Basic Medical Sciences in Vet Med",
                    note="Single broad department, molecular to ecology; PULSe umbrella PhD also feeds labs."),
  "ncstate":   dict(name="NC State, Department of Biological Sciences", college="Sciences", ag="Y", vet="Y", landgrant="Y",
                    micro="inside (2013 merger absorbed Microbiology); plant/soil micro in CALS", neuro="no separate unit found",
-                   bs="415", majors="2,100 students; 160 faculty/staff/postdocs (dept, 2013 launch)", phd="45 broad CIP 26 (year unspecified)",
-                   fac="not published; est. 60-80 T/TT",
+                   bs="415", majors="2,100 students; 160 faculty/staff/postdocs (dept, 2013 launch)", phd="~100 grad students (dept site); 45 doctorates broad CIP 26",
+                   fac="not published; directory shows >=17 tenure-line, 11 teaching-track, 4 research (partial)",
                    boundary="Entomology & Plant Pathology, Plant & Microbial Biology, Biochemistry, Applied Ecology in CALS; Molecular Biomedical Sciences in Vet Med",
                    note="Formed 2013 from Biology + Microbiology + Genetics + Env. & Molecular Toxicology; broader than TAMU by genetics and toxicology."),
  "lsu":       dict(name="LSU, Department of Biological Sciences", college="Science", ag="Y (AgCenter)", vet="Y", landgrant="Y",
                    micro="inside (BS Microbiology)", neuro="no dedicated unit found",
-                   bs="334 (360 in a 2024 snippet)", majors="~2,120 majors", phd="~140 graduate students",
-                   fac="59 T/TT, largest unit on campus (dept site)",
+                   bs="334 (360 in a 2024 snippet)", majors="~2,120 majors", phd="130-140 grad students (dept pages); Peterson's 126",
+                   fac="59 TT (dept site; older snapshot \"over 60 TT and 15+ instructors\"); Peterson's 57 FT",
                    boundary="Entomology, Plant Pathology, Renewable Natural Resources in AgCenter/College of Agriculture; Pathobiological Sciences in Vet Med. Biochemistry is INSIDE the department",
                    note="Merger of Biochemistry, Microbiology, Plant Biology, Zoology & Physiology (c. 2011); three divisions; Museum of Natural Science."),
  "vt":        dict(name="Virginia Tech, Department of Biological Sciences", college="Science", ag="Y", vet="Y (Virginia-Maryland)", landgrant="Y",
                    micro="partly outside (Microbiology listed as separate Fralin-supported program)", neuro="outside: School of Neuroscience (College of Science)",
-                   bs="250 (594 broad CIP 26)", majors="most popular major on campus", phd="27 PhDs 2022",
-                   fac="not published; est. 40-50 T/TT",
+                   bs="250 (594 broad CIP 26)", majors="most popular major on campus", phd="not published; 27 PhDs 2022 (IPEDS)",
+                   fac="not published; separate research-faculty page; directory not indexable",
                    boundary="Entomology, Biochemistry, Plant & Environmental Sciences in CALS; Fish & Wildlife in CNRE; Biomedical Sciences & Pathobiology in Vet Med",
                    note="Strong Fralin Life Sciences Institute / Roanoke biomedical pipeline; GBCB interdisciplinary PhD."),
  "auburn":    dict(name="Auburn, Department of Biological Sciences", college="Sciences and Mathematics", ag="Y", vet="Y", landgrant="Y",
                    micro="inside (Microbial, Cellular & Molecular Biology major)", neuro="no dedicated unit found",
-                   bs="315", majors="not published", phd="120+ grad students, ~65% PhD (~78)",
-                   fac="not published; est. 40-50 T/TT",
+                   bs="315", majors="not published", phd="120+ grad students, 65% PhD (dept); Peterson's 137",
+                   fac="Peterson's 42 full-time + 6 part-time; 11 emeriti listed separately",
                    boundary="Entomology & Plant Pathology, Fisheries in College of Agriculture; Forestry & Wildlife separate college; Chemistry & Biochemistry separate COSAM dept",
                    note="Three majors (Organismal; Microbial, Cellular & Molecular; Marine). Ichthyology/systematics strength."),
  "colostate": dict(name="Colorado State, Department of Biology", college="Natural Sciences", ag="Y", vet="Y", landgrant="Y",
@@ -82,14 +82,14 @@ D = {
                    note="1999 merger of Botany + Zoology; PhDs still conferred as Botany and Zoology."),
  "texastech": dict(name="Texas Tech, Department of Biological Sciences", college="Arts and Sciences", ag="Y", vet="Y (Amarillo, accredited 2025)", landgrant="N",
                    micro="inside (BS + PhD track)", neuro="outside (Psychology; TTUHSC)",
-                   bs="261", majors="not published", phd="100+ grad students",
-                   fac="40-46 (TT + continuing track)",
+                   bs="261", majors="not published", phd="\"over 100 graduate students\" (dept site)",
+                   fac="\"more than 40 tenure-track and continuing-track faculty, teaching professionals\" (dept site)",
                    boundary="Natural Resources Mgmt, Plant & Soil Science in Davis College of Ag; biochem in Chemistry & Biochemistry",
                    note="Same state, same legislature; not land-grant. Quantitative biology PhD track."),
  "kstate":    dict(name="Kansas State, Division of Biology", college="Arts and Sciences", ag="Y", vet="Y", landgrant="Y",
                    micro="inside (own PhD in Microbiology)", neuro="not found",
-                   bs="65 (26.0101 coding likely differs)", majors="~650 majors", phd="not published",
-                   fac="50+ instructional and research faculty (all ranks)",
+                   bs="65 (26.0101 coding likely differs)", majors="~650 majors", phd="Peterson's 68 grad students",
+                   fac="\"over 50 instructional and research faculty\" (dept); Peterson's 73 FT includes graduate faculty from other units",
                    boundary="Entomology, Plant Pathology in College of Agriculture; Biochemistry & Molecular Biophysics in same college",
                    note="Konza Prairie LTER; studio-model intro biology. Smallest research footprint among the finalists' peers."),
  "missouri":  dict(name="Missouri, Division of Biological Sciences", college="Arts and Science", ag="Y", vet="Y", landgrant="Y",
@@ -204,21 +204,22 @@ P("Twenty-five land-grant and flagship candidates were screened. Ten were remove
 P("Two kinds of evidence drove the ranking. Structure came from department and catalog pages (college, sibling units, majors, PhD programs, mergers). Scale and research mix came from two sources that can be re-queried by anyone: PubMed affiliation counts for 2021 to 2025, with MeSH subsets for ecology and evolution, microbiology, neuroscience, and plant biology; and IPEDS-derived bachelor's counts in CIP 26.0101 (general biology) from collegefactual.com. Faculty and student headcounts come from department pages when published; several are estimates and are marked as such.")
 
 H("Evidence table")
-P("PubMed: papers listing the department in an author affiliation, publication years 2021 to 2025. Mix distance: Euclidean distance between the department's four-subfield percentage profile and TAMU's (0 = identical). BS/yr: bachelor's degrees in general biology (CIP 26.0101), 2021-22 unless noted.", size=9)
+P("PubMed: papers listing the department in an author affiliation, publication years 2021 to 2025, with percent change from the 2016 to 2020 count where pulled. Mix distance: Euclidean distance between the department's four-subfield percentage profile and TAMU's (0 = identical). BS/yr: bachelor's degrees in general biology (CIP 26.0101), 2021-22 unless noted.", size=9)
 rows = []
 order = ["tamu"] + FINALISTS + ["kstate", "texastech", "colostate", "florida", "wsu", "missouri", "oregonstate", "okstate", "msstate", "pennstate", "kentucky"]
 for k in order:
     d = D[k]; p = PM[k]
     m = mix(k) if "eeb" in p else None
+    trend = f'{p["total"]} ({100*(p["total"]/p["prev"]-1):+.0f}%)' if "prev" in p else str(p["total"])
     rows.append([d["name"].replace(", Department of", ",").replace(", Division of", ",").replace(", School of", ","),
-                 p["total"],
+                 trend,
                  f"{m[0]:.0f}/{m[1]:.0f}/{m[2]:.0f}/{m[3]:.0f}" if m else "not profiled",
                  f"{mix_dist(k):.1f}" if m else "",
                  d["bs"], d["phd"], d["fac"],
                  "Y" if d["micro"].startswith("inside") else ("part" if d["micro"].startswith(("split","partly")) else "N"),
                  "Y" if d["neuro"].startswith("inside") or d["neuro"].startswith("in-dept") else ("part" if d["neuro"].startswith(("split","shared")) else "N"),
                  f'{d["ag"]}/{d["vet"]}'])
-table(["Department", "PubMed 2021-25", "Mix EEB/micro/neuro/plant %", "Mix dist.", "BS/yr", "PhD program", "Faculty", "Micro in", "Neuro in", "Ag/Vet"],
+table(["Department", "PubMed 2021-25 (change vs 2016-20)", "Mix EEB/micro/neuro/plant %", "Mix dist.", "BS/yr", "PhD program", "Faculty", "Micro in", "Neuro in", "Ag/Vet"],
       rows, widths=[1.6, 0.55, 0.9, 0.45, 0.7, 1.1, 1.1, 0.4, 0.4, 0.6], size=7.5)
 
 H("The five, in detail")
@@ -266,9 +267,11 @@ for lead, txt in [
   ("Penn State and Kentucky.", "No vet school; Penn State's PhD training runs through intercollege Huck programs and its IPEDS numbers pool all campuses."),
 ]: B(txt, lead)
 
-H("Confidence and what to check")
-P("The rankings rest on structure (high confidence, from catalogs and department pages), PubMed counts (high confidence, exact and repeatable, but affiliation strings undercount ecology journals and any faculty who omit the department name), and headcounts (mixed: LSU, Kansas State, Oklahoma State, and Texas Tech publish theirs; Purdue's are from 2016; NC State, Virginia Tech, and Auburn do not publish tenure-line counts). Nothing here depends on a number that cannot be re-derived from the sources in the appendix.")
-P("Ten minutes of work would close the main gaps: count the faculty directory pages for Purdue, NC State, Virginia Tech, and Auburn, and ask each graduate coordinator (contacts are in data/seed_pool.csv) for PhDs per year 2019 to 2025. The email draft is ready in the Gmail drafts folder.")
+H("What the department websites say, and what they do not")
+P("Each finalist's own site was mined for faculty and graduate-student counts, with Peterson's annual survey (self-reported by departments) as the cross-check. What is solid: LSU publishes 59 tenure-track faculty and 130 to 140 graduate students; Purdue's 2016 fact sheet gives 39 tenure-track plus 13 joint faculty and 136 graduate students, 128 of them PhD; Auburn reports 120+ graduate students, 65% PhD, and 42 full-time faculty to Peterson's; NC State's site says about 100 graduate students; Texas Tech says over 100 graduate students and more than 40 tenure-track and continuing-track faculty; Kansas State says over 50 instructional and research faculty and reports 68 graduate students to Peterson's; TAMU reports 128 graduate students to Peterson's and says over 40 faculty on its site.")
+P("What is not solid: the tenure-line faculty count at NC State, Virginia Tech, Auburn, Kansas State, Texas Tech, and TAMU itself. Every one of those directories is a paginated or script-rendered page that the search tool only samples, and this session's network policy blocks fetching the pages directly. The partial rosters that did surface are floors (NC State at least 17 tenure-line and 11 teaching-track; Auburn at least 15 tenure-line), not counts.")
+P("The fix is one command on a laptop: Rscript R/08_directory_counts.R in the biolai-peers folder downloads all 19 directory pages, saves the text, and tallies names by rank (tenure-line, teaching-track, research, adjunct, emeritus) so the table can be completed and checked by eye in a few minutes.")
+P("With the publication record the picture is otherwise complete. PubMed counts are exact and repeatable; the affiliation strings undercount ecology journals and any authors who omit the department name, but that bias is the same for every department. The trend column shows TAMU's footprint grew 31% between the two five-year windows, faster than every finalist except Texas Tech (63%, from a small base) and roughly in line with NC State and Virginia Tech (20%).")
 
 H("Appendix: sources")
 P("PubMed queries (publication date 2021/01/01 to 2025/12/31; run 2026-09-04 through NCBI E-utilities). Subfield subsets add: EEB = (\"Biological Evolution\"[MeSH] OR \"Ecology\"[MeSH] OR \"Ecosystem\"[MeSH]); micro = (\"Bacteria\"[MeSH] OR \"Viruses\"[MeSH] OR \"Fungi\"[MeSH]); neuro = (\"Nervous System\"[MeSH] OR \"Neurons\"[MeSH] OR \"Behavior, Animal\"[MeSH]); plant = \"Plants\"[MeSH].", size=9)

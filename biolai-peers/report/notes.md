@@ -93,3 +93,15 @@ Facts gathered by web search snippets (WebFetch to .edu hosts was blocked in thi
 ## Kentucky Biology
 - Faculty research areas incl. microbiology and neuroscience (SEARCH https://bio.as.uky.edu/faculty-research); Med School Microbiology dept separate (SEARCH https://medicine.uky.edu/departments/microbiology/graduate-studies); no vet school
 - collegefactual: 173 to 211 BS
+
+## Directory-mining pass (2026-09-04, evening): faculty and graduate student counts from department sites
+- TAMU: Peterson's 35 faculty / 128 graduate students (undated); department site "over 40 faculty"; 14 tenure-line names confirmed individually (partial). Emeritus page https://artsci.tamu.edu/biology/research/emeritus-faculty.html
+- Purdue: 2016 fact sheet 39 TT, 13 joint, 7 lecturers, 136 grad students (128 PhD), 784 majors (SEARCH https://www.bio.purdue.edu/About/January%202016%20Dept%20of%20Biological%20Sciences%20Fact%20Sheet.pdf); no newer sheet; teaching faculty page https://www.bio.purdue.edu/bio-education/index.html
+- NC State: "approximately 100 graduate students" (dept site); partial roster: 9 associate, 8 assistant professors; 4 teaching professors, 6 associate teaching, 1 assistant teaching, 2 lecturers, 4 research faculty (SEARCH https://bio.sciences.ncsu.edu/group/faculty/); no Peterson's page
+- LSU: 59 TT, ~140 grad students (SEARCH https://www.lsu.edu/science/biosci/about-us/index.php); grad program page says 130; older snapshot "over 60 TT and 15+ instructors"; SEE division "30 faculty and adjuncts" (SEARCH https://www.lsu.edu/science/biosci/divisions/see.php); Peterson's 57 FT faculty, 126 grad students
+- Virginia Tech: no counts retrievable; separate research-faculty page https://www.biol.vt.edu/People/research_scientists_associates_postdocs.html; 9-10 tenure-line names surfaced
+- Auburn: Peterson's 48 faculty (42 FT, 6 PT), 137 grad students (SEARCH https://www.petersons.com/graduate-schools/auburn-university-college-of-sciences-and-mathematics-department-of-biological-sciences-000_10019431.aspx); dept "120+ grad students, 65% PhD"; 15 tenure-line names, 2 senior lecturers, 11 emeriti surfaced
+- Kansas State: Peterson's 99 faculty (73 FT, 26 PT; includes graduate faculty from other units), 68 grad students (SEARCH https://www.petersons.com/graduate-schools/kansas-state-university-college-of-arts-and-sciences-division-of-biology-000_10037409.aspx); dept "over 50 instructional and research faculty"
+- Texas Tech: "more than 40 tenure-track and continuance-track faculty, teaching professionals" (SEARCH https://www.depts.ttu.edu/biology/academics/indexnew.php); "over 100 graduate students" (SEARCH https://www.depts.ttu.edu/biology/academics/graduate/prospective-students/)
+- PubMed 2016-2020 baselines: TAMU 659, Purdue 791, NC State 699, LSU 564, VT 647, Auburn 439, K-State 368, Texas Tech 276
+- Exact rosters: run R/08_directory_counts.R locally (all .edu hosts blocked in this session).
